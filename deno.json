@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "MoveGen/": "./MoveGen/"
+  },
+  "tasks": {
+    "dev": "deno run main.ts",
+    "test": "deno test"
+  },
+  "test": {
+    "include": ["tests/MoveGen/*Test.ts"]
+  }
+}
