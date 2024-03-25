@@ -7,6 +7,6 @@
     "test": "deno test"
   },
   "test": {
-    "include": ["tests/MoveGen/*Test.ts"]
+    "include": ["tests/**/*Test.ts"]
   }
 }

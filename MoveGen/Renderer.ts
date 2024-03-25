@@ -1,4 +1,4 @@
-import {Board, Color, PieceType, Square} from "./Board.ts";
+import {Board, Color, PieceType, Square, SquareState} from "./Board.ts";
 import {bgBrightBlue, bgBrightMagenta, black, bold, white} from "https://deno.land/std@0.219.1/fmt/colors.ts";
 
 
@@ -22,8 +22,9 @@ export class Renderer {
         const squaresByRank: Record<number, number[]> = {8: [], 7: [], 6: [], 5: [], 4: [], 3: [], 2: [], 1: []}
         for(let i=0;i<64;i++){
             const rank = Math.floor((i + 1) / -8) + 9;
-            const piece = board.squareList[i]
-            squaresByRank[rank].push(piece == Square.Empty ? 0 : board.pieceTypeList[piece])
+            const index120 = (-1 * rank + 9) * 10 + i % 8 + 10 + 1
+            const piece = board.squareList[index120]
+            squaresByRank[rank].push(piece == SquareState.Empty ? 0 : board.pieceTypeList[piece])
         }
 
         for(let rank=8;rank>0;rank--) {
