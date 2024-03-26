@@ -1,7 +1,6 @@
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 import {Board, Piece, Square, SquareState} from "../MoveGen/Board.ts";
-import {MoveType} from "../MoveGen/Move.ts";
-
+import {dumpBin} from "../Utils.ts";
 const board = new Board()
 
 Deno.test('it sets the board', () => {
@@ -43,49 +42,43 @@ Deno.test('it sets the board', () => {
     assertEquals(Array.from(board.squareList), expectedSquareList, 'squareList is set correctly')
 })
 
-Deno.test('it generates quiet move with genMove', () => {
+Deno.test('it generates attack lists', () => {
+    board.setPieces('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')
+    board.generateAttackList()
 
-    const move = board.genMove(Square.g8, Square.f6)
+    dumpBin(board.attackList[Square.f3], 32)
+    assertEquals(
+        board.attackList[Square.f3],
+        board.pieceMasks[30] | board.pieceMasks[22] | board.pieceMasks[20],
+        'has expected attacks on f3'
+    )
 
-    assertEquals(move.getFrom(), Square.g8)
-    assertEquals(move.getTo(), Square.f6)
-    assertEquals(move.getMoving(), 6)
-    assertEquals(move.getCaptured(), 0)
-    assertEquals(move.getType(), 0)
-})
+    dumpBin(board.attackList[Square.e7], 32)
+    assertEquals(
+        board.attackList[Square.e7],
+        board.pieceMasks[3] | board.pieceMasks[4] | board.pieceMasks[5] | board.pieceMasks[6],
+        'has expected attacks on e7'
+        )
 
-Deno.test('it generates capture move with genMove', () => {
+    dumpBin(board.attackList[Square.a3], 32)
+    assertEquals(
+        board.attackList[Square.a3],
+        board.pieceMasks[25] | board.pieceMasks[17],
+        'has expected attacks on a3'
+    )
 
-    board.setPieces('4k3/8/3R4/8/8/6b1/8/4K3')
-    const move = board.genMove(Square.g3, Square.d6, MoveType.Capture)
+    dumpBin(board.attackList[Square.h8], 32)
+    assertEquals(
+        board.attackList[Square.h8],
+        0,
+        'has expected attacks on h8'
+    )
 
-    assertEquals(move.getFrom(), Square.g3)
-    assertEquals(move.getTo(), Square.d6)
-    assertEquals(move.getMoving(), 2)
-    assertEquals(move.getCaptured(), 1)
-    assertEquals(move.getType(), MoveType.Capture)
-})
-
-Deno.test('it generates en-passant with genMove for white', () => {
-
-    board.setPieces('4k3/8/6Pp/8/8/8/8/4K3')
-    const move = board.genMove(Square.g6, Square.h7, MoveType.EnPassant)
-
-    assertEquals(move.getFrom(), Square.g6)
-    assertEquals(move.getTo(), Square.h7)
-    assertEquals(move.getMoving(), 1)
-    assertEquals(move.getCaptured(), 2)
-    assertEquals(move.getType(), MoveType.EnPassant)
-})
-
-Deno.test('it generates en-passant with genMove for black', () => {
-
-    board.setPieces('4k3/8/8/8/8/1Pp5/8/4K3')
-    const move = board.genMove(Square.c3, Square.b2, MoveType.EnPassant)
-
-    assertEquals(move.getFrom(), Square.c3)
-    assertEquals(move.getTo(), Square.b2)
-    assertEquals(move.getMoving(), 2)
-    assertEquals(move.getCaptured(), 1)
-    assertEquals(move.getType(), MoveType.EnPassant)
+    // ensure invalid squares are still empty
+    for(let i=0;i<120;i++) {
+        const square = board.squareList[i]
+        if(square & SquareState.Invalid){
+            assertEquals(board.attackList[i], 0, 'Invalid square does not have attack list')
+        }
+    }
 })
