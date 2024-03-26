@@ -103,7 +103,7 @@ export class Board
     pieceList: Uint8Array = new Uint8Array(32)      // Square index where piece is located or 0 if captured
     squareList: Uint8Array = new Uint8Array(120)    // 0-31 are piece indexes, 32 is empty square and 64 is out-of-bounds square
     pieceTypeList: Uint8Array = new Uint8Array(32)  // last bit is color, first 6 bits are piece type
-    pieceMasks = new Uint32Array(32)
+    pieceMasks = new Uint32Array(32)    // masks for setting attack list bits for each piece
     positionStack: BoardState[] = []
 
     constructor() {
@@ -143,6 +143,12 @@ export class Board
         for(let pieceIndex = 0; pieceIndex < 32; pieceIndex++) {
             const piece: number = this.pieceTypeList[pieceIndex]
             const from: number = this.pieceList[pieceIndex]
+
+            if(from == 0){
+                // piece is captured
+                continue
+            }
+
             // @ts-ignore it's always a piece type
             const pieceType: PieceType = piece >> 1
             if(pieceType & PieceType.Pawn){
@@ -179,8 +185,17 @@ export class Board
         }
     }
 
-    #initializePiece(index: number, type: PieceType, color: Color, square: Square)
-    {
+    getAttackingPieces(square: Square) {
+        let bits = this.attackList[square]
+        const pieces = [];
+        while (bits !== 0) {
+            pieces.push(31 - Math.clz32(bits & -bits)); // Calculate the index of the least significant 'on' bit
+            bits &= (bits - 1); // Turn off the least significant 'on' bit
+        }
+        return pieces;
+    }
+
+    #initializePiece(index: number, type: PieceType, color: Color, square: Square) {
         this.pieceTypeList[index] = type << 1 | color //shift to the left one bit and set last bit the same as color
         this.pieceList[index] = square
         this.squareList[square] = index

@@ -1,7 +1,17 @@
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 import {Board, Piece, Square, SquareState} from "../MoveGen/Board.ts";
 import {dumpBin} from "../Utils.ts";
+import {assertArrayIncludes} from "https://deno.land/std@0.219.0/assert/assert_array_includes.ts";
 const board = new Board()
+
+const assertHasAttackingPieces = (square: Square, expected: number[], msg: string=''): void => {
+    dumpBin(board.attackList[square], 32)
+    if(msg == ''){msg = `Has expected attacks on ${square}`}
+    const actual = board.getAttackingPieces(square)
+    assertArrayIncludes(actual,expected, `${msg}`)
+    assertEquals(actual.length, expected.length, `${msg} (Expected Length)`)
+}
+
 
 Deno.test('it sets the board', () => {
     board.setPieces('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')
@@ -46,33 +56,11 @@ Deno.test('it generates attack lists', () => {
     board.setPieces('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')
     board.generateAttackList()
 
-    dumpBin(board.attackList[Square.f3], 32)
-    assertEquals(
-        board.attackList[Square.f3],
-        board.pieceMasks[30] | board.pieceMasks[22] | board.pieceMasks[20],
-        'has expected attacks on f3'
-    )
-
-    dumpBin(board.attackList[Square.e7], 32)
-    assertEquals(
-        board.attackList[Square.e7],
-        board.pieceMasks[3] | board.pieceMasks[4] | board.pieceMasks[5] | board.pieceMasks[6],
-        'has expected attacks on e7'
-        )
-
-    dumpBin(board.attackList[Square.a3], 32)
-    assertEquals(
-        board.attackList[Square.a3],
-        board.pieceMasks[25] | board.pieceMasks[17],
-        'has expected attacks on a3'
-    )
-
-    dumpBin(board.attackList[Square.h8], 32)
-    assertEquals(
-        board.attackList[Square.h8],
-        0,
-        'has expected attacks on h8'
-    )
+    assertHasAttackingPieces(Square.f3, [20,22,30], 'has expected attacks on f3')
+    assertHasAttackingPieces(Square.e7, [3,4,5,6], 'has expected attacks on e7')
+    assertHasAttackingPieces(Square.a3, [25,17], 'has expected attacks on a3')
+    assertHasAttackingPieces(Square.h8, [], 'has expected attacks on h8')
+    assertHasAttackingPieces(Square.h2, [31], 'has expected attacks on h2')
 
     // ensure invalid squares are still empty
     for(let i=0;i<120;i++) {
