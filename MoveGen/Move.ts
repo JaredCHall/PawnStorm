@@ -35,14 +35,4 @@ export class Move {
         this.flag = flag
     }
 
-    static newPromotions(from: Square, to:Square, moving: number, captured:number, captureFlag: number = 0): Move[]
-    {
-        return [
-            new Move(from,to,moving,captured, MoveType.KnightPromote | captureFlag),
-            new Move(from,to,moving,captured, MoveType.BishopPromote | captureFlag),
-            new Move(from,to,moving,captured, MoveType.RookPromote | captureFlag),
-            new Move(from,to,moving,captured, MoveType.QueenPromote | captureFlag),
-        ]
-    }
-
 }

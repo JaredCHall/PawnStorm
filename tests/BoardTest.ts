@@ -1,16 +1,7 @@
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
-import {Board, Piece, Square, SquareState} from "../MoveGen/Board.ts";
-import {dumpBin} from "../Utils.ts";
+import {Board, Color, Piece, PieceIndex, Square, SquareState} from "../MoveGen/Board.ts";
 import {assertArrayIncludes} from "https://deno.land/std@0.219.0/assert/assert_array_includes.ts";
 const board = new Board()
-
-const assertHasAttackingPieces = (square: Square, expected: number[], msg: string=''): void => {
-    dumpBin(board.attackList[square], 32)
-    if(msg == ''){msg = `Has expected attacks on ${square}`}
-    const actual = board.getAttackingPieces(square)
-    assertArrayIncludes(actual,expected, `${msg}`)
-    assertEquals(actual.length, expected.length, `${msg} (Expected Length)`)
-}
 
 
 Deno.test('it sets the board', () => {
@@ -56,11 +47,11 @@ Deno.test('it generates attack lists', () => {
     board.setPieces('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')
     board.generateAttackList()
 
-    assertHasAttackingPieces(Square.f3, [20,22,30], 'has expected attacks on f3')
-    assertHasAttackingPieces(Square.e7, [3,4,5,6], 'has expected attacks on e7')
-    assertHasAttackingPieces(Square.a3, [25,17], 'has expected attacks on a3')
-    assertHasAttackingPieces(Square.h8, [], 'has expected attacks on h8')
-    assertHasAttackingPieces(Square.h2, [31], 'has expected attacks on h2')
+
+    assertEquals(board.attackList[Square.f3], 1 << 20 | 1 << 22 | 1 << 30, 'has expected attacks on f3')
+    assertEquals(board.attackList[Square.e7], 1 << 3 | 1 << 4 | 1 << 5 | 1 << 6, 'has expected attacks on e7')
+    assertEquals(board.attackList[Square.a3], 1 << 25 | 1 << 17, 'has expected attacks on a3')
+    assertEquals(board.attackList[Square.h8], 0, 'has expected attacks on h8')
 
     // ensure invalid squares are still empty
     for(let i=0;i<120;i++) {
@@ -69,4 +60,18 @@ Deno.test('it generates attack lists', () => {
             assertEquals(board.attackList[i], 0, 'Invalid square does not have attack list')
         }
     }
+})
+
+
+Deno.test('it generates moves', () => {
+    board.setPieces('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')
+    board.generateAttackList()
+    const moves = board.generateMoves(Color.White).map((move) => [move.from, move.to, move.moving, move.captured, move.flag])
+
+    assertArrayIncludes(moves, [
+        [Square.g1, Square.f3, 30,PieceIndex.None,0],
+        [Square.g1, Square.h3, 30,PieceIndex.None,0],
+        [Square.b1, Square.c3, 25,PieceIndex.None,0],
+        [Square.b1, Square.a3, 25,PieceIndex.None,0],
+    ])
 })
