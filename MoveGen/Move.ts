@@ -1,4 +1,4 @@
-import {Square} from "./Board.ts";
+import {Square} from "./Enums.ts";
 
 export enum MoveFlag {
     Flag1       = 0b0001,

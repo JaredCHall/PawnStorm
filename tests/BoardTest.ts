@@ -1,77 +1,102 @@
+import {Board} from "../MoveGen/Board.ts";
+import {Piece, Square} from "../MoveGen/Enums.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
-import {Board, Color, Piece, PieceIndex, Square, SquareState} from "../MoveGen/Board.ts";
+import {binToString} from "../Utils.ts";
 import {assertArrayIncludes} from "https://deno.land/std@0.219.0/assert/assert_array_includes.ts";
 const board = new Board()
 
 
-Deno.test('it sets the board', () => {
-    board.setPieces('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')
-    
-    const expectedPieceTypes = [
-        Piece.BlackRook, Piece.BlackKnight, Piece.BlackBishop, Piece.BlackQueen, Piece.BlackKing, Piece.BlackBishop, Piece.BlackKnight, Piece.BlackRook,
-        Piece.BlackPawn, Piece.BlackPawn, Piece.BlackPawn, Piece.BlackPawn, Piece.BlackPawn, Piece.BlackPawn, Piece.BlackPawn, Piece.BlackPawn,
-        Piece.WhitePawn, Piece.WhitePawn, Piece.WhitePawn, Piece.WhitePawn, Piece.WhitePawn, Piece.WhitePawn, Piece.WhitePawn, Piece.WhitePawn,
-        Piece.WhiteRook, Piece.WhiteKnight, Piece.WhiteBishop,  Piece.WhiteQueen, Piece.WhiteKing, Piece.WhiteBishop, Piece.WhiteKnight, Piece.WhiteRook,
-    ]
-    assertEquals(Array.from(board.pieceTypeList), expectedPieceTypes, 'pieceTypeList is set correctly')
+const assertSquareEquals = (square: Square, pieceCode: number) => {
+    assertEquals(board.squareList[square], pieceCode, `Expected ${binToString(pieceCode,8)} on square ${square}`)
+}
 
-    const expectedPieceList = [
-        Square.a8, Square.b8, Square.c8, Square.d8, Square.e8, Square.f8, Square.g8, Square.h8,
-        Square.a7, Square.b7, Square.c7, Square.d7, Square.e7, Square.f7, Square.g7, Square.h7,
-        Square.a2, Square.b2, Square.c2, Square.d2, Square.e2, Square.f2, Square.g2, Square.h2,
-        Square.a1, Square.b1, Square.c1, Square.d1, Square.e1, Square.f1, Square.g1, Square.h1,
-    ]
-    assertEquals(Array.from(board.pieceList), expectedPieceList, 'pieceList is set correctly')
-
-    const emp = SquareState.Empty
-    const oob = SquareState.Invalid
+Deno.test('it initializes square list correct', () => {
     
+    const oob = Square.Invalid
     const expectedSquareList = [
         oob, oob, oob, oob, oob, oob, oob, oob, oob, oob,
         oob, oob, oob, oob, oob, oob, oob, oob, oob, oob,
-        oob,   0,   1,   2,   3,   4,   5,   6,   7, oob, // Black Pieces
-        oob,   8,   9,   10, 11,  12,  13,  14,  15, oob, // Black Pawns
-        oob, emp, emp, emp, emp, emp, emp, emp, emp, oob,
-        oob, emp, emp, emp, emp, emp, emp, emp, emp, oob,
-        oob, emp, emp, emp, emp, emp, emp, emp, emp, oob,
-        oob, emp, emp, emp, emp, emp, emp, emp, emp, oob,
-        oob,  16,  17,  18,  19,  20,  21,  22,  23, oob, // White Pawns
-        oob,  24,  25,  26,  27,  28,  29,  30,  31, oob, // White Pieces
+        oob,   0,   0,   0,   0,   0,   0,   0,   0, oob,
+        oob,   0,   0,   0,   0,   0,   0,   0,   0, oob,
+        oob,   0,   0,   0,   0,   0,   0,   0,   0, oob,
+        oob,   0,   0,   0,   0,   0,   0,   0,   0, oob,
+        oob,   0,   0,   0,   0,   0,   0,   0,   0, oob,
+        oob,   0,   0,   0,   0,   0,   0,   0,   0, oob,
+        oob,   0,   0,   0,   0,   0,   0,   0,   0, oob,
+        oob,   0,   0,   0,   0,   0,   0,   0,   0, oob,
         oob, oob, oob, oob, oob, oob, oob, oob, oob, oob,
         oob, oob, oob, oob, oob, oob, oob, oob, oob, oob,
     ]
     assertEquals(Array.from(board.squareList), expectedSquareList, 'squareList is set correctly')
 })
 
-Deno.test('it generates attack lists', () => {
+
+Deno.test('it sets board representation', () => {
+    
     board.setPieces('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')
-    board.generateAttackList()
+    
+    assertSquareEquals(Square.a8, Piece.BlackRook)
+    assertSquareEquals(Square.b8, Piece.BlackKnight)
+    assertSquareEquals(Square.c8, Piece.BlackBishop)
+    assertSquareEquals(Square.d8, Piece.BlackQueen)
+    assertSquareEquals(Square.e8, Piece.BlackKing)
+    assertSquareEquals(Square.f8, Piece.BlackBishop)
+    assertSquareEquals(Square.g8, Piece.BlackKnight)
+    assertSquareEquals(Square.h8, Piece.BlackRook)
+    
+    assertSquareEquals(Square.a7, Piece.BlackPawn)
+    assertSquareEquals(Square.b7, Piece.BlackPawn)
+    assertSquareEquals(Square.c7, Piece.BlackPawn)
+    assertSquareEquals(Square.d7, Piece.BlackPawn)
+    assertSquareEquals(Square.e7, Piece.BlackPawn)
+    assertSquareEquals(Square.f7, Piece.BlackPawn)
+    assertSquareEquals(Square.g7, Piece.BlackPawn)
+    assertSquareEquals(Square.h7, Piece.BlackPawn)
 
+    assertSquareEquals(Square.a1, Piece.WhiteRook)
+    assertSquareEquals(Square.b1, Piece.WhiteKnight)
+    assertSquareEquals(Square.c1, Piece.WhiteBishop)
+    assertSquareEquals(Square.d1, Piece.WhiteQueen)
+    assertSquareEquals(Square.e1, Piece.WhiteKing)
+    assertSquareEquals(Square.f1, Piece.WhiteBishop)
+    assertSquareEquals(Square.g1, Piece.WhiteKnight)
+    assertSquareEquals(Square.h1, Piece.WhiteRook)
 
-    assertEquals(board.attackList[Square.f3], 1 << 20 | 1 << 22 | 1 << 30, 'has expected attacks on f3')
-    assertEquals(board.attackList[Square.e7], 1 << 3 | 1 << 4 | 1 << 5 | 1 << 6, 'has expected attacks on e7')
-    assertEquals(board.attackList[Square.a3], 1 << 25 | 1 << 17, 'has expected attacks on a3')
-    assertEquals(board.attackList[Square.h8], 0, 'has expected attacks on h8')
-
-    // ensure invalid squares are still empty
-    for(let i=0;i<120;i++) {
-        const square = board.squareList[i]
-        if(square & SquareState.Invalid){
-            assertEquals(board.attackList[i], 0, 'Invalid square does not have attack list')
-        }
-    }
+    assertSquareEquals(Square.a2, Piece.WhitePawn)
+    assertSquareEquals(Square.b2, Piece.WhitePawn)
+    assertSquareEquals(Square.c2, Piece.WhitePawn)
+    assertSquareEquals(Square.d2, Piece.WhitePawn)
+    assertSquareEquals(Square.e2, Piece.WhitePawn)
+    assertSquareEquals(Square.f2, Piece.WhitePawn)
+    assertSquareEquals(Square.g2, Piece.WhitePawn)
+    assertSquareEquals(Square.h2, Piece.WhitePawn)
+    
+    const emptySquares: number[] = [
+        Square.a6, Square.b6, Square.c6, Square.d6, Square.e6, Square.f6, Square.g6, Square.h6,
+        Square.a5, Square.b5, Square.c5, Square.d5, Square.e5, Square.f5, Square.g5, Square.h5,
+        Square.a4, Square.b4, Square.c4, Square.d4, Square.e4, Square.f4, Square.g4, Square.h4,
+        Square.a3, Square.b3, Square.c3, Square.d3, Square.e3, Square.f3, Square.g3, Square.h3,
+    ]
+    emptySquares.forEach((square) => {
+        assertSquareEquals(square, 0)
+    })
 })
 
 
-Deno.test('it generates moves', () => {
-    board.setPieces('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')
-    board.generateAttackList()
-    const moves = board.generateMoves(Color.White).map((move) => [move.from, move.to, move.moving, move.captured, move.flag])
+Deno.test('it generates quiet moves for queen', () => {
+    board.setPieces('8/8/8/4Q3/8/8/8/8')
+
+    const moves = board.getMovesForSquare(Square.e5, Piece.WhiteQueen).map((move) => move.to)
+    board.render(moves)
 
     assertArrayIncludes(moves, [
-        [Square.g1, Square.f3, 30,PieceIndex.None,0],
-        [Square.g1, Square.h3, 30,PieceIndex.None,0],
-        [Square.b1, Square.c3, 25,PieceIndex.None,0],
-        [Square.b1, Square.a3, 25,PieceIndex.None,0],
-    ])
-})
+        Square.e6, Square.e7, Square.e8, // N
+        Square.f5, Square.g5, Square.h5, // E
+        Square.e4, Square.e3, Square.e2, Square.e1, // S
+        Square.d5, Square.c5, Square.b5, Square.a5, // W
+        Square.f6, Square.g7, Square.h8, // NE
+        Square.f4, Square.g3, Square.h2, // SE
+        Square.d4, Square.c3, Square.b2, Square.a1, // SW
+        Square.d6, Square.c7, Square.b8 // NW
+    ], 'Queen is allowed expected moves')
+});
