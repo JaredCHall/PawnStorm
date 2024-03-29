@@ -52,11 +52,6 @@ export const SquareIndexes = [
     91, 92, 93, 94, 95, 96, 97, 98,
 ]
 
-export enum SquareState {
-    Empty = 32,
-    Invalid = 64
-}
-
 export const pieceRenderMap: Record<PieceType, string> = {
     [PieceType.Pawn]: '♟',
     [PieceType.Knight]: '♞',
@@ -66,7 +61,6 @@ export const pieceRenderMap: Record<PieceType, string> = {
     [PieceType.King]: '♚',
     [PieceType.BPawn]: '♟',
 }
-
 
 export const FenPieceMap = {
     p: Piece.BlackPawn,
@@ -88,24 +82,4 @@ export enum CastlingRight { // 4 bits
     Q= 0b0010,
     k= 0b0100,
     q= 0b1000
-}
-
-export enum MoveFlag {
-    Flag1       = 0b0001,
-    Flag2       = 0b0010,
-    Capture     = 0b0100,
-    Promotion   = 0b1000,
-}
-
-export enum MoveType {
-    Quiet,
-    DoublePawnPush = MoveFlag.Flag1,
-    CastleShort = MoveFlag.Flag2,
-    CastleLong = MoveFlag.Flag1 | MoveFlag.Flag2,
-    Capture = MoveFlag.Capture,
-    EnPassant = MoveFlag.Capture | MoveFlag.Flag1,
-    KnightPromote = MoveFlag.Promotion,
-    BishopPromote = MoveFlag.Promotion | MoveFlag.Flag1,
-    RookPromote = MoveFlag.Promotion | MoveFlag.Flag2,
-    QueenPromote = MoveFlag.Promotion | MoveFlag.Flag1 | MoveFlag.Flag2,
 }

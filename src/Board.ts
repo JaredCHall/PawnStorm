@@ -1,7 +1,7 @@
 
 
 //
-import {FenPieceMap, MoveType, Piece, pieceRenderMap, Square, SquareIndexes, Color, PieceType} from "./Enums.ts";
+import {FenPieceMap, Piece, pieceRenderMap, Square, SquareIndexes, Color, PieceType} from "./Enums.ts";
 import {
     bgBrightBlue,
     bgBrightGreen,
@@ -10,7 +10,7 @@ import {
     bold,
     white
 } from "https://deno.land/std@0.219.1/fmt/colors.ts";
-import {Move} from "./Move.ts";
+import {Move, MoveType} from "./Move.ts";
 
 
 class RayDirections {
@@ -23,11 +23,11 @@ class RayDirections {
     // i[1]: capture ray directions
     // i[2]: quiet move ray directions (pawns only)
     static readonly pieceMap = {
-        [PieceType.Knight]: [7, RayDirections.knightMoves],
+        [PieceType.Knight]: [1, RayDirections.knightMoves],
         [PieceType.Rook]:   [7, RayDirections.cardinal],
         [PieceType.Bishop]: [7, RayDirections.diagonal],
         [PieceType.Queen]:  [7, RayDirections.all],
-        [PieceType.King]:   [7, RayDirections.all],
+        [PieceType.King]:   [1, RayDirections.all],
         [PieceType.Pawn]:   [1, [-11 , -9], [10, 20]],
         [PieceType.BPawn]:  [1, [11, 9], [10, 20]],
     }

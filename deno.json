@@ -1,6 +1,6 @@
 {
   "imports": {
-    "MoveGen/": "./MoveGen/"
+    "BitChess/": "./src/"
   },
   "tasks": {
     "dev": "deno run main.ts",
