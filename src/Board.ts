@@ -210,11 +210,6 @@ export class Board {
         //handle castling moves
         this.state.getCastlingRights(color).forEach((right) => {
             const [kingSquares, rookSquares, emptySquares, safeSquares] = CastlingData.fromToSquares[right]
-
-
-            if(this.squareList[rookSquares[0]] != (PieceType.Rook << 1 | color)){
-                return
-            }
             if(!emptySquares.every((square)=> this.squareList[square] == 0)){
                 return
             }
@@ -223,14 +218,6 @@ export class Board {
         })
 
         return moves
-    }
-
-    #addCastlingMoves(from: Square, moving: Piece, color: Color)
-    {
-        const rights = this.state.castleRights & CastlingData.sideMask[color]
-        if(rights == 0){
-            return
-        }
     }
 
 

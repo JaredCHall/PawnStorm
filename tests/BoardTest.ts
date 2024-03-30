@@ -200,8 +200,90 @@ Deno.test('it generates castles as white', () => {
         new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
         new Move(Square.e1, Square.g1, Piece.WhiteKing, 0, MoveType.CastleShort),
         new Move(Square.e1, Square.c1, Piece.WhiteKing, 0, MoveType.CastleLong),
-    ], 'Can castle either side')
+    ], 'Can castle either side if both rights exist')
+
+    moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R', Square.e1, 0, CastlingRight.K)
+    assertMatchesMoveList(moves,[
+        new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
+        new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
+        new Move(Square.e1, Square.g1, Piece.WhiteKing, 0, MoveType.CastleShort),
+    ], 'Can castle castle short if right exists')
+
+    moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R', Square.e1, 0, CastlingRight.Q)
+    assertMatchesMoveList(moves,[
+        new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
+        new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
+        new Move(Square.e1, Square.c1, Piece.WhiteKing, 0, MoveType.CastleLong),
+    ], 'Can castle castle long if right exists')
+
+    moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R', Square.e1, 0, CastlingRight.q | CastlingRight.k)
+    assertMatchesMoveList(moves,[
+        new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
+        new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
+    ], 'Cannot castle if only black as castling rights')
+
+    moves = genMoves('8/8/8/8/8/8/3PPP2/R2QKB1R', Square.e1, 0, CastlingRight.K | CastlingRight.Q)
+    assertMatchesMoveList(moves,[], 'Cannot castle if adjacent squares are blocked')
+
+    moves = genMoves('8/8/8/8/8/8/3PPP2/R1Q1K1NR', Square.e1, 0, CastlingRight.K | CastlingRight.Q)
+    assertMatchesMoveList(moves,[
+        new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
+        new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
+    ], 'Cannot castle if rook squares are blocked')
+
+    moves = genMoves('8/8/8/8/8/8/3PPP2/RQ2K1NR', Square.e1, 0, CastlingRight.K | CastlingRight.Q)
+    assertMatchesMoveList(moves,[
+        new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
+        new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
+    ], 'Cannot castle long if b-file is blocked')
 })
+
+Deno.test('it generates castles as black', () => {
+    let moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.k | CastlingRight.q)
+    assertMatchesMoveList(moves,[
+        new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
+        new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
+        new Move(Square.e8, Square.g8, Piece.BlackKing, 0, MoveType.CastleShort),
+        new Move(Square.e8, Square.c8, Piece.BlackKing, 0, MoveType.CastleLong),
+    ], 'Can castle either side if both rights exist')
+
+    moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.k)
+    assertMatchesMoveList(moves,[
+        new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
+        new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
+        new Move(Square.e8, Square.g8, Piece.BlackKing, 0, MoveType.CastleShort),
+    ], 'Can castle castle short if right exists')
+
+    moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.q)
+    assertMatchesMoveList(moves,[
+        new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
+        new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
+        new Move(Square.e8, Square.c8, Piece.BlackKing, 0, MoveType.CastleLong),
+    ], 'Can castle castle long if right exists')
+
+    moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.Q | CastlingRight.K)
+    assertMatchesMoveList(moves,[
+        new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
+        new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
+    ], 'Cannot castle if only black as castling rights')
+
+    moves = genMoves('r2qkb1r/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.k | CastlingRight.q)
+    assertMatchesMoveList(moves,[], 'Cannot castle if adjacent squares are blocked')
+
+    moves = genMoves('r1q1k1nr/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.k | CastlingRight.q)
+    assertMatchesMoveList(moves,[
+        new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
+        new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
+    ], 'Cannot castle if rook squares are blocked')
+
+    moves = genMoves('rq2k1nr/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.k | CastlingRight.q)
+    assertMatchesMoveList(moves,[
+        new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
+        new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
+    ], 'Cannot castle long if b-file is blocked')
+})
+
+
 
 Deno.test('it generates quiet moves for white pawn', () => {
     let moves = genMoves('8/8/8/8/8/8/4P3/8', Square.e2)
