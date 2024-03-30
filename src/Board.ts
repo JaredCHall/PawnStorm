@@ -10,7 +10,7 @@ import {
     bold,
     white
 } from "https://deno.land/std@0.219.1/fmt/colors.ts";
-import {Move, MoveType} from "./Move.ts";
+import {Move, MoveFlag, MoveType} from "./Move.ts";
 import {dumpBin} from "./Utils.ts";
 
 enum RayDirection {
@@ -59,11 +59,11 @@ export class CastlingData {
     // i[1] - rook
     // i[2] - squares that must be empty
     // i[3] - squares that must be safe
-    static readonly fromToSquares = {
-        [CastlingRight.K]: [[Square.e1, Square.g1], [Square.h1, Square.f1], [Square.f1, Square.g1], [Square.e1, Square.f1, Square.g1]],
-        [CastlingRight.Q]: [[Square.e1, Square.c1], [Square.a1, Square.d1], [Square.d1, Square.c1, Square.b1], [Square.e1, Square.d1, Square.c1]],
-        [CastlingRight.k]: [[Square.e8, Square.g8], [Square.h8, Square.f8], [Square.f8, Square.g8], [Square.e8, Square.f8, Square.g8]],
-        [CastlingRight.q]: [[Square.e8, Square.c8], [Square.a8, Square.d8], [Square.d8, Square.c8, Square.b8], [Square.e8, Square.d8, Square.c8]],
+    static readonly fromToSquares: Record<CastlingRight, number[][]> = {
+        [CastlingRight.K]: [[Square.e1, Square.g1], [Square.h1, Square.f1], [Square.f1, Square.g1], [Square.e1, Square.f1]],
+        [CastlingRight.Q]: [[Square.e1, Square.c1], [Square.a1, Square.d1], [Square.d1, Square.c1, Square.b1], [Square.e1, Square.d1]],
+        [CastlingRight.k]: [[Square.e8, Square.g8], [Square.h8, Square.f8], [Square.f8, Square.g8], [Square.e8, Square.f8]],
+        [CastlingRight.q]: [[Square.e8, Square.c8], [Square.a8, Square.d8], [Square.d8, Square.c8, Square.b8], [Square.e8, Square.d8]],
     }
 
     static readonly MoveTypes = {
@@ -115,8 +115,13 @@ export class Board {
      *  bit 1 is the piece color
      */
     readonly squareList = new Uint8Array(120) // first bit is if square is out-of-bounds. next
-    readonly squareIndexMap: Uint8Array =  new Uint8Array(64)
+    readonly squareMailboxMap: Uint8Array =  new Uint8Array(64) // 8x8 index to 10x12 index
+    readonly squareIndexMap = new Uint8Array(120) // 10x12 index to 8x8 index
     readonly squaresRanks = new Uint8Array(120)
+    readonly squaresFiles = new Uint8Array(120) // files represented as 0-7 for 1-8
+
+    // https://www.chessprogramming.org/Distance
+    readonly chebyshevDistances: Uint8Array[] = []
 
     state = new BoardState()
 
@@ -129,13 +134,34 @@ export class Board {
         let row = 8
         for(let i = 0; i < 64; i++){
             const squareIndex = SquareIndexes[i]
-            this.squareIndexMap[i] = squareIndex
+            this.squareMailboxMap[i] = squareIndex
+            this.squareIndexMap[squareIndex] = i
             this.squareList[squareIndex] = 0
             this.squaresRanks[squareIndex] = row
+            this.squaresFiles[squareIndex] = i % 8
+            this.chebyshevDistances[i] = new Uint8Array(64)
             if((i + 1) % 8 == 0){
                 row--
             }
         }
+
+        // calculate distances
+        for(let i = 0; i < 64; i++){
+            const square1 = this.squareMailboxMap[i]
+            for(let n=0; n < 64; n++){
+                const square2 = this.squareMailboxMap[n]
+                const rank1 = this.squaresRanks[square1]
+                const rank2 = this.squaresRanks[square2]
+                const file1 = this.squaresFiles[square1]
+                const file2 = this.squaresFiles[square2]
+                this.chebyshevDistances[i][n] = Math.max(Math.abs(rank2 - rank1),Math.abs(file2 - file1))
+            }
+        }
+    }
+
+    getDistanceBetweenSquares(square1: Square, square2: Square): number
+    {
+        return this.chebyshevDistances[this.squareIndexMap[square1]][this.squareIndexMap[square2]]
     }
 
     setPieces(piecePlacementsString: string) {
@@ -162,7 +188,6 @@ export class Board {
             squareIndex+=2
         }
     }
-
 
     getMovesForSquare(from: Square, moving: Piece): Move[]
     {
@@ -213,23 +238,69 @@ export class Board {
             if(!emptySquares.every((square)=> this.squareList[square] == 0)){
                 return
             }
-            // TODO: Check squares are safe here?
+            const enemyColor = color ? 0: 1
+            if(!safeSquares.every((square) => !this.isSquareThreatened(square,enemyColor))){
+                return
+            }
+
             moves.push(new Move(from, kingSquares[1], moving, 0, CastlingData.MoveTypes[right]))
         })
 
         return moves
     }
 
+    isSquareThreatened(square: Square, enemyColor: Color)
+    {
+        const movingColor = enemyColor ? 0 : 1
+        const hasKnightThreat = !this.getMovesForSquare(square, PieceType.Knight << 1 | movingColor)
+            .every((move) => move.flag == MoveType.Quiet || !(move.captured >> 1 & PieceType.Knight))
+        if(hasKnightThreat){return true}
+
+        const hasCardinalThreat = !this.getMovesForSquare(square, PieceType.Rook << 1 | movingColor)
+            .every((move) => {
+                if(move.flag == MoveType.Quiet){return true}
+                const capturedType = move.captured >> 1
+                if(capturedType & (PieceType.Rook | PieceType.Queen)){return false}
+                if(capturedType & PieceType.King){
+                    // king can only capture if adjacent
+                    if(this.getDistanceBetweenSquares(square, move.to) == 1){
+                        return false
+                    }
+                }
+                return true
+            })
+        if(hasCardinalThreat){return true}
+
+        // Diagonal threat
+        return !this.getMovesForSquare(square, PieceType.Bishop << 1 | movingColor)
+            .every((move) => {
+                if(move.flag == MoveType.Quiet){return true}
+                const capturedType = move.captured >> 1
+                if(capturedType & (PieceType.Bishop | PieceType.Queen)){return false}
+                if(capturedType & PieceType.King){
+                    // king can only capture if adjacent
+                    if(this.getDistanceBetweenSquares(square, move.to) == 1){
+                        return false
+                    }
+                }
+                if(capturedType & PieceType.Pawn || capturedType & PieceType.BPawn){
+                    //@ts-ignore these are the correct directions
+                    const captureOffset: number[] = RayDirections.pieceMap[capturedType][2]
+                    const actualOffset = move.from - move.to
+                    return !captureOffset.includes(actualOffset)
+                }
+                return true
+            })
+    }
 
     #getPawnMoves(from: Square, moving: Piece, type: PieceType, color: Color): Move[] {
         const moves: Move[] = []
-        const rayDirections = RayDirections.pieceMap[type]
         const [
             doubleMoveRank,
             promotesFromRank,
             captureOffsets,
             quietOffsets
-        ] = rayDirections
+        ] = RayDirections.pieceMap[type]
         const rank = this.squaresRanks[from]
 
         // Quiet moves
@@ -292,7 +363,7 @@ export class Board {
         const squaresByRank: Record<number, number[]> = {8: [], 7: [], 6: [], 5: [], 4: [], 3: [], 2: [], 1: []}
         for(let i=0;i<64;i++){
             const rank = Math.floor((i + 1) / -8) + 9;
-            const piece = this.squareList[this.squareIndexMap[i]]
+            const piece = this.squareList[this.squareMailboxMap[i]]
             squaresByRank[rank].push(piece)
         }
 

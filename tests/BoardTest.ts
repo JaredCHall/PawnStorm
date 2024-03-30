@@ -1,14 +1,29 @@
 import {Board} from "../src/Board.ts";
-import {CastlingRight, Piece, Square} from "../src/Enums.ts";
+import {CastlingRight, Color, Piece, Square} from "../src/Enums.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 import {binToString} from "../src/Utils.ts";
 import {assertArrayIncludes} from "https://deno.land/std@0.219.0/assert/assert_array_includes.ts";
 import {Move, MoveType} from "../src/Move.ts";
+
 const board = new Board()
 
 
 const assertSquareEquals = (square: Square, pieceCode: number) => {
     assertEquals(board.squareList[square], pieceCode, `Expected ${binToString(pieceCode,8)} on square ${square}`)
+}
+
+const assertSquareThreatened = (piecePositions: string, square: Square, color: number, message: string = 'Square threatened') => {
+    board.setPieces(piecePositions)
+    const isThreatened = board.isSquareThreatened(square, color)
+    board.render(isThreatened ? [square] : [])
+    assertEquals(isThreatened, true, message)
+}
+
+const assertNotSquareThreatened = (piecePositions: string, square: Square, color: number, message: string = 'Square not threatened') => {
+    board.setPieces(piecePositions)
+    const isThreatened = board.isSquareThreatened(square, color)
+    board.render(isThreatened ? [square] : [])
+    assertEquals(isThreatened, false, message)
 }
 
 const assertMatchesSquareList = (actual: Move[], expected: Square[], message='Move list matches expected square names') => {
@@ -69,6 +84,42 @@ Deno.test('it initializes square ranks correctly', () => {
         oob, oob, oob, oob, oob, oob, oob, oob, oob, oob,
     ]
     assertEquals(Array.from(board.squaresRanks), expectedList, 'squaresRanks is set correctly')
+})
+
+Deno.test('it initializes square files correctly', () => {
+
+    const oob = 0
+    const expectedList = [
+        oob, oob, oob, oob, oob, oob, oob, oob, oob, oob,
+        oob, oob, oob, oob, oob, oob, oob, oob, oob, oob,
+        oob,   0,   1,   2,   3,   4,   5,   6,   7, oob,
+        oob,   0,   1,   2,   3,   4,   5,   6,   7, oob,
+        oob,   0,   1,   2,   3,   4,   5,   6,   7, oob,
+        oob,   0,   1,   2,   3,   4,   5,   6,   7, oob,
+        oob,   0,   1,   2,   3,   4,   5,   6,   7, oob,
+        oob,   0,   1,   2,   3,   4,   5,   6,   7, oob,
+        oob,   0,   1,   2,   3,   4,   5,   6,   7, oob,
+        oob,   0,   1,   2,   3,   4,   5,   6,   7, oob,
+        oob, oob, oob, oob, oob, oob, oob, oob, oob, oob,
+        oob, oob, oob, oob, oob, oob, oob, oob, oob, oob,
+    ]
+    assertEquals(Array.from(board.squaresFiles), expectedList, 'squaresRanks is set correctly')
+})
+
+Deno.test('it initializes square distances correctly', () => {
+
+    assertEquals(board.chebyshevDistances.length, 64, 'Distances generated for every square')
+    for(let i = 0;i<64;i++){
+        assertEquals(board.chebyshevDistances[i].length, 64, `There are 64 expected distances for square with index: ${i}`)
+    }
+
+    // there's 4096 of these, so we will spot check some distances
+    assertEquals(board.getDistanceBetweenSquares(Square.e4, Square.h1), 3, 'calculates 3 king moves from e4 to h1')
+    assertEquals(board.getDistanceBetweenSquares(Square.e4, Square.a1), 4, 'calculates 3 king moves from e4 to a1')
+    assertEquals(board.getDistanceBetweenSquares(Square.a8, Square.h1), 7, 'calculates 7 king moves from a8 to h1')
+    assertEquals(board.getDistanceBetweenSquares(Square.d5, Square.e5), 1, 'calculates 1 king moves from d5 to e5')
+    assertEquals(board.getDistanceBetweenSquares(Square.d5, Square.d5), 0, 'calculates 0 king moves from d5 to d5')
+    assertEquals(board.getDistanceBetweenSquares(Square.a2, Square.a6), 4, 'calculates 4 king moves from a2 to a6')
 })
 
 Deno.test('it sets board representation', () => {
@@ -383,4 +434,34 @@ Deno.test('it generates captures and en-passant for black pawn', () => {
         new Move(Square.a4, Square.b3, Piece.BlackPawn, Piece.WhitePawn, MoveType.EnPassant),
 
     ], 'Pawn has expected en-passant capture on edge of the board')
+})
+
+Deno.test('it calculates if square is threatened', () => {
+    assertNotSquareThreatened('7n/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'h8 knight does not threaten f6 king')
+    assertSquareThreatened('6n1/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'g8 knight threatens f6 king')
+
+    assertNotSquareThreatened('6b1/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'g8 bishop does not threaten f6 king')
+    assertSquareThreatened('7b/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'h8 bishop threatens f6 king')
+    assertNotSquareThreatened('7b/6n1/5K2/8/8/8/8/8', Square.f6, Color.Black, 'blocked h8 bishop does not threaten f6 king')
+
+    assertNotSquareThreatened('6r1/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'g8 rook does not threaten f6 king')
+    assertSquareThreatened('5r2/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'f8 rook threatens f6 king')
+    assertNotSquareThreatened('5r2/5n2/5K2/8/8/8/8/8', Square.f6, Color.Black, 'blocked f8 rook does not threaten f6 king')
+
+    assertNotSquareThreatened('6q1/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'g8 queen does not threaten f6 king')
+    assertSquareThreatened('7q/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'f8 queen threatens f6 king')
+    assertSquareThreatened('5q2/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'h8 queen threatens f6 king')
+    assertNotSquareThreatened('7q/6n1/5K2/8/8/8/8/8', Square.f6, Color.Black, 'blocked h8 queen does not threaten f6 king')
+    assertNotSquareThreatened('5q2/5n2/5K2/8/8/8/8/8', Square.f6, Color.Black, 'blocked f8 queen does not threaten f6 king')
+
+    assertNotSquareThreatened('5k2/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'f8 king does not threaten f6 king')
+    assertNotSquareThreatened('7k/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'h8 king does not threaten f6 king')
+    assertSquareThreatened('8/8/5Kk1/8/8/8/8/8', Square.f6, Color.Black, 'g6 king threatens f6 king')
+    assertSquareThreatened('8/6k1/5K2/8/8/8/8/8', Square.f6, Color.Black, 'g7 king threatens f6 king')
+
+    assertNotSquareThreatened('8/5p2/5K2/8/8/8/8/8', Square.f6, Color.Black, 'f7 pawn does not threaten f6 king')
+    assertNotSquareThreatened('8/7p/5K2/8/8/8/8/8', Square.f6, Color.Black, 'h7 pawn does not threaten f6 king')
+    assertNotSquareThreatened('7p/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'h8 pawn does not threaten f6 king')
+    assertSquareThreatened('8/6p1/5K2/8/8/8/8/8', Square.f6, Color.Black, 'g7 pawn threatens f6 king')
+    assertSquareThreatened('8/4p3/5K2/8/8/8/8/8', Square.f6, Color.Black, 'e7 pawn threatens f6 king')
 })

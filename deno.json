@@ -8,5 +8,9 @@
   },
   "test": {
     "include": ["tests/**/*Test.ts"]
+  },
+  "compilerOptions": {
+    "target": "esnext",
+    "lib": ["deno.window"]
   }
 }
