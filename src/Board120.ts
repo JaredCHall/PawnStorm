@@ -7,6 +7,7 @@ import {
     white
 } from "https://deno.land/std@0.219.1/fmt/colors.ts";
 import {FenPieceMap} from "./Enums.ts";
+import {dumpBin} from "./Utils.ts";
 
 export enum Color { // 1 bit
     White= 0,
@@ -87,11 +88,16 @@ export class Board120
     ]) // 8x8 index to 10x12 index
     readonly square64Indexes = new Uint8Array(120) // 10x12 index to 8x8 index
 
+    // quick access to king squares, for checking if a move puts the king in check
+    readonly kingSquares = new Uint8Array(2)
+
     // square data saved for quick access, uses index64
     readonly squareRanks = new Uint8Array(64) // rank 0-7
     readonly squareFiles = new Uint8Array(64) // file 0-7
     // The Chebyshev Distance - https://www.chessprogramming.org/Distance
     readonly squareDistances: Uint8Array[] = []
+
+
 
     constructor() {
         // initialize all squares to invalid
@@ -150,6 +156,11 @@ export class Board120
                     // @ts-ignore it's fine
                     const piece = FenPieceMap[character]
                     this.squareList[squareIndex] = piece
+                    // store king positions for quicker access
+                    if((piece >> 1) & PieceType.King){
+                        // @ts-ignore ok
+                        this.kingSquares[piece & 1] = squareIndex
+                    }
                     squareIndex++
                 }
             })

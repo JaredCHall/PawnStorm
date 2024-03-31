@@ -1,8 +1,13 @@
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
-import {Board120, Square, Piece} from "../src/Board120.ts";
+import {Board120, Square, Piece, Color} from "../src/Board120.ts";
 import {binToString} from "../src/Utils.ts";
 
 const board = new Board120()
+
+
+const assertSquareEquals = (square: Square, pieceCode: number) => {
+    assertEquals(board.squareList[square], pieceCode, `Expected ${binToString(pieceCode,8)} on square ${square}`)
+}
 
 Deno.test('it initializes square indexes correctly' , () => {
     for(let i=0; i<64; i++){
@@ -75,9 +80,7 @@ Deno.test('it initializes square distances correctly', () => {
     assertEquals(board.getDistanceBetweenSquares(Square.a2, Square.a6), 4, 'calculates 4 king moves from a2 to a6')
 })
 
-const assertSquareEquals = (square: Square, pieceCode: number) => {
-    assertEquals(board.squareList[square], pieceCode, `Expected ${binToString(pieceCode,8)} on square ${square}`)
-}
+
 
 Deno.test('it sets board representation', () => {
 
@@ -128,6 +131,10 @@ Deno.test('it sets board representation', () => {
     emptySquares.forEach((square) => {
         assertSquareEquals(square, 0)
     })
+
+    assertEquals(board.kingSquares[Color.White], Square.e1, 'White king is on expected square')
+    assertEquals(board.kingSquares[Color.Black], Square.e8, 'Black king is on expected square')
+
 })
 
 Deno.test('it renders board with highlights', () => {

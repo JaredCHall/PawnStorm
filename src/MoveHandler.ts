@@ -1,5 +1,6 @@
 import {Board120, Color, PieceType, Square} from "./Board120.ts";
 import {Move, MoveFlag, MoveType} from "./Move.ts";
+import {dumpBin} from "./Utils.ts";
 
 export enum CastlingRight { // 4 bits
     K= 0b0001,
@@ -9,7 +10,7 @@ export enum CastlingRight { // 4 bits
 }
 
 export class CastlingMoveInfo {
-    static readonly sideMask = new Uint8Array([0b1100, 0b0011])
+    static readonly sideMask = new Uint8Array([0b0011, 0b1100])
     static readonly kingSquare = new Uint8Array([Square.e1, Square.e8])
 
     static readonly typeMap = new Uint8Array(16)
@@ -23,7 +24,7 @@ export class CastlingMoveInfo {
     }
 
     static readonly typeByKingNewSquare = new Uint8Array(120)
-    static readonly kingNewSquare = new Uint8Array([Square.g1, Square.c1, Square.g8, Square.g1])
+    static readonly kingNewSquare = new Uint8Array([Square.g1, Square.c1, Square.g8, Square.c8])
 
     static {
         for(let i=0;i<4;i++){
@@ -48,10 +49,17 @@ export class CastlingMoveInfo {
 
 
 export class BoardState {
-    sideToMove: Color = Color.White
-    castleRights: number = 0b0000
-    enPassantTarget: Square|0 = 0
-    halfMoveClock: number = 0
+    sideToMove: Color
+    castleRights: number
+    enPassantTarget: Square|0
+    halfMoveClock: number
+
+    constructor(sideToMove: Color = Color.White, castleRights: number = 0b0000, enPassantTarget: Square|0 = 0, halfMoveClock: number = 0) {
+        this.sideToMove = sideToMove
+        this.castleRights = castleRights
+        this.enPassantTarget = enPassantTarget
+        this.halfMoveClock = halfMoveClock
+    }
 
     getCastlingRights(color: Color){
         const rights = []
@@ -67,13 +75,23 @@ export class BoardState {
     toggleSideToMove(): void {
         this.sideToMove = this.sideToMove ? 0 : 1
     }
+
+    clone(): BoardState
+    {
+        return new BoardState(
+            this.sideToMove,
+            this.castleRights,
+            this.enPassantTarget,
+            this.halfMoveClock
+        )
+    }
 }
 
 export class MoveHandler extends Board120
 {
 
     state: BoardState = new BoardState()
-    kingSquares = new Uint8Array(2)
+    positionStack: BoardState[] = []
 
     enPassantTargets = new Uint8Array([
          0,  0,  0,  0,  0,  0,  0,  0,
@@ -86,12 +104,23 @@ export class MoveHandler extends Board120
          0,  0,  0,  0,  0,  0,  0,  0,
     ])
 
+    saveBoardState(): void {
+        this.positionStack.push(this.state.clone())
+    }
+
+    restoreLastState(): void {
+        // @ts-ignore deal with it
+        this.state = this.positionStack.pop()
+    }
+
     makeMove(move: Move)
     {
+        this.saveBoardState()
+        this.state.toggleSideToMove()
+
         this.squareList[move.from] = 0
         const movingType = move.moving >> 1
         const movingColor = move.moving & 1
-        this.state.toggleSideToMove()
 
         // handle pawn moves
         if(movingType & PieceType.Pawn || movingType & PieceType.BPawn){
@@ -103,7 +132,7 @@ export class MoveHandler extends Board120
                 this.squareList[move.to] = move.moving
                 this.squareList[this.state.enPassantTarget] = 0
             }else if(move.flag & MoveFlag.Promotion){
-                const hasFlag1 = move.flag & MoveFlag.Flag2
+                const hasFlag1 = move.flag & MoveFlag.Flag1
                 const hasFlag2 = move.flag & MoveFlag.Flag2
                 if(hasFlag1){
                     if(hasFlag2){
@@ -116,6 +145,9 @@ export class MoveHandler extends Board120
                 }else{
                     this.squareList[move.to] = PieceType.Knight << 1 | movingColor
                 }
+            }else{
+                this.squareList[move.to] = move.moving
+                this.squareList[this.state.enPassantTarget] = 0
             }
             return
         }
@@ -134,6 +166,7 @@ export class MoveHandler extends Board120
         if(movingType & PieceType.Rook){
             this.state.getCastlingRights(movingColor).forEach((right) => {
                 if(CastlingMoveInfo.rookSquares[CastlingMoveInfo.typeMap[right]][0] == move.from){
+
                     this.state.castleRights &= ~right
                 }
             })
@@ -142,17 +175,49 @@ export class MoveHandler extends Board120
 
         // king moves
         if(movingType & PieceType.King){
+
             // either castle type
-            if(move.flag & MoveFlag.Flag1){
+            if(move.flag & MoveFlag.Flag2){
                 const type = CastlingMoveInfo.typeByKingNewSquare[move.to]
                 const rookSquares = CastlingMoveInfo.rookSquares[type]
                 this.squareList[rookSquares[0]] = 0
                 this.squareList[rookSquares[1]] = PieceType.Rook << 1 | movingColor
             }
-            this.state.castleRights &= ~CastlingMoveInfo.sideMask[movingColor]
+            this.state.castleRights &= CastlingMoveInfo.sideMask[movingColor ? 0 : 1]
+            this.kingSquares[movingColor] = move.to
         }
-
     }
 
+    unmakeMove(move: Move){
+
+        const movingType = move.moving >> 1
+        const movingColor = move.moving & 1
+
+        // handle en-passant
+        if(move.flag == MoveType.EnPassant){
+            if(move.flag == MoveType.EnPassant) {
+                this.squareList[move.to] = 0
+                this.squareList[this.enPassantTargets[move.to]] = move.captured
+                this.restoreLastState()
+                return
+            }
+        }
+
+        this.squareList[move.from] = move.moving
+        this.squareList[move.to] = move.captured
+
+        // handle castles
+        if(movingType & PieceType.King){
+            // either castle type
+            if(move.flag & MoveFlag.Flag2){
+                const type = CastlingMoveInfo.typeByKingNewSquare[move.to]
+                const rookSquares = CastlingMoveInfo.rookSquares[type]
+                this.squareList[rookSquares[1]] = 0
+                this.squareList[rookSquares[0]] = PieceType.Rook << 1 | movingColor
+            }
+            this.kingSquares[movingColor] = move.from
+        }
+        this.restoreLastState()
+    }
 
 }
