@@ -1,6 +1,5 @@
-import {Board120, Color, PieceType, Square} from "./Board120.ts";
+import {Board, Color, PieceType, Square} from "./Board.ts";
 import {Move, MoveFlag, MoveType} from "./Move.ts";
-import {dumpBin} from "./Utils.ts";
 
 export enum CastlingRight { // 4 bits
     K= 0b0001,
@@ -45,6 +44,11 @@ export class CastlingMoveInfo {
         [Square.e8, Square.f8], [Square.e8, Square.d8],
     ]
 
+    static readonly moveType = [
+        MoveType.CastleShort, MoveType.CastleLong,
+        MoveType.CastleShort, MoveType.CastleLong,
+    ]
+
 }
 
 
@@ -87,13 +91,13 @@ export class BoardState {
     }
 }
 
-export class MoveHandler extends Board120
+export class MoveHandler extends Board
 {
 
     state: BoardState = new BoardState()
     positionStack: BoardState[] = []
 
-    enPassantTargets = new Uint8Array([
+    enPassantToSquares = new Uint8Array([
          0,  0,  0,  0,  0,  0,  0,  0,
          0,  0,  0,  0,  0,  0,  0,  0,
          0,  0,  0,  0,  0,  0,  0,  0,
@@ -102,6 +106,16 @@ export class MoveHandler extends Board120
          0,  0,  0,  0,  0,  0,  0,  0,
          0,  0,  0,  0,  0,  0,  0,  0,
          0,  0,  0,  0,  0,  0,  0,  0,
+    ])
+    enPassantCaptureOnSquares = new Uint8Array([
+        0,  0,  0,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,  0,  0,  0,  0,
+        51, 52, 53, 54, 55, 56, 57, 58,
+        0,  0,  0,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,  0,  0,  0,  0,
+        61, 62, 63, 64, 65, 66, 67, 68,
+        0,  0,  0,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,  0,  0,  0,  0,
     ])
 
     saveBoardState(): void {
@@ -127,10 +141,12 @@ export class MoveHandler extends Board120
             this.state.halfMoveClock = 0
             if(move.flag == MoveType.DoublePawnPush){
                 this.squareList[move.to] = move.moving
-                this.state.enPassantTarget = this.enPassantTargets[this.square64Indexes[move.to]]
+                this.state.enPassantTarget = this.enPassantToSquares[this.square64Indexes[move.to]]
             }else if(move.flag == MoveType.EnPassant){
+                const capturedPawnSquare = this.enPassantCaptureOnSquares[this.square64Indexes[move.to]]
                 this.squareList[move.to] = move.moving
-                this.squareList[this.state.enPassantTarget] = 0
+                this.squareList[capturedPawnSquare] = 0
+                this.state.enPassantTarget = 0
             }else if(move.flag & MoveFlag.Promotion){
                 const hasFlag1 = move.flag & MoveFlag.Flag1
                 const hasFlag2 = move.flag & MoveFlag.Flag2
@@ -145,9 +161,11 @@ export class MoveHandler extends Board120
                 }else{
                     this.squareList[move.to] = PieceType.Knight << 1 | movingColor
                 }
+                this.state.enPassantTarget = 0
             }else{
                 this.squareList[move.to] = move.moving
                 this.squareList[this.state.enPassantTarget] = 0
+                this.state.enPassantTarget = 0
             }
             return
         }
@@ -195,9 +213,11 @@ export class MoveHandler extends Board120
 
         // handle en-passant
         if(move.flag == MoveType.EnPassant){
+
             if(move.flag == MoveType.EnPassant) {
+                this.squareList[move.from] = move.moving
                 this.squareList[move.to] = 0
-                this.squareList[this.enPassantTargets[move.to]] = move.captured
+                this.squareList[this.enPassantCaptureOnSquares[this.square64Indexes[move.to]]] = move.captured
                 this.restoreLastState()
                 return
             }

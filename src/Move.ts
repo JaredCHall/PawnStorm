@@ -1,4 +1,4 @@
-import {Square} from "./Enums.ts";
+import {Square} from "./Board.ts";
 
 export enum MoveFlag {
     Flag1       = 0b0001,
@@ -27,7 +27,7 @@ export class Move {
     readonly captured: number // captured piece
     readonly flag: number
 
-    constructor(from: Square, to:Square, moving: number, captured: number, flag: number = MoveType.Quiet) {
+    constructor(from: Square, to: Square, moving: number, captured: number, flag: number = MoveType.Quiet) {
         this.from = from
         this.to = to
         this.moving = moving

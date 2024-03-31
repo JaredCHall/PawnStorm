@@ -1,7 +1,3 @@
-
-
-//
-import {FenPieceMap, Piece, pieceRenderMap, Square, SquareIndexes, Color, PieceType, CastlingRight} from "./Enums.ts";
 import {
     bgBrightBlue,
     bgBrightGreen,
@@ -10,120 +6,100 @@ import {
     bold,
     white
 } from "https://deno.land/std@0.219.1/fmt/colors.ts";
-import {Move, MoveFlag, MoveType} from "./Move.ts";
-import {dumpBin} from "./Utils.ts";
 
-enum RayDirection {
-    N = -10, NE = -9, E = 1, SE = 11, S = 10, SW = 9, W = -1, NW = -11
+export enum Color { // 1 bit
+    White= 0,
+    Black= 1
 }
 
-class RayDirections {
-    static readonly cardinal: number[] = [RayDirection.N, RayDirection.E, RayDirection.S, RayDirection.W]
-    static readonly ordinal: number[] = [RayDirection.NE, RayDirection.SE, RayDirection.SW, RayDirection.NW]
-    static readonly all: number[] = RayDirections.cardinal.concat(RayDirections.ordinal)
-    static readonly knightMoves = [-21, -19,-12, -8, 8, 12, 19, 21]
-
-    static readonly pieceMap = {
-        // i[0]: max ray length
-        // i[1]: capture ray directions
-        [PieceType.Knight]: [1, RayDirections.knightMoves],
-        [PieceType.Rook]:   [7, RayDirections.cardinal],
-        [PieceType.Bishop]: [7, RayDirections.ordinal],
-        [PieceType.Queen]:  [7, RayDirections.all],
-        [PieceType.King]:   [1, RayDirections.all],
-        
-        // i[0]: double-move rank
-        // i[1]: promotion rank
-        // i[2]: capture move ray directions
-        // i[3]: quiet move ray directions
-        [PieceType.Pawn]:   [2, 7, [RayDirection.NW , RayDirection.NE], [RayDirection.N, RayDirection.N * 2]],
-        [PieceType.BPawn]:  [7, 2, [RayDirection.SW , RayDirection.SE], [RayDirection.S, RayDirection.S * 2]],
-    }
-
-    static onSameRay(square1: Square, square2: Square): boolean
-    {
-        throw new Error('not implemented')
-    }
+export enum PieceType { // 7 bits
+    Pawn    = 0b0000001,
+    Knight  = 0b0000010,
+    Rook    = 0b0000100,
+    Bishop  = 0b0001000,
+    Queen   = 0b0010000,
+    King    = 0b0100000,
+    BPawn   = 0b1000000
 }
 
-export class CastlingData {
-    static readonly sideMask: Record<Color, number> = {
-        [Color.White]: 0b1100,
-        [Color.Black]: 0b0011,
-    }
-    static readonly kingSquare: Record<Color, number> = {
-        [Color.White]: Square.e1,
-        [Color.Black]: Square.e8,
-    }
-    // i[0] - king
-    // i[1] - rook
-    // i[2] - squares that must be empty
-    // i[3] - squares that must be safe
-    static readonly fromToSquares: Record<CastlingRight, number[][]> = {
-        [CastlingRight.K]: [[Square.e1, Square.g1], [Square.h1, Square.f1], [Square.f1, Square.g1], [Square.e1, Square.f1]],
-        [CastlingRight.Q]: [[Square.e1, Square.c1], [Square.a1, Square.d1], [Square.d1, Square.c1, Square.b1], [Square.e1, Square.d1]],
-        [CastlingRight.k]: [[Square.e8, Square.g8], [Square.h8, Square.f8], [Square.f8, Square.g8], [Square.e8, Square.f8]],
-        [CastlingRight.q]: [[Square.e8, Square.c8], [Square.a8, Square.d8], [Square.d8, Square.c8, Square.b8], [Square.e8, Square.d8]],
-    }
-
-    static readonly MoveTypes = {
-        [CastlingRight.K]: MoveType.CastleShort, [CastlingRight.Q]: MoveType.CastleLong,
-        [CastlingRight.k]: MoveType.CastleShort, [CastlingRight.q]: MoveType.CastleLong,
-    }
+const pieceRenderMap: Record<PieceType, string> = {
+    [PieceType.Pawn]: '♟',
+    [PieceType.Knight]: '♞',
+    [PieceType.Bishop]: '♝',
+    [PieceType.Rook]: '♜',
+    [PieceType.Queen]: '♛',
+    [PieceType.King]: '♚',
+    [PieceType.BPawn]: '♟',
 }
 
-export class BoardState {
-    sideToMove: Color = Color.White
-    castleRights: number = 0b0000
-    enPassantTarget: Square|0 = 0
-    halfMoveClock: number = 0
-
-    getCastlingRights(color: Color){
-        const rights = []
-        if(color & 1){
-            // black
-            if(this.castleRights & CastlingRight.k){
-                rights.push(CastlingRight.k)
-            }
-            if(this.castleRights & CastlingRight.q){
-                rights.push(CastlingRight.q)
-            }
-        }else{
-            //white
-            if(this.castleRights & CastlingRight.K){
-                rights.push(CastlingRight.K)
-            }
-            if(this.castleRights & CastlingRight.Q){
-                rights.push(CastlingRight.Q)
-            }
-
-        }
-        return rights
-    }
-
+export enum Piece { // 8 bits
+    None = 0,
+    WhitePawn = PieceType.Pawn << 1 | Color.White,
+    WhiteKnight = PieceType.Knight << 1 | Color.White,
+    WhiteBishop = PieceType.Bishop << 1 | Color.White,
+    WhiteRook = PieceType.Rook << 1 | Color.White,
+    WhiteQueen = PieceType.Queen << 1 | Color.White,
+    WhiteKing = PieceType.King << 1 | Color.White,
+    BlackPawn = PieceType.BPawn << 1 | Color.Black,
+    BlackKnight = PieceType.Knight << 1 | Color.Black,
+    BlackBishop = PieceType.Bishop << 1 | Color.Black,
+    BlackRook = PieceType.Rook << 1 | Color.Black,
+    BlackQueen = PieceType.Queen << 1 | Color.Black,
+    BlackKing = PieceType.King << 1 | Color.Black,
 }
 
-export class Board {
+export const FenPieceMap = {
+    p: Piece.BlackPawn, n: Piece.BlackKnight, b: Piece.BlackBishop, r: Piece.BlackRook, q: Piece.BlackQueen, k: Piece.BlackKing,
+    P: Piece.WhitePawn, N: Piece.WhiteKnight, B: Piece.WhiteBishop, R: Piece.WhiteRook, Q: Piece.WhiteQueen, K: Piece.WhiteKing
+}
 
-    /**
-     * 10x12 board representation
-     *
-     * square encoding:
-     *  zero - empty valid square
-     *  bit 8 - set if square is out-of-bounds
-     *  bits 7 - 2 are the piece type
-     *  bit 1 is the piece color
-     */
-    readonly squareList = new Uint8Array(120) // first bit is if square is out-of-bounds. next
-    readonly squareMailboxMap: Uint8Array =  new Uint8Array(64) // 8x8 index to 10x12 index
-    readonly squareIndexMap = new Uint8Array(120) // 10x12 index to 8x8 index
-    readonly squaresRanks = new Uint8Array(120)
-    readonly squaresFiles = new Uint8Array(120) // files represented as 0-7 for 1-8
+export enum Square { // 7 bits
+    a8 = 21, b8,c8, d8, e8, f8,g8,h8,
+    a7 = 31, b7,c7, d7, e7, f7,g7,h7,
+    a6 = 41, b6,c6, d6, e6, f6,g6,h6,
+    a5 = 51, b5,c5, d5, e5, f5,g5,h5,
+    a4 = 61, b4,c4, d4, e4, f4,g4,h4,
+    a3 = 71, b3,c3, d3, e3, f3,g3,h3,
+    a2 = 81, b2,c2, d2, e2, f2,g2,h2,
+    a1 = 91, b1,c1, d1, e1, f1,g1,h1,
+    Invalid = 255
+}
 
-    // https://www.chessprogramming.org/Distance
-    readonly chebyshevDistances: Uint8Array[] = []
+export enum SquareFile {a, b, c, d, e, f, g, h}
+export type SquareRank = 0|1|2|3|4|5|6|7
+/**
+ * 10x12 board representation
+ *
+ * square encoding:
+ *  zero - empty valid square
+ *  255 - out-of-bounds sentinel value
+ *  bits 8 - 2 are the piece type (black and white pawns are different types)
+ *  bit 1 is the piece color
+ */
+export class Board
+{
 
-    state = new BoardState()
+    readonly squareList = new Uint8Array(120) // encoded squares
+    readonly square120Indexes: Uint8Array =  new Uint8Array([
+        21, 22, 23, 24, 25, 26, 27, 28,
+        31, 32, 33, 34, 35, 36, 37, 38,
+        41, 42, 43, 44, 45, 46, 47, 48,
+        51, 52, 53, 54, 55, 56, 57, 58,
+        61, 62, 63, 64, 65, 66, 67, 68,
+        71, 72, 73, 74, 75, 76, 77, 78,
+        81, 82, 83, 84, 85, 86, 87, 88,
+        91, 92, 93, 94, 95, 96, 97, 98,
+    ]) // 8x8 index to 10x12 index
+    readonly square64Indexes = new Uint8Array(120) // 10x12 index to 8x8 index
+
+    // quick access to king squares, for checking if a move puts the king in check
+    readonly kingSquares = new Uint8Array(2)
+
+    // square data saved for quick access, uses index64
+    readonly squareRanks = new Uint8Array(64) // rank 0-7
+    readonly squareFiles = new Uint8Array(64) // file 0-7
+    // The Chebyshev Distance - https://www.chessprogramming.org/Distance
+    readonly squareDistances: Uint8Array[] = []
 
     constructor() {
         // initialize all squares to invalid
@@ -131,15 +107,14 @@ export class Board {
             this.squareList[i] = Square.Invalid
         }
         // set valid squares to empty and build map of indexes
-        let row = 8
+        let row = 7
         for(let i = 0; i < 64; i++){
-            const squareIndex = SquareIndexes[i]
-            this.squareMailboxMap[i] = squareIndex
-            this.squareIndexMap[squareIndex] = i
+            const squareIndex = this.square120Indexes[i]
+            this.square64Indexes[squareIndex] = i
             this.squareList[squareIndex] = 0
-            this.squaresRanks[squareIndex] = row
-            this.squaresFiles[squareIndex] = i % 8
-            this.chebyshevDistances[i] = new Uint8Array(64)
+            this.squareRanks[i] = row
+            this.squareFiles[i] = i % 8
+            this.squareDistances[i] = new Uint8Array(64)
             if((i + 1) % 8 == 0){
                 row--
             }
@@ -147,21 +122,22 @@ export class Board {
 
         // calculate distances
         for(let i = 0; i < 64; i++){
-            const square1 = this.squareMailboxMap[i]
-            for(let n=0; n < 64; n++){
-                const square2 = this.squareMailboxMap[n]
-                const rank1 = this.squaresRanks[square1]
-                const rank2 = this.squaresRanks[square2]
-                const file1 = this.squaresFiles[square1]
-                const file2 = this.squaresFiles[square2]
-                this.chebyshevDistances[i][n] = Math.max(Math.abs(rank2 - rank1),Math.abs(file2 - file1))
+            const rank1 = this.squareRanks[i]
+            const file1 = this.squareFiles[i]
+            for(let n= 0; n < 64; n++){
+                const rank2 = this.squareRanks[n]
+                const file2 = this.squareFiles[n]
+                this.squareDistances[i][n] = Math.max(
+                    Math.abs(rank2 - rank1),
+                    Math.abs(file2 - file1)
+                )
             }
         }
     }
 
     getDistanceBetweenSquares(square1: Square, square2: Square): number
     {
-        return this.chebyshevDistances[this.squareIndexMap[square1]][this.squareIndexMap[square2]]
+        return this.squareDistances[this.square64Indexes[square1]][this.square64Indexes[square2]]
     }
 
     setPieces(piecePlacementsString: string) {
@@ -182,6 +158,11 @@ export class Board {
                     // @ts-ignore it's fine
                     const piece = FenPieceMap[character]
                     this.squareList[squareIndex] = piece
+                    // store king positions for quicker access
+                    if((piece >> 1) & PieceType.King){
+                        // @ts-ignore ok
+                        this.kingSquares[piece & 1] = squareIndex
+                    }
                     squareIndex++
                 }
             })
@@ -189,187 +170,19 @@ export class Board {
         }
     }
 
-    getMovesForSquare(from: Square, moving: Piece): Move[]
-    {
-        const moves: Move[] = []
-        const type = moving >> 1
-        const color: Color = moving & 1
-
-        if(type & PieceType.Pawn || type & PieceType.BPawn){
-            return this.#getPawnMoves(from, moving, type, color)
-        }
-
-        // @ts-ignore
-        const rayDirections = RayDirections.pieceMap[type]
-        const offsets = rayDirections[1]
-        const maxRayLength = rayDirections[0]
-        for(let i = 0; i<offsets.length;i++) {
-            const offset = offsets[i]
-            for (let j = 1; j <= maxRayLength; j++) {
-                const to: number = from + j * offset
-                const captured = this.squareList[to]
-                if (captured == Square.Invalid) {
-                    break // square out of bounds
-                }
-
-                if (captured == 0) {
-                    // empty square
-                    moves.push(new Move(from, to, moving, 0, MoveType.Quiet))
-                    continue
-                }
-
-                if ((captured & 1) == color) {
-                    // friendly piece
-                    break
-                }
-
-                moves.push(new Move(from, to, moving, captured, MoveType.Capture))
-                break
-            }
-        }
-        if(!(type & PieceType.King) || from != CastlingData.kingSquare[color]){
-            return moves
-        }
-
-
-        //handle castling moves
-        this.state.getCastlingRights(color).forEach((right) => {
-            const [kingSquares, rookSquares, emptySquares, safeSquares] = CastlingData.fromToSquares[right]
-            if(!emptySquares.every((square)=> this.squareList[square] == 0)){
-                return
-            }
-            const enemyColor = color ? 0: 1
-            if(!safeSquares.every((square) => !this.isSquareThreatened(square,enemyColor))){
-                return
-            }
-
-            moves.push(new Move(from, kingSquares[1], moving, 0, CastlingData.MoveTypes[right]))
-        })
-
-        return moves
-    }
-
-    isSquareThreatened(square: Square, enemyColor: Color)
-    {
-        const movingColor = enemyColor ? 0 : 1
-        const hasKnightThreat = !this.getMovesForSquare(square, PieceType.Knight << 1 | movingColor)
-            .every((move) => move.flag == MoveType.Quiet || !(move.captured >> 1 & PieceType.Knight))
-        if(hasKnightThreat){return true}
-
-        const hasCardinalThreat = !this.getMovesForSquare(square, PieceType.Rook << 1 | movingColor)
-            .every((move) => {
-                if(move.flag == MoveType.Quiet){return true}
-                const capturedType = move.captured >> 1
-                if(capturedType & (PieceType.Rook | PieceType.Queen)){return false}
-                if(capturedType & PieceType.King){
-                    // king can only capture if adjacent
-                    if(this.getDistanceBetweenSquares(square, move.to) == 1){
-                        return false
-                    }
-                }
-                return true
-            })
-        if(hasCardinalThreat){return true}
-
-        // Diagonal threat
-        return !this.getMovesForSquare(square, PieceType.Bishop << 1 | movingColor)
-            .every((move) => {
-                if(move.flag == MoveType.Quiet){return true}
-                const capturedType = move.captured >> 1
-                if(capturedType & (PieceType.Bishop | PieceType.Queen)){return false}
-                if(capturedType & PieceType.King){
-                    // king can only capture if adjacent
-                    if(this.getDistanceBetweenSquares(square, move.to) == 1){
-                        return false
-                    }
-                }
-                if(capturedType & PieceType.Pawn || capturedType & PieceType.BPawn){
-                    //@ts-ignore these are the correct directions
-                    const captureOffset: number[] = RayDirections.pieceMap[capturedType][2]
-                    const actualOffset = move.from - move.to
-                    return !captureOffset.includes(actualOffset)
-                }
-                return true
-            })
-    }
-
-    #getPawnMoves(from: Square, moving: Piece, type: PieceType, color: Color): Move[] {
-        const moves: Move[] = []
-        const [
-            doubleMoveRank,
-            promotesFromRank,
-            captureOffsets,
-            quietOffsets
-        ] = RayDirections.pieceMap[type]
-        const rank = this.squaresRanks[from]
-
-        // Quiet moves
-        // @ts-ignore it's fine
-        let to: number = from + quietOffsets[0]
-        if(this.squareList[to] == 0){
-            if(promotesFromRank == rank){
-                moves.push(new Move(from, to, moving, 0, MoveType.KnightPromote))
-                moves.push(new Move(from, to, moving, 0, MoveType.BishopPromote))
-                moves.push(new Move(from, to, moving, 0, MoveType.RookPromote))
-                moves.push(new Move(from, to, moving, 0, MoveType.QueenPromote))
-            }else{
-                moves.push(new Move(from, to, moving, 0, MoveType.Quiet))
-                if(rank == doubleMoveRank){
-                    // @ts-ignore also fine
-                    to = from + quietOffsets[1]
-                    if(this.squareList[to] == 0){
-                        moves.push(new Move(from, to, moving, 0, MoveType.DoublePawnPush))
-                    }
-                }
-            }
-        }
-
-        // Capture moves
-        const promotes = promotesFromRank == rank
-        for(let i=0;i<2;i++){
-            // @ts-ignore it's fine
-            const to: number = from + captureOffsets[i]
-            const captured = this.squareList[to]
-
-            if(captured == 0){
-                if(to == this.state.enPassantTarget){
-                    // @ts-ignore it's fine - captured piece is one quiet move behind the pawn
-                    moves.push(new Move(from, to, moving, this.squareList[to + -1 * quietOffsets[0]], MoveType.EnPassant))
-                }
-                // cannot capture empty square if it's not en-passant.
-                continue
-            }
-            if(captured == Square.Invalid // cannot capture out of bounds square
-                || (captured & 1) == color // cannot capture friendly piece
-            ){
-                continue
-            }
-
-            if(promotes){
-                moves.push(new Move(from, to, moving, captured, MoveType.KnightPromote | MoveType.Capture))
-                moves.push(new Move(from, to, moving, captured, MoveType.BishopPromote | MoveType.Capture))
-                moves.push(new Move(from, to, moving, captured, MoveType.RookPromote | MoveType.Capture))
-                moves.push(new Move(from, to, moving, captured, MoveType.QueenPromote | MoveType.Capture))
-            }else{
-                moves.push(new Move(from, to, moving, captured, MoveType.Capture))
-            }
-        }
-
-        return moves
-    }
 
     render(highlights: Square[] = [])
     {
-        const squaresByRank: Record<number, number[]> = {8: [], 7: [], 6: [], 5: [], 4: [], 3: [], 2: [], 1: []}
+        const squaresByRank: Record<number, number[]> = {7: [], 6: [], 5: [], 4: [], 3: [], 2: [], 1: [], 0: []}
         for(let i=0;i<64;i++){
-            const rank = Math.floor((i + 1) / -8) + 9;
-            const piece = this.squareList[this.squareMailboxMap[i]]
+            const rank = this.squareRanks[i]
+            const piece = this.squareList[this.square120Indexes[i]]
             squaresByRank[rank].push(piece)
         }
 
         let i = 20
-        for(let rank=8;rank>0;rank--) {
-            let squareType = rank % 2 === 0 ? 0 : 1
+        for(let rank=7;rank>=0;rank--) {
+            let squareType = rank % 2 === 0 ? 1: 0
             console.log(squaresByRank[rank].map((piece)=> {
                 i++
                 const formatted = this.formatSquare(squareType, piece, highlights.includes(i))
