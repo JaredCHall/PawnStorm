@@ -1,4 +1,4 @@
-import {Board, Color, FenPieceMap, PieceType, Square} from "./Board.ts";
+import {Board, Color, FenPieceMap, Piece, PieceType, Square} from "./Board.ts";
 import {Move, MoveFlag, MoveType} from "./Move.ts";
 import {dumpBin} from "./Utils.ts";
 
@@ -183,7 +183,28 @@ export class MoveHandler extends Board
         }
     }
 
+    #revokeCastleRightsOnRookCapture(movingColor: Color, captured: Piece, to: number)
+    {
+        const captureType = captured >> 1
+        if(!(captureType & PieceType.Rook)){
+            return
+        }
 
+        if(movingColor == Color.White){
+            if(this.state.castleRights & CastlingRight.k && to == Square.h8){
+                this.state.castleRights &= 0b1011
+            }else if(this.state.castleRights & CastlingRight.q && to == Square.a8){
+                this.state.castleRights &= 0b0111
+            }
+        }else{
+            if(this.state.castleRights & CastlingRight.K && to == Square.h1){
+                this.state.castleRights &= 0b1110
+            }else if(this.state.castleRights & CastlingRight.Q && to == Square.a1){
+                this.state.castleRights &= 0b1101
+            }
+        }
+
+    }
 
     makeMove(move: Move)
     {
@@ -220,11 +241,13 @@ export class MoveHandler extends Board
                     this.squareList[move.to] = PieceType.Knight << 1 | movingColor
                 }
                 this.state.enPassantTarget = 0
+                this.#revokeCastleRightsOnRookCapture(movingColor, move.captured, move.to)
             }else{
                 this.squareList[move.to] = move.moving
                 this.squareList[this.state.enPassantTarget] = 0
                 this.state.enPassantTarget = 0
             }
+
             return
         }
         // moves by other pieces
@@ -233,22 +256,7 @@ export class MoveHandler extends Board
 
         if(move.flag & MoveFlag.Capture){
             this.state.halfMoveClock = 0
-            const captureType = move.captured >> 1
-            if(captureType & PieceType.Rook){
-                if(movingColor == Color.White){
-                    if(this.state.castleRights & CastlingRight.k && move.to == Square.h8){
-                        this.state.castleRights &= 0b1011
-                    }else if(this.state.castleRights & CastlingRight.q && move.to == Square.a8){
-                        this.state.castleRights &= 0b0111
-                    }
-                }else{
-                    if(this.state.castleRights & CastlingRight.K && move.to == Square.h1){
-                        this.state.castleRights &= 0b1110
-                    }else if(this.state.castleRights & CastlingRight.Q && move.to == Square.a1){
-                        this.state.castleRights &= 0b1101
-                    }
-                }
-            }
+            this.#revokeCastleRightsOnRookCapture(movingColor, move.captured, move.to)
         }else{
             this.state.halfMoveClock++
         }

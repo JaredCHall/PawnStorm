@@ -3,7 +3,6 @@ import {Move, MoveFlag, MoveType} from "../src/Move.ts";
 import {Color, Piece, Square} from "../src/Board.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 import {binToString} from "../src/Utils.ts";
-import {MoveFactory} from "../src/MoveFactory.ts";
 
 let board = new MoveHandler()
 let lastBoardState = new BoardState()
@@ -575,6 +574,51 @@ Deno.test('it revokes long castles for white when a1 rook is captured', () => {
     board.unmakeMove(move)
     assertBoardStatePopped()
 })
+
+Deno.test('it revokes short castles for black when h8 rook is captured by pawn', () => {
+    setBoard('r3k2r/p2pppPp/8/8/8/8/P2PPP1P/R3K2R', new BoardState(0,0b0111))
+
+    const move = new Move(Square.g7, Square.h8, Piece.WhitePawn, Piece.BlackRook, MoveType.KnightPromote | MoveFlag.Capture)
+    board.makeMove(move)
+    board.render()
+    assertBoardStatePushed(new BoardState(1,0b0011))
+    board.unmakeMove(move)
+    assertBoardStatePopped()
+})
+
+Deno.test('it revokes long castles for black when a8 rook is captured by pawn', () => {
+    setBoard('r3k2r/pP1ppp1p/8/8/8/8/P2PPP1P/R3K2R', new BoardState(0,0b1101))
+
+    const move = new Move(Square.b7, Square.a8, Piece.WhitePawn, Piece.BlackRook, MoveType.KnightPromote | MoveFlag.Capture)
+    board.makeMove(move)
+    board.render()
+    assertBoardStatePushed(new BoardState(1,0b0101))
+    board.unmakeMove(move)
+    assertBoardStatePopped()
+})
+
+Deno.test('it revokes short castles for white when h1 rook is captured by pawn', () => {
+    setBoard('r3k2r/p2ppp1p/8/8/8/8/P2PPPpP/R3K2R', new BoardState(1,0b0111))
+
+    const move = new Move(Square.g2, Square.h1, Piece.BlackPawn, Piece.WhiteRook, MoveType.KnightPromote | MoveFlag.Capture)
+    board.makeMove(move)
+    board.render()
+    assertBoardStatePushed(new BoardState(0,0b0110))
+    board.unmakeMove(move)
+    assertBoardStatePopped()
+})
+
+Deno.test('it revokes long castles for white when a1 rook is captured by pawn', () => {
+    setBoard('r3k2r/p2ppp1p/8/8/8/8/Pp1PPP1P/R3K2R', new BoardState(1,0b0111))
+
+    const move = new Move(Square.b2, Square.a1, Piece.BlackPawn, Piece.WhiteRook,MoveType.KnightPromote | MoveFlag.Capture)
+    board.makeMove(move)
+    board.render()
+    assertBoardStatePushed(new BoardState(0,0b0101))
+    board.unmakeMove(move)
+    assertBoardStatePopped()
+})
+
 
 Deno.test('it castles short as white', () => {
     board.setPieces('r3k2r/8/8/8/8/8/8/R3K2R')
