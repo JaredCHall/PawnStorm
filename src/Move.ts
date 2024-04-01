@@ -27,6 +27,9 @@ export class Move {
     readonly captured: number // captured piece
     readonly flag: number
 
+    isCheck: boolean = false
+    isMate: boolean = false
+
     constructor(from: Square, to: Square, moving: number, captured: number, flag: number = MoveType.Quiet) {
         this.from = from
         this.to = to

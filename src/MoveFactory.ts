@@ -6,19 +6,7 @@ import {Move, MoveType} from "./Move.ts";
 enum RayDirection {
     N = -10, NE = -9, E = 1, SE = 11, S = 10, SW = 9, W = -1, NW = -11
 }
-
 class RayDirections {
-
-    static readonly typeMap = {
-        [PieceType.Pawn]: 0,
-        [PieceType.BPawn]: 1,
-        [PieceType.Knight]: 2,
-        [PieceType.Bishop]: 3,
-        [PieceType.Rook]: 4,
-        [PieceType.Queen]: 5,
-        [PieceType.King]: 6,
-    }
-
 
     static readonly cardinal: number[] = [RayDirection.N, RayDirection.E, RayDirection.S, RayDirection.W]
     static readonly ordinal: number[] = [RayDirection.NE, RayDirection.SE, RayDirection.SW, RayDirection.NW]
@@ -41,16 +29,36 @@ class RayDirections {
         [PieceType.Pawn]:   [1, 6, [RayDirection.NW , RayDirection.NE], [RayDirection.N, RayDirection.N * 2]],
         [PieceType.BPawn]:  [6, 1, [RayDirection.SW , RayDirection.SE], [RayDirection.S, RayDirection.S * 2]],
     }
-
-    static onSameRay(square1: Square, square2: Square): boolean
-    {
-        throw new Error('not implemented')
-    }
 }
 
 export class MoveFactory extends MoveHandler
 {
-    getMovesForSquare(from: Square, moving: Piece): Move[]
+
+    getLegalMoves(color: Color = this.state.sideToMove){
+        let moves: Move[] = []
+        for(let i=0;i<64;i++){
+            const from = this.square120Indexes[i]
+            const piece = this.squareList[from]
+            if(piece != 0 && (piece & 1) == color){
+                moves = moves.concat(this.getLegalMovesFromSquare(from, piece))
+            }
+        }
+        return moves
+    }
+
+    getLegalMovesFromSquare(from: Square, moving: Piece): Move[] {
+        const movingColor = this.state.sideToMove
+        const enemyColor = this.state.sideToMove ? 0 : 1
+        return this.getMovesFromSquare(from, moving).filter((move) => {
+            this.makeMove(move)
+            const isCheck = this.isSquareThreatened(this.kingSquares[movingColor], enemyColor)
+            this.unmakeMove(move)
+            return !isCheck
+        })
+
+    }
+
+    getMovesFromSquare(from: Square, moving: Piece): Move[]
     {
         const moves: Move[] = []
         const type = moving >> 1
@@ -60,7 +68,7 @@ export class MoveFactory extends MoveHandler
             return this.#getPawnMoves(from, moving, type, color)
         }
 
-        // @ts-ignore
+        // @ts-ignore - is correct
         const rayDirections = RayDirections.pieceMap[type]
         const offsets = rayDirections[1]
         const maxRayLength = rayDirections[0]
@@ -72,18 +80,15 @@ export class MoveFactory extends MoveHandler
                 if (captured == Square.Invalid) {
                     break // square out of bounds
                 }
-
                 if (captured == 0) {
                     // empty square
                     moves.push(new Move(from, to, moving, 0, MoveType.Quiet))
                     continue
                 }
-
                 if ((captured & 1) == color) {
                     // friendly piece
                     break
                 }
-
                 moves.push(new Move(from, to, moving, captured, MoveType.Capture))
                 break
             }
@@ -91,7 +96,6 @@ export class MoveFactory extends MoveHandler
         if(!(type & PieceType.King) || from != CastlingMoveInfo.kingSquare[color]){
             return moves
         }
-
 
         //handle castling moves
         this.state.getCastlingRights(color).forEach((right) => {
@@ -114,11 +118,11 @@ export class MoveFactory extends MoveHandler
     isSquareThreatened(square: Square, enemyColor: Color)
     {
         const movingColor = enemyColor ? 0 : 1
-        const hasKnightThreat = !this.getMovesForSquare(square, PieceType.Knight << 1 | movingColor)
+        const hasKnightThreat = !this.getMovesFromSquare(square, PieceType.Knight << 1 | movingColor)
             .every((move) => move.flag == MoveType.Quiet || !(move.captured >> 1 & PieceType.Knight))
         if(hasKnightThreat){return true}
 
-        const hasCardinalThreat = !this.getMovesForSquare(square, PieceType.Rook << 1 | movingColor)
+        const hasCardinalThreat = !this.getMovesFromSquare(square, PieceType.Rook << 1 | movingColor)
             .every((move) => {
                 if(move.flag == MoveType.Quiet){return true}
                 const capturedType = move.captured >> 1
@@ -134,7 +138,7 @@ export class MoveFactory extends MoveHandler
         if(hasCardinalThreat){return true}
 
         // Diagonal threat
-        return !this.getMovesForSquare(square, PieceType.Bishop << 1 | movingColor)
+        return !this.getMovesFromSquare(square, PieceType.Bishop << 1 | movingColor)
             .every((move) => {
                 if(move.flag == MoveType.Quiet){return true}
                 const capturedType = move.captured >> 1
@@ -217,7 +221,6 @@ export class MoveFactory extends MoveHandler
                 moves.push(new Move(from, to, moving, captured, MoveType.Capture))
             }
         }
-
         return moves
     }
 }

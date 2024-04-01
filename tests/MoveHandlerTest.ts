@@ -1,17 +1,17 @@
 import {BoardState, CastlingRight, MoveHandler} from "../src/MoveHandler.ts";
 import {Move, MoveFlag, MoveType} from "../src/Move.ts";
-import {Piece, Square} from "../src/Board.ts";
+import {Color, Piece, Square} from "../src/Board.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 import {binToString} from "../src/Utils.ts";
 
 let board = new MoveHandler()
-let oldState = new BoardState()
+let lastBoardState = new BoardState()
 
 const setBoard = (piecePositions: string, state: BoardState = new BoardState()) => {
     board = new MoveHandler()
     board.setPieces(piecePositions)
     board.state = state.clone()
-    oldState = state
+    lastBoardState = state
 }
 
 const assertSquareEquals = (square: Square, pieceCode: number) => {
@@ -20,11 +20,11 @@ const assertSquareEquals = (square: Square, pieceCode: number) => {
 
 const assertBoardStatePushed = (state: BoardState) => {
     assertEquals(board.state, state, 'Expected state set on board object')
-    assertEquals(board.positionStack, [oldState], 'Previous state pushed to stack')
+    assertEquals(board.positionStack, [lastBoardState], 'Previous state pushed to stack')
 }
 
 const assertBoardStatePopped = () => {
-    assertEquals(board.state, oldState, 'Expected state set on board object')
+    assertEquals(board.state, lastBoardState, 'Expected state set on board object')
     assertEquals(board.positionStack, [], 'Previous state popped from stack')
 }
 
@@ -49,6 +49,25 @@ Deno.test('board state gets correct castle rights', () => {
     state = new BoardState(0, 0b1010)
     assertEquals(state.getCastlingRights(0), [CastlingRight.Q])
     assertEquals(state.getCastlingRights(1), [CastlingRight.q])
+})
+
+Deno.test('it sets board from Fen Number', () => {
+
+    // black to move with board state parts set
+    board.setFromFenNumber('8/8/8/8/8/8/8/8 b KQ e3 4 20')
+    assertEquals(board.state.sideToMove, Color.Black)
+    assertEquals(board.ply, 39)
+    assertEquals(board.state.enPassantTarget, Square.e3)
+    assertEquals(board.state.castleRights, 0b0011)
+    assertEquals(board.state.halfMoveClock, 4)
+
+    // empty board state
+    board.setFromFenNumber('8/8/8/8/8/8/8/8 w - - 0 0')
+    assertEquals(board.state.sideToMove, Color.White)
+    assertEquals(board.ply, 0)
+    assertEquals(board.state.enPassantTarget,0)
+    assertEquals(board.state.castleRights, 0)
+    assertEquals(board.state.halfMoveClock, 0)
 })
 
 Deno.test('it makes quiet moves for piece', () => {

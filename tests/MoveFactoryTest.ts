@@ -4,15 +4,21 @@ import {Move, MoveType} from "../src/Move.ts";
 import {assertArrayIncludes} from "https://deno.land/std@0.219.0/assert/assert_array_includes.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 import { CastlingRight } from "../src/MoveHandler.ts";
+import {dumpBin} from "../src/Utils.ts";
 
 
 const board = new MoveFactory()
 
-const genMoves = (piecePositions: string, from: Square, enPassantTarget: Square|0=0, castleRights: number = 0): Move[] => {
-    board.setPieces(piecePositions)
-    board.state.enPassantTarget = enPassantTarget
-    board.state.castleRights = castleRights
-    const moves = board.getMovesForSquare(from, board.squareList[from])
+const genMoves = (fen: string, from: Square): Move[] => {
+    board.setFromFenNumber(fen)
+    const moves = board.getMovesFromSquare(from, board.squareList[from])
+    board.render(moves.map((move) => move.to))
+    return moves
+}
+
+const genLegalMoves = (fen: string, from: Square): Move[] => {
+    board.setFromFenNumber(fen)
+    const moves = board.getLegalMovesFromSquare(from, board.squareList[from])
     board.render(moves.map((move) => move.to))
     return moves
 }
@@ -145,7 +151,7 @@ Deno.test('it generates moves for king', () => {
 
 
 Deno.test('it generates castles as white', () => {
-    let moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R', Square.e1, 0, CastlingRight.K | CastlingRight.Q)
+    let moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R w KQ', Square.e1)
     assertMatchesMoveList(moves,[
         new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
         new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
@@ -153,36 +159,36 @@ Deno.test('it generates castles as white', () => {
         new Move(Square.e1, Square.c1, Piece.WhiteKing, 0, MoveType.CastleLong),
     ], 'Can castle either side if both rights exist')
 
-    moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R', Square.e1, 0, CastlingRight.K)
+    moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R w K', Square.e1)
     assertMatchesMoveList(moves,[
         new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
         new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
         new Move(Square.e1, Square.g1, Piece.WhiteKing, 0, MoveType.CastleShort),
     ], 'Can castle castle short if right exists')
 
-    moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R', Square.e1, 0, CastlingRight.Q)
+    moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R w Q', Square.e1)
     assertMatchesMoveList(moves,[
         new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
         new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
         new Move(Square.e1, Square.c1, Piece.WhiteKing, 0, MoveType.CastleLong),
     ], 'Can castle castle long if right exists')
 
-    moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R', Square.e1, 0, CastlingRight.q | CastlingRight.k)
+    moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R w kq', Square.e1)
     assertMatchesMoveList(moves,[
         new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
         new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
     ], 'Cannot castle if only black as castling rights')
 
-    moves = genMoves('8/8/8/8/8/8/3PPP2/R2QKB1R', Square.e1, 0, CastlingRight.K | CastlingRight.Q)
+    moves = genMoves('8/8/8/8/8/8/3PPP2/R2QKB1R w KQ', Square.e1)
     assertMatchesMoveList(moves,[], 'Cannot castle if adjacent squares are blocked')
 
-    moves = genMoves('8/8/8/8/8/8/3PPP2/R1Q1K1NR', Square.e1, 0, CastlingRight.K | CastlingRight.Q)
+    moves = genMoves('8/8/8/8/8/8/3PPP2/R1Q1K1NR w KQ', Square.e1)
     assertMatchesMoveList(moves,[
         new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
         new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
     ], 'Cannot castle if rook squares are blocked')
 
-    moves = genMoves('8/8/8/8/8/8/3PPP2/RQ2K1NR', Square.e1, 0, CastlingRight.K | CastlingRight.Q)
+    moves = genMoves('8/8/8/8/8/8/3PPP2/RQ2K1NR w KQ', Square.e1)
     assertMatchesMoveList(moves,[
         new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
         new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
@@ -190,7 +196,7 @@ Deno.test('it generates castles as white', () => {
 })
 
 Deno.test('it generates castles as black', () => {
-    let moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.k | CastlingRight.q)
+    let moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8 b kq', Square.e8)
     assertMatchesMoveList(moves,[
         new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
         new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
@@ -198,36 +204,36 @@ Deno.test('it generates castles as black', () => {
         new Move(Square.e8, Square.c8, Piece.BlackKing, 0, MoveType.CastleLong),
     ], 'Can castle either side if both rights exist')
 
-    moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.k)
+    moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8 b k', Square.e8)
     assertMatchesMoveList(moves,[
         new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
         new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
         new Move(Square.e8, Square.g8, Piece.BlackKing, 0, MoveType.CastleShort),
     ], 'Can castle castle short if right exists')
 
-    moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.q)
+    moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8 b q', Square.e8)
     assertMatchesMoveList(moves,[
         new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
         new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
         new Move(Square.e8, Square.c8, Piece.BlackKing, 0, MoveType.CastleLong),
     ], 'Can castle castle long if right exists')
 
-    moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.Q | CastlingRight.K)
+    moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8 b KQ', Square.e8)
     assertMatchesMoveList(moves,[
         new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
         new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
     ], 'Cannot castle if only black as castling rights')
 
-    moves = genMoves('r2qkb1r/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.k | CastlingRight.q)
+    moves = genMoves('r2qkb1r/3ppp2/8/8/8/8/8/8 b kq', Square.e8)
     assertMatchesMoveList(moves,[], 'Cannot castle if adjacent squares are blocked')
 
-    moves = genMoves('r1q1k1nr/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.k | CastlingRight.q)
+    moves = genMoves('r1q1k1nr/3ppp2/8/8/8/8/8/8 b kq', Square.e8)
     assertMatchesMoveList(moves,[
         new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
         new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
     ], 'Cannot castle if rook squares are blocked')
 
-    moves = genMoves('rq2k1nr/3ppp2/8/8/8/8/8/8', Square.e8, 0, CastlingRight.k | CastlingRight.q)
+    moves = genMoves('rq2k1nr/3ppp2/8/8/8/8/8/8 b kq', Square.e8)
     assertMatchesMoveList(moves,[
         new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
         new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
@@ -287,7 +293,7 @@ Deno.test('it generates captures and en-passant for white pawn', () => {
         new Move(Square.g7, Square.h8, Piece.WhitePawn, Piece.BlackKnight, MoveType.QueenPromote | MoveType.Capture),
     ], 'Pawn has expected capture promotions')
 
-    moves = genMoves('8/8/6b1/4pP2/8/8/8/8', Square.f5, Square.e6)
+    moves = genMoves('8/8/6b1/4pP2/8/8/8/8 w - e6', Square.f5)
     assertMatchesMoveList(moves,[
         new Move(Square.f5, Square.f6, Piece.WhitePawn, 0, 0),
         new Move(Square.f5, Square.e6, Piece.WhitePawn, Piece.BlackPawn, MoveType.EnPassant),
@@ -295,7 +301,7 @@ Deno.test('it generates captures and en-passant for white pawn', () => {
 
     ], 'Pawn has expected en-passant capture in middle of the board')
 
-    moves = genMoves('8/8/N7/Pp6/8/8/8/8', Square.a5, Square.b6)
+    moves = genMoves('8/8/N7/Pp6/8/8/8/8 w - b6', Square.a5)
     assertMatchesMoveList(moves,[
         new Move(Square.a5, Square.b6, Piece.WhitePawn, Piece.BlackPawn, MoveType.EnPassant),
 
@@ -322,7 +328,7 @@ Deno.test('it generates captures and en-passant for black pawn', () => {
         new Move(Square.g2, Square.h1, Piece.BlackPawn, Piece.WhiteKnight, MoveType.QueenPromote | MoveType.Capture),
     ], 'Pawn has expected capture promotions')
 
-    moves = genMoves('8/8/8/8/4Pp2/6B1/8/8', Square.f4, Square.e3)
+    moves = genMoves('8/8/8/8/4Pp2/6B1/8/8 b - e3', Square.f4)
     assertMatchesMoveList(moves,[
         new Move(Square.f4, Square.f3, Piece.BlackPawn, 0, 0),
         new Move(Square.f4, Square.e3, Piece.BlackPawn, Piece.WhitePawn, MoveType.EnPassant),
@@ -330,9 +336,73 @@ Deno.test('it generates captures and en-passant for black pawn', () => {
 
     ], 'Pawn has expected en-passant capture in middle of the board')
 
-    moves = genMoves('8/8/8/8/pP6/n7/8/8', Square.a4, Square.b3)
+    moves = genMoves('8/8/8/8/pP6/n7/8/8 b - b3', Square.a4)
     assertMatchesMoveList(moves,[
         new Move(Square.a4, Square.b3, Piece.BlackPawn, Piece.WhitePawn, MoveType.EnPassant),
 
     ], 'Pawn has expected en-passant capture on edge of the board')
+})
+
+Deno.test('it prevents moving pinned piece', () => {
+
+    const fen = 'r2q1b1r/ppp1kppp/4bn2/1B1P2B1/8/4Q3/PPP2PPP/RN2K2R b'
+    let moves = genLegalMoves(fen, Square.f6)
+    assertMatchesMoveList(moves, [], 'Cannot move pinned knight')
+
+    moves = genLegalMoves(fen, Square.e6)
+    assertMatchesMoveList(moves, [], 'Cannot move pinned bishop')
+})
+
+Deno.test('it handles king move legality', () => {
+    let moves = genLegalMoves('r2q1b1r/ppp1kppp/4bn2/1B1P2B1/8/4Q3/PPP2PPP/RN2K2R b', Square.e7)
+    assertMatchesSquareList(moves, [Square.d6], 'King only has one move')
+
+    moves = genLegalMoves('r2q1b1r/1pp1kppp/p3bB2/1B1P4/8/4Q3/PPP2PPP/RN2K2R b', Square.e7)
+    assertMatchesSquareList(moves, [Square.d6, Square.f6], 'King can capture to get out of check')
+
+    moves = genLegalMoves('5k2/5P2/4K3/8/8/8/8/8 b', Square.f8)
+    assertMatchesSquareList(moves, [Square.g7], 'King can escape with other king nearby')
+
+    moves = genLegalMoves('rnbq1bnr/ppp1kPpp/8/8/8/8/PPPP1PPP/RNBQKBNR b', Square.e7)
+    assertMatchesSquareList(moves, [Square.d7, Square.d6, Square.e6, Square.f6, Square.f7], 'King can scoot behind a pawn')
+})
+
+Deno.test('it prevents illegal castles', () => {
+
+    let moves = genLegalMoves('r3k2r/3ppp2/3N4/8/8/5n2/3PPP2/R3K2R b KQkq', Square.e8)
+    assertMatchesSquareList(moves, [Square.d8, Square.f8], 'Cannot castle when king is in check')
+
+    moves = genLegalMoves('r3k2r/3ppp2/4N3/8/8/8/3PPP2/R3K2R b KQkq', Square.e8)
+    assertMatchesSquareList(moves, [], 'Cannot castle when adjacent squares are threatened')
+
+    moves = genLegalMoves('r3k2r/1P1ppp2/8/8/8/8/1p1PPP2/R3K2R b KQkq', Square.e8)
+    assertMatchesSquareList(moves, [Square.d8, Square.f8, Square.g8], 'Cannot castle long when c-file is threatened')
+
+    moves = genLegalMoves('r3k2r/3ppp1B/Q7/8/8/q7/3PPP1b/R3K2R b KQkq', Square.e8)
+    assertMatchesSquareList(moves, [Square.d8, Square.f8], 'Cannot castle into check')
+})
+
+Deno.test('it generates all moves in a position', () => {
+
+    const factory = new MoveFactory()
+    factory.setFromFenNumber('2b1rr2/6kp/1R6/1p6/4n3/2N4P/PPP1B1P1/2K4R w - - 0 24')
+    let moves = factory.getLegalMoves(Color.White)
+    factory.render(moves.map((move) => move.to))
+    assertMatchesSquareList(moves,[
+        Square.b8,Square.b7,Square.a6,Square.c6,Square.d6,Square.e6,Square.f6,Square.g6,Square.h6,
+        Square.b5,Square.d5,Square.h5,Square.a4,Square.b4,Square.c4,Square.e4,Square.g4,Square.h4,
+        Square.a3,Square.b3,Square.d3,Square.f3,Square.g3,Square.h2,
+        Square.b1,Square.d1,Square.e1,Square.f1,Square.g1,
+    ], 'It generates all moves for white in a position')
+
+    factory.setFromFenNumber('2b1rr2/6kp/1R6/1p6/4n3/2N4P/PPP1B1P1/2K4R b - - 0 24')
+    moves = factory.getLegalMoves(Color.Black)
+    factory.render(moves.map((move) => move.to))
+
+    assertMatchesSquareList(moves, [
+        Square.a6, Square.d8,Square.b7,Square.b4,Square.c5,Square.c3,Square.d2,Square.d6,Square.d7,Square.d8,
+        Square.e7,Square.e6,Square.e5,Square.f7,Square.f6,Square.f5,Square.f4,Square.f3,Square.f2,Square.f1,
+        Square.g8,Square.h8,Square.g5,Square.g4,Square.g3,Square.h6,Square.h5,Square.h3
+    ])
+    
 })
