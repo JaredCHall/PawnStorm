@@ -140,3 +140,8 @@ Deno.test('it sets board representation', () => {
 Deno.test('it renders board with highlights', () => {
     board.render([Square.e1, Square.e8])
 })
+
+Deno.test('it serializes as FEN piece placements', () => {
+    board.render()
+    assertEquals(board.serialize(), 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')
+})

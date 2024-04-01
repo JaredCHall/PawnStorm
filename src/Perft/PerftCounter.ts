@@ -1,5 +1,4 @@
 import {Move, MoveFlag, MoveType} from "../Move.ts";
-import {dumpBin} from "../Utils.ts";
 
 export class PerftCounter {
     nodes: number

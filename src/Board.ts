@@ -48,10 +48,10 @@ export enum Piece { // 8 bits
     BlackKing = PieceType.King << 1 | Color.Black,
 }
 
-export const FenPieceMap = {
-    p: Piece.BlackPawn, n: Piece.BlackKnight, b: Piece.BlackBishop, r: Piece.BlackRook, q: Piece.BlackQueen, k: Piece.BlackKing,
-    P: Piece.WhitePawn, N: Piece.WhiteKnight, B: Piece.WhiteBishop, R: Piece.WhiteRook, Q: Piece.WhiteQueen, K: Piece.WhiteKing
-}
+export const FenPieceMap = new Map([
+    ['p', Piece.BlackPawn], ['n', Piece.BlackKnight],['b', Piece.BlackBishop],['r', Piece.BlackRook],['q', Piece.BlackQueen],['k', Piece.BlackKing],
+    ['P', Piece.WhitePawn], ['N', Piece.WhiteKnight],['B', Piece.WhiteBishop],['R', Piece.WhiteRook],['Q', Piece.WhiteQueen],['K', Piece.WhiteKing],
+])
 
 export enum Square { // 7 bits
     a8 = 21, b8,c8, d8, e8, f8,g8,h8,
@@ -156,7 +156,7 @@ export class Board
                 } else if (/[rbnqkpRBNQKP]/.test(character)) {
                     // Handle Pieces
                     // @ts-ignore it's fine
-                    const piece = FenPieceMap[character]
+                    const piece: Piece = FenPieceMap.get(character)
                     this.squareList[squareIndex] = piece
                     // store king positions for quicker access
                     if((piece >> 1) & PieceType.King){
@@ -211,4 +211,39 @@ export class Board
         return moving & 1 ? bold(black(formatted)) : bold(white(formatted))
     }
 
+    serialize(): string {
+        const files = ['a','b','c','d','e','f','g','h']
+        // @ts-ignore let's try it
+        const pieceMap = new Map(Array.from(FenPieceMap, a => a.reverse()));
+        let emptySquares = 0
+        let serialized = ''
+
+        let row = 8
+        for(let i=0;i<64;i++)
+        {
+            const piece = this.squareList[this.square120Indexes[i]]
+            const isLastInRow = (i+1) % 8 == 0
+
+            if(!piece){
+                emptySquares++
+                if(!isLastInRow){continue}
+            }
+
+            if(emptySquares > 0){
+                serialized += emptySquares.toString()
+                emptySquares = 0
+            }
+            if(piece) {
+                const fenType = pieceMap.get(piece)
+                serialized += fenType
+            }
+            if(isLastInRow){
+                if(row != 1){
+                    serialized += '/'
+                }
+                row--
+            }
+        }
+        return serialized
+    }
 }

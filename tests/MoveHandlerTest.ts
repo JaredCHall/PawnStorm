@@ -3,6 +3,7 @@ import {Move, MoveFlag, MoveType} from "../src/Move.ts";
 import {Color, Piece, Square} from "../src/Board.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 import {binToString} from "../src/Utils.ts";
+import {MoveFactory} from "../src/MoveFactory.ts";
 
 let board = new MoveHandler()
 let lastBoardState = new BoardState()
@@ -68,6 +69,22 @@ Deno.test('it sets board from Fen Number', () => {
     assertEquals(board.state.enPassantTarget,0)
     assertEquals(board.state.castleRights, 0)
     assertEquals(board.state.halfMoveClock, 0)
+})
+
+Deno.test('it serializes as FEN string', () => {
+
+    let fen = '8/8/8/8/8/8/8/8 w KQ e3 4 20'
+    board.setFromFenNumber(fen)
+    assertEquals(board.serialize(), fen)
+
+    fen = '8/8/4r1pk/1p1pP1R1/p4KP1/2P5/PP6/8 b - - 10 47'
+    board.setFromFenNumber(fen)
+    assertEquals(board.serialize(), fen)
+
+    fen = '1r2k2r/p1ppqNb1/bn2pnp1/3P4/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQk - 1 2'
+    board.setFromFenNumber(fen)
+    assertEquals(board.serialize(), fen)
+
 })
 
 Deno.test('it makes quiet moves for piece', () => {
@@ -512,6 +529,50 @@ Deno.test('it revokes castle rights when black king moves', () => {
     //unmake
     board.unmakeMove(move)
     board.render()
+    assertBoardStatePopped()
+})
+
+Deno.test('it revokes short castles for black when h8 rook is captured', () => {
+    setBoard('1r2k2r/p1ppqNb1/bn2pnp1/3P4/1p2P3/2N2Q1p/PPPBBPPP/R3K2R', new BoardState(0,0b0111))
+
+    const move = new Move(Square.f7, Square.h8, Piece.WhiteKnight, Piece.BlackRook, MoveType.Capture)
+    board.makeMove(move)
+    board.render()
+    assertBoardStatePushed(new BoardState(1,0b0011))
+    board.unmakeMove(move)
+    assertBoardStatePopped()
+})
+
+Deno.test('it revokes long castles for black when a8 rook is captured', () => {
+    setBoard('r3k2r/p1ppq1b1/bN2pnp1/3P4/1p2P3/2N2Q1p/PPPBBPPP/R3K2R', new BoardState(0,0b1101))
+
+    const move = new Move(Square.b6, Square.a8, Piece.WhiteKnight, Piece.BlackRook, MoveType.Capture)
+    board.makeMove(move)
+    board.render()
+    assertBoardStatePushed(new BoardState(1,0b0101))
+    board.unmakeMove(move)
+    assertBoardStatePopped()
+})
+
+Deno.test('it revokes short castles for white when h1 rook is captured', () => {
+    setBoard('r3k2r/p1ppq1b1/bN2p1p1/3P4/1p2P3/2N2Qnp/PPPBBPPP/R3K2R', new BoardState(1,0b0111))
+
+    const move = new Move(Square.g3, Square.h1, Piece.BlackKnight, Piece.WhiteRook, MoveType.Capture)
+    board.makeMove(move)
+    board.render()
+    assertBoardStatePushed(new BoardState(0,0b0110))
+    board.unmakeMove(move)
+    assertBoardStatePopped()
+})
+
+Deno.test('it revokes long castles for white when a1 rook is captured', () => {
+    setBoard('r3k2r/p1ppq1b1/bN2p1p1/3P4/1p2P3/1nN2Q1p/PPPBBPPP/R3K2R', new BoardState(1,0b0111))
+
+    const move = new Move(Square.b3, Square.a1, Piece.BlackKnight, Piece.WhiteRook, MoveType.Capture)
+    board.makeMove(move)
+    board.render()
+    assertBoardStatePushed(new BoardState(0,0b0101))
+    board.unmakeMove(move)
     assertBoardStatePopped()
 })
 
