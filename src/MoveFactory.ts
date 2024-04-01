@@ -33,6 +33,35 @@ class RayDirections {
 
 export class MoveFactory extends MoveHandler
 {
+    options = {
+        evaluateChecksAndMates: false,
+    }
+
+    makeMove(move: Move) {
+        super.makeMove(move);
+        if(this.options.evaluateChecksAndMates){
+            const movingColor = move.moving & 1
+            const enemyColor = movingColor ? 0 : 1
+            move.isCheck = this.isSquareThreatened(this.kingSquares[enemyColor], movingColor)
+            if(move.isCheck){
+                move.isMate = !this.hasLegalMoves(enemyColor)
+            }
+        }
+    }
+
+    hasLegalMoves(color: Color) {
+        for(let i=0;i<64;i++){
+            const from = this.square120Indexes[i]
+            const piece = this.squareList[from]
+            if(piece != 0 && (piece & 1) == color){
+                if(this.getLegalMovesFromSquare(from, piece).length > 0) {
+                    // early return
+                    return true
+                }
+            }
+        }
+        return false
+    }
 
     getLegalMoves(color: Color = this.state.sideToMove){
         let moves: Move[] = []
@@ -50,9 +79,9 @@ export class MoveFactory extends MoveHandler
         const movingColor = this.state.sideToMove
         const enemyColor = this.state.sideToMove ? 0 : 1
         return this.getMovesFromSquare(from, moving).filter((move) => {
-            this.makeMove(move)
+            super.makeMove(move)
             const isCheck = this.isSquareThreatened(this.kingSquares[movingColor], enemyColor)
-            this.unmakeMove(move)
+            super.unmakeMove(move)
             return !isCheck
         })
 

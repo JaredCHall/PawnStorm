@@ -1,6 +1,5 @@
 import {Board, Color, PieceType, Square} from "./Board.ts";
 import {Move, MoveFlag, MoveType} from "./Move.ts";
-import {dumpBin} from "./Utils.ts";
 
 
 // for parsing fen strings
@@ -106,7 +105,6 @@ export class BoardState {
 
 export class MoveHandler extends Board
 {
-
     ply: number = 0
     state: BoardState = new BoardState()
     positionStack: BoardState[] = []
@@ -189,7 +187,6 @@ export class MoveHandler extends Board
             }
         }
     }
-
 
     makeMove(move: Move)
     {
