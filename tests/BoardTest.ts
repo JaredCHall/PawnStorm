@@ -1,9 +1,10 @@
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
-import {Board, Square, Piece, Color} from "../src/Board.ts";
+import {Board} from "../src/Board/Board.ts";
+import {Square} from "../src/Board/Square.ts";
 import {binToString} from "../src/Utils.ts";
+import {Piece, Color} from "../src/Board/Piece.ts";
 
 const board = new Board()
-
 
 const assertSquareEquals = (square: Square, pieceCode: number) => {
     assertEquals(board.squareList[square], pieceCode, `Expected ${binToString(pieceCode,8)} on square ${square}`)

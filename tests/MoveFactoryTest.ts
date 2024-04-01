@@ -1,11 +1,9 @@
 import {MoveFactory} from "../src/MoveFactory.ts";
-import {Color, Piece, Square} from "../src/Board.ts";
 import {Move, MoveType} from "../src/Move.ts";
 import {assertArrayIncludes} from "https://deno.land/std@0.219.0/assert/assert_array_includes.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
-import { CastlingRight } from "../src/MoveHandler.ts";
-import {dumpBin} from "../src/Utils.ts";
-
+import {Square} from "../src/Board/Square.ts";
+import {Piece, Color} from "../src/Board/Piece.ts";
 
 const board = new MoveFactory()
 

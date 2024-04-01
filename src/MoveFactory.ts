@@ -1,5 +1,6 @@
 import {CastlingMoveInfo, MoveHandler} from "./MoveHandler.ts";
-import {Color, Piece, PieceType, Square} from "./Board.ts";
+import {Piece, Color, PieceType} from "./Board/Piece.ts";
+import {Square} from "./Board/Square.ts";
 import {Move, MoveType} from "./Move.ts";
 
 
