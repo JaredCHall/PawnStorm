@@ -101,9 +101,7 @@ export class MoveFactory extends MoveHandler
         }
 
         // @ts-ignore - is correct
-        const rayDirections = RayDirections.pieceMap[type]
-        const offsets = rayDirections[1]
-        const maxRayLength = rayDirections[0]
+        const [maxRayLength, offsets] = RayDirections.pieceMap[type]
         for(let i = 0; i<offsets.length;i++) {
             const offset = offsets[i]
             for (let j = 1; j <= maxRayLength; j++) {

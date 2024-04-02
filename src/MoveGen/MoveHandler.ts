@@ -1,7 +1,7 @@
 import {Board} from "../Board/Board.ts";
 import {Piece, Color, PieceType} from "../Board/Piece.ts";
 import {Move, MoveFlag, MoveType} from "./Move.ts";
-import {Square, squareNameMap} from "../Board/Square.ts";
+import {Square, SquareNameMap} from "../Board/Square.ts";
 import {CastlingMove, CastlingMoveMap, CastlingRight} from "./CastlingMove.ts";
 import { BoardState } from "../Board/BoardState.ts";
 
@@ -65,7 +65,7 @@ export class MoveHandler extends Board
         this.state.enPassantTarget = 0
         if(enPassantTarget != '-'){
             // @ts-ignore it works fine
-            const enPassantSquare = squareNameMap[enPassantTarget] ?? null
+            const enPassantSquare = SquareNameMap.indexByName[enPassantTarget] ?? null
             if(!enPassantSquare){
                 throw new Error(`Invalid enPassantTarget: ${enPassantTarget}`)
             }
@@ -84,29 +84,6 @@ export class MoveHandler extends Board
                 this.ply = (fullMoveClockInt - 1) * 2 + this.state.sideToMove
             }
         }
-    }
-
-    #revokeCastleRightsOnRookCapture(movingColor: Color, captured: Piece, to: number)
-    {
-        const captureType = captured >> 1
-        if(!(captureType & PieceType.Rook)){
-            return
-        }
-
-        if(movingColor == Color.White){
-            if(this.state.castleRights & CastlingRight.k && to == Square.h8){
-                this.state.castleRights &= 0b1011
-            }else if(this.state.castleRights & CastlingRight.q && to == Square.a8){
-                this.state.castleRights &= 0b0111
-            }
-        }else{
-            if(this.state.castleRights & CastlingRight.K && to == Square.h1){
-                this.state.castleRights &= 0b1110
-            }else if(this.state.castleRights & CastlingRight.Q && to == Square.a1){
-                this.state.castleRights &= 0b1101
-            }
-        }
-
     }
 
     makeMove(move: Move)
@@ -220,6 +197,30 @@ export class MoveHandler extends Board
         this.restoreLastState()
     }
 
+    #revokeCastleRightsOnRookCapture(movingColor: Color, captured: Piece, to: number)
+    {
+        const captureType = captured >> 1
+        if(!(captureType & PieceType.Rook)){
+            return
+        }
+
+        if(movingColor == Color.White){
+            if(this.state.castleRights & CastlingRight.k && to == Square.h8){
+                this.state.castleRights &= 0b1011
+            }else if(this.state.castleRights & CastlingRight.q && to == Square.a8){
+                this.state.castleRights &= 0b0111
+            }
+        }else{
+            if(this.state.castleRights & CastlingRight.K && to == Square.h1){
+                this.state.castleRights &= 0b1110
+            }else if(this.state.castleRights & CastlingRight.Q && to == Square.a1){
+                this.state.castleRights &= 0b1101
+            }
+        }
+
+    }
+
+
     serialize(): string {
         let serialized = super.serialize();
         serialized += ' ' + (this.state.sideToMove == 0 ? 'w' : 'b')
@@ -233,8 +234,8 @@ export class MoveHandler extends Board
         serialized += ' '
 
         if(this.state.enPassantTarget){
-            const map = Object.fromEntries(Object.entries(squareNameMap).map(([k,v]) => [v,k]))
-            serialized += map[this.state.enPassantTarget]
+            // @ts-ignore
+            serialized += SquareNameMap.nameByIndex[this.state.enPassantTarget]
         }else{
             serialized += '-'
         }
