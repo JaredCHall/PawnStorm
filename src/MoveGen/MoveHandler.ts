@@ -96,44 +96,13 @@ export class MoveHandler extends Board
         const movingColor = move.moving & 1
 
         // handle pawn moves
-        if(movingType & PieceType.Pawn || movingType & PieceType.BPawn){
-            this.state.halfMoveClock = 0
-            if(move.flag == MoveType.DoublePawnPush){
-                this.squareList[move.to] = move.moving
-                this.state.enPassantTarget = this.enPassantTargetSquares[this.square64Indexes[move.to]]
-            }else if(move.flag == MoveType.EnPassant){
-                const capturedPawnSquare = this.enPassantCaptureOnSquares[this.square64Indexes[move.to]]
-                this.squareList[move.to] = move.moving
-                this.squareList[capturedPawnSquare] = 0
-                this.state.enPassantTarget = 0
-            }else if(move.flag & MoveFlag.Promotion){
-                const hasFlag1 = move.flag & MoveFlag.Flag1
-                const hasFlag2 = move.flag & MoveFlag.Flag2
-                if(hasFlag1){
-                    if(hasFlag2){
-                        this.squareList[move.to] = PieceType.Queen << 1 | movingColor
-                    }else{
-                        this.squareList[move.to] = PieceType.Bishop << 1 | movingColor
-                    }
-                }else if(hasFlag2) {
-                    this.squareList[move.to] = PieceType.Rook << 1 | movingColor
-                }else{
-                    this.squareList[move.to] = PieceType.Knight << 1 | movingColor
-                }
-                this.state.enPassantTarget = 0
-                this.#revokeCastleRightsOnRookCapture(movingColor, move.captured, move.to)
-            }else{
-                this.squareList[move.to] = move.moving
-                this.squareList[this.state.enPassantTarget] = 0
-                this.state.enPassantTarget = 0
-            }
-
-            return
+        if(movingType & (PieceType.Pawn | PieceType.BPawn)){
+            return this.#makePawnMove(move, movingColor)
         }
+
         // moves by other pieces
         this.squareList[move.to] = move.moving
         this.state.enPassantTarget = 0
-
         if(move.flag & MoveFlag.Capture){
             this.state.halfMoveClock = 0
             this.#revokeCastleRightsOnRookCapture(movingColor, move.captured, move.to)
@@ -195,6 +164,40 @@ export class MoveHandler extends Board
             this.kingSquares[movingColor] = move.from
         }
         this.restoreLastState()
+    }
+
+    #makePawnMove(move: Move, movingColor: Color)
+    {
+        this.state.halfMoveClock = 0
+        if(move.flag == MoveType.DoublePawnPush){
+            this.squareList[move.to] = move.moving
+            this.state.enPassantTarget = this.enPassantTargetSquares[this.square64Indexes[move.to]]
+        }else if(move.flag == MoveType.EnPassant){
+            const capturedPawnSquare = this.enPassantCaptureOnSquares[this.square64Indexes[move.to]]
+            this.squareList[move.to] = move.moving
+            this.squareList[capturedPawnSquare] = 0
+            this.state.enPassantTarget = 0
+        }else if(move.flag & MoveFlag.Promotion){
+            const hasFlag1 = move.flag & MoveFlag.Flag1
+            const hasFlag2 = move.flag & MoveFlag.Flag2
+            if(hasFlag1){
+                if(hasFlag2){
+                    this.squareList[move.to] = PieceType.Queen << 1 | movingColor
+                }else{
+                    this.squareList[move.to] = PieceType.Bishop << 1 | movingColor
+                }
+            }else if(hasFlag2) {
+                this.squareList[move.to] = PieceType.Rook << 1 | movingColor
+            }else{
+                this.squareList[move.to] = PieceType.Knight << 1 | movingColor
+            }
+            this.state.enPassantTarget = 0
+            this.#revokeCastleRightsOnRookCapture(movingColor, move.captured, move.to)
+        }else{
+            this.squareList[move.to] = move.moving
+            this.squareList[this.state.enPassantTarget] = 0
+            this.state.enPassantTarget = 0
+        }
     }
 
     #revokeCastleRightsOnRookCapture(movingColor: Color, captured: Piece, to: number)

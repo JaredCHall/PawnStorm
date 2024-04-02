@@ -1,4 +1,4 @@
-import {Square} from "../Board/Square.ts";
+import {Square, SquareNameMap} from "../Board/Square.ts";
 
 export enum MoveFlag {
     Flag1       = 0b0001,
@@ -41,7 +41,7 @@ export class Move {
     serialize(): string
     {
         // @ts-ignore ok
-        let moveStr: string = squareNamesBy120Index[this.from] + squareNamesBy120Index[this.to]
+        let moveStr: string = SquareNameMap.nameByIndex[this.from] + SquareNameMap.nameByIndex[this.to]
         if(this.flag & MoveFlag.Promotion){
             switch(this.flag & 0b1011){
                 case MoveType.KnightPromote: moveStr += 'N'; break

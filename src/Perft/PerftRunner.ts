@@ -7,7 +7,7 @@ export class PerftRunner {
     factory: MoveFactory
     counter: PerftCounter
     runTime: number = 0// milliseconds
-    debug: boolean = false
+    debug: boolean = true
     denoChess: ChessGame|null = null
 
     constructor(startFen: string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') {
@@ -19,6 +19,7 @@ export class PerftRunner {
         // if debugging, we will ask a smarter chess engine if our moves are legal
         if(this.debug){
             this.denoChess = ChessGame.NewFromFEN(startFen)
+            console.log('debugging with deno chess')
         }
 
     }
