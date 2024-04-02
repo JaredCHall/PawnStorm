@@ -1,7 +1,8 @@
-import {CastlingMoveInfo, MoveHandler} from "./MoveHandler.ts";
+import {MoveHandler} from "./MoveHandler.ts";
 import {Piece, Color, PieceType} from "./Board/Piece.ts";
 import {Square} from "./Board/Square.ts";
 import {Move, MoveType} from "./Move.ts";
+import {CastlingMove, CastlingMoveMap} from "./MoveGen/CastlingMove.ts";
 
 
 enum RayDirection {
@@ -124,23 +125,21 @@ export class MoveFactory extends MoveHandler
                 break
             }
         }
-        if(!(type & PieceType.King) || from != CastlingMoveInfo.kingSquare[color]){
+        if(!(type & PieceType.King) || from != CastlingMoveMap.kingSquareByColor[color]){
             return moves
         }
 
         //handle castling moves
         this.state.getCastlingRights(color).forEach((right) => {
-            const type = CastlingMoveInfo.typeMap[right]
-            const kingTo = CastlingMoveInfo.kingNewSquare[type]
-            if(!CastlingMoveInfo.emptySquares[type].every((square)=> this.squareList[square] == 0)){
+            const castlingMove = CastlingMoveMap.byRight[right]
+            if(!castlingMove.emptySquares.every((square)=> this.squareList[square] == 0)){
                 return
             }
             const enemyColor = color ? 0: 1
-            if(!CastlingMoveInfo.safeSquares[type].every((square) => !this.isSquareThreatened(square,enemyColor))){
+            if(!castlingMove.safeSquares.every((square) => !this.isSquareThreatened(square,enemyColor))){
                 return
             }
-
-            moves.push(new Move(from, kingTo, moving, 0, CastlingMoveInfo.moveType[type]))
+            moves.push(castlingMove.move)
         })
 
         return moves

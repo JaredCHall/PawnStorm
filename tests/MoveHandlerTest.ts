@@ -1,9 +1,11 @@
-import {BoardState, CastlingRight, MoveHandler} from "../src/MoveHandler.ts";
+import {MoveHandler} from "../src/MoveHandler.ts";
 import {Move, MoveFlag, MoveType} from "../src/Move.ts";
 import {Color, Piece} from "../src/Board/Piece.ts";
 import {Square} from "../src/Board/Square.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 import {binToString} from "../src/Utils.ts";
+import { BoardState } from "../src/Board/BoardState.ts";
+import { CastlingRight } from "../src/MoveGen/CastlingMove.ts";
 
 let board = new MoveHandler()
 let lastBoardState = new BoardState()
