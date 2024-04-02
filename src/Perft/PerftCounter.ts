@@ -1,4 +1,4 @@
-import {Move, MoveFlag, MoveType} from "../Move.ts";
+import {Move, MoveFlag, MoveType} from "../MoveGen/Move.ts";
 
 export class PerftCounter {
     nodes: number

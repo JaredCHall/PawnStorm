@@ -1,8 +1,8 @@
 import {MoveHandler} from "./MoveHandler.ts";
-import {Piece, Color, PieceType} from "./Board/Piece.ts";
-import {Square} from "./Board/Square.ts";
+import {Piece, Color, PieceType} from "../Board/Piece.ts";
+import {Square} from "../Board/Square.ts";
 import {Move, MoveType} from "./Move.ts";
-import {CastlingMove, CastlingMoveMap} from "./MoveGen/CastlingMove.ts";
+import {CastlingMoveMap} from "./CastlingMove.ts";
 
 
 enum RayDirection {
@@ -56,7 +56,7 @@ export class MoveFactory extends MoveHandler
             const from = this.square120Indexes[i]
             const piece = this.squareList[from]
             if(piece != 0 && (piece & 1) == color){
-                // TODO: This can be improved to early return on the first legal within a single piece's move set
+                // TODO: This can be improved to early return on the first legal move within a single piece's move set
                 if(this.getLegalMovesFromSquare(from, piece).length > 0) {
                     // early return
                     return true

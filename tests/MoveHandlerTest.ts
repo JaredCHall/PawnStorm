@@ -1,5 +1,5 @@
-import {MoveHandler} from "../src/MoveHandler.ts";
-import {Move, MoveFlag, MoveType} from "../src/Move.ts";
+import {MoveHandler} from "../src/MoveGen/MoveHandler.ts";
+import {Move, MoveFlag, MoveType} from "../src/MoveGen/Move.ts";
 import {Color, Piece} from "../src/Board/Piece.ts";
 import {Square} from "../src/Board/Square.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";

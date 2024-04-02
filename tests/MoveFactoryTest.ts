@@ -1,5 +1,5 @@
-import {MoveFactory} from "../src/MoveFactory.ts";
-import {Move, MoveType} from "../src/Move.ts";
+import {MoveFactory} from "../src/MoveGen/MoveFactory.ts";
+import {Move, MoveType} from "../src/MoveGen/Move.ts";
 import {assertArrayIncludes} from "https://deno.land/std@0.219.0/assert/assert_array_includes.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 import {Square} from "../src/Board/Square.ts";

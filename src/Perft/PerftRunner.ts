@@ -1,6 +1,6 @@
-import {MoveFactory} from "../MoveFactory.ts";
+import {MoveFactory} from "../MoveGen/MoveFactory.ts";
 import {PerftCounter} from "./PerftCounter.ts";
-import {Move} from "../Move.ts";
+import {Move} from "../MoveGen/Move.ts";
 import { ChessGame } from "https://deno.land/x/chess@0.6.0/mod.ts";
 export class PerftRunner {
 

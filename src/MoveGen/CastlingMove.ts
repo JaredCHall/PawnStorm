@@ -1,5 +1,5 @@
 import {Square} from "../Board/Square.ts";
-import {Move, MoveType} from "../Move.ts";
+import {Move, MoveType} from "./Move.ts";
 import {Piece, PieceType} from "../Board/Piece.ts";
 
 export enum CastlingRight { // 4 bits

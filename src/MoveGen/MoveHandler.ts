@@ -1,9 +1,9 @@
-import {Board} from "./Board/Board.ts";
-import {Piece, Color, PieceType} from "./Board/Piece.ts";
+import {Board} from "../Board/Board.ts";
+import {Piece, Color, PieceType} from "../Board/Piece.ts";
 import {Move, MoveFlag, MoveType} from "./Move.ts";
-import {Square, squareNameMap} from "./Board/Square.ts";
-import {CastlingMove, CastlingMoveMap, CastlingRight} from "./MoveGen/CastlingMove.ts";
-import { BoardState } from "./Board/BoardState.ts";
+import {Square, squareNameMap} from "../Board/Square.ts";
+import {CastlingMove, CastlingMoveMap, CastlingRight} from "./CastlingMove.ts";
+import { BoardState } from "../Board/BoardState.ts";
 
 
 
@@ -167,8 +167,7 @@ export class MoveHandler extends Board
         if(movingType & PieceType.Rook){
             this.state.getCastlingRights(movingColor).forEach((right) => {
                 // @ts-ignore ok
-                const castlingMove = CastlingMoveMap.byRight[right]
-                if(castlingMove.rookSquares[0] == move.from){
+                if(CastlingMoveMap.byRight[right].rookSquares[0] == move.from){
                     this.state.castleRights &= ~right
                 }
             })
