@@ -39,12 +39,16 @@ export class MoveFactory extends MoveHandler
     }
 
     getLegalMoves(color: Color = this.state.sideToMove){
-        let moves: Move[] = []
+        const moves: Move[] = []
         for(let i=0;i<64;i++){
             const from = this.square120Indexes[i]
             const piece = this.squareList[from]
+
             if(piece != 0 && (piece & 1) == color){
-                moves = moves.concat(this.getLegalMovesFromSquare(from, piece))
+                const movesForSquare = this.getLegalMovesFromSquare(from, piece)
+                for(let j=0;j<movesForSquare.length;j++){
+                    moves.push(movesForSquare[j])
+                }
             }
         }
         return moves
@@ -91,8 +95,12 @@ export class MoveFactory extends MoveHandler
         }
 
         // only the queen remains
-        return this.#getDiagonalMoves(from, moving, color)
-            .concat(this.#getLateralMoves(from, moving, color))
+        const moves = this.#getDiagonalMoves(from, moving, color)
+        const lateralMoves = this.#getLateralMoves(from, moving, color)
+        for(let i=0;i<lateralMoves.length;i++){
+            moves.push(lateralMoves[i])
+        }
+        return moves
     }
 
     #getMovesFromOffsets(from: Square, moving: Piece, color: Color, offsets: number[], maxRayLen: number): Move[] {
@@ -261,73 +269,38 @@ export class MoveFactory extends MoveHandler
             || this.#hasKnightThreat(square, movingColor)
     }
 
-
-    #getBPawnMoves(from: Square, moving: Piece): Move[]
-    {
-        const moves: Move[] = []
-        const rank = this.squareRanks[this.square64Indexes[from]]
-        const promotes = rank == 1
-
-        let to: number = from + 10
-        if(this.squareList[to] == 0){
-            if(promotes){
-                moves.push(new Move(from, to, moving, 0, MoveType.KnightPromote))
-                moves.push(new Move(from, to, moving, 0, MoveType.BishopPromote))
-                moves.push(new Move(from, to, moving, 0, MoveType.RookPromote))
-                moves.push(new Move(from, to, moving, 0, MoveType.QueenPromote))
-            }else{
-                moves.push(new Move(from, to, moving, 0, MoveType.Quiet))
-                if(rank == 6){
-                    to = from + 20
-                    if(this.squareList[to] == 0){
-                        moves.push(new Move(from, to, moving, 0, MoveType.DoublePawnPush))
-                    }
-                }
-            }
-        }
-
-        // Capture moves
-        const captureOffsets = [9,11]
-        for(let i=0;i<2;i++){
-            const to: number = from + captureOffsets[i]
-            const captured = this.squareList[to]
-
-            if(captured == 0){
-                if(to == this.state.enPassantTarget){
-                    const captureSquare = this.enPassantCaptureOnSquares[this.square64Indexes[to]]
-                    // @ts-ignore to is assumed to be valid if it matches the enPassantTarget
-                    moves.push(new Move(from, to, moving, this.squareList[captureSquare], MoveType.EnPassant))
-                }
-                // cannot capture empty square if it's not en-passant.
-                continue
-            }
-            if(captured == Square.Invalid // cannot capture out of bounds square
-                || (captured & 1) == 1 // cannot capture friendly piece
-            ){
-                continue
-            }
-
-            if(promotes){
-                moves.push(new Move(from, to, moving, captured, MoveType.KnightPromote | MoveType.Capture))
-                moves.push(new Move(from, to, moving, captured, MoveType.BishopPromote | MoveType.Capture))
-                moves.push(new Move(from, to, moving, captured, MoveType.RookPromote | MoveType.Capture))
-                moves.push(new Move(from, to, moving, captured, MoveType.QueenPromote | MoveType.Capture))
-            }else{
-                moves.push(new Move(from, to, moving, captured, MoveType.Capture))
-            }
-        }
-
-
-        return moves
-    }
-
-
-    #getPawnMoves(from: Square, moving: Piece): Move[] {
-        const moves: Move[] = []
+    #getPawnMoves(
+        from: Square,
+        moving: Piece,
+    ): Move[] {
         const rank = this.squareRanks[this.square64Indexes[from]]
         const promotes = rank == 6
 
-        let to: number = from + -10
+        const moves = this.#getPawnQuietMoves(from, moving, -10, -20, rank == 1, promotes)
+        const captureMoves = this.#getPawnCaptureMoves(from, moving, 0, [-11,-9], promotes)
+        for(let i = 0; i < captureMoves.length; i++){
+            moves.push(captureMoves[i])
+        }
+        return moves
+    }
+
+    #getBPawnMoves(from: Square, moving: Piece): Move[]
+    {
+        const rank = this.squareRanks[this.square64Indexes[from]]
+        const promotes = rank == 1
+
+        const moves = this.#getPawnQuietMoves(from, moving, 10, 20, rank == 6, promotes)
+        const captureMoves = this.#getPawnCaptureMoves(from, moving, 1, [9,11], promotes)
+        for(let i = 0; i < captureMoves.length; i++){
+            moves.push(captureMoves[i])
+        }
+        return moves
+    }
+
+    #getPawnQuietMoves(from: Square, moving: Piece, offset: number, doubleOffset: number, onStartSquare: boolean, promotes: boolean): Move[]
+    {
+        const moves: Move[] = []
+        let to: number = from + offset
         if(this.squareList[to] == 0){
             if(promotes){
                 moves.push(new Move(from, to, moving, 0, MoveType.KnightPromote))
@@ -336,19 +309,22 @@ export class MoveFactory extends MoveHandler
                 moves.push(new Move(from, to, moving, 0, MoveType.QueenPromote))
             }else{
                 moves.push(new Move(from, to, moving, 0, MoveType.Quiet))
-                if(rank == 1){
-                    to = from + -20
+                if(onStartSquare){
+                    to = from + doubleOffset
                     if(this.squareList[to] == 0){
                         moves.push(new Move(from, to, moving, 0, MoveType.DoublePawnPush))
                     }
                 }
             }
         }
+        return moves
+    }
 
-        // Capture moves
-        const captureOffsets = [-11,-9]
+    #getPawnCaptureMoves(from: Square, moving: Piece, color: Color, offsets: number[], promotes: boolean): Move[]
+    {
+        const moves: Move[] = []
         for(let i=0;i<2;i++){
-            const to: number = from + captureOffsets[i]
+            const to: number = from + offsets[i]
             const captured = this.squareList[to]
 
             if(captured == 0){
@@ -361,7 +337,7 @@ export class MoveFactory extends MoveHandler
                 continue
             }
             if(captured == Square.Invalid // cannot capture out of bounds square
-                || (captured & 1) == 0 // cannot capture friendly piece
+                || (captured & 1) == color // cannot capture friendly piece
             ){
                 continue
             }
@@ -375,8 +351,6 @@ export class MoveFactory extends MoveHandler
                 moves.push(new Move(from, to, moving, captured, MoveType.Capture))
             }
         }
-
-
         return moves
     }
 }
