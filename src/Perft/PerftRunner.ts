@@ -7,7 +7,7 @@ export class PerftRunner {
     factory: MoveFactory
     counter: PerftCounter
     runTime: number = 0// milliseconds
-    debug: boolean = true
+    debug: boolean = false
     denoChess: ChessGame|null = null
 
     constructor(startFen: string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') {
