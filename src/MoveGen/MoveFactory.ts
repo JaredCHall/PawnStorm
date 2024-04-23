@@ -5,27 +5,6 @@ import {Move, MoveType} from "./Move.ts";
 import {CastlingMoveMap} from "./CastlingMove.ts";
 
 
-enum RayDirection {
-    N = -10, NE = -9, E = 1, SE = 11, S = 10, SW = 9, W = -1, NW = -11
-}
-class RayDirections {
-
-
-
-    static readonly pieceMap = {
-        // i[0]: max ray length
-        // i[1]: capture ray directions
-
-
-        // i[0]: double-move rank
-        // i[1]: promotion rank
-        // i[2]: capture move ray directions
-        // i[3]: quiet move ray directions
-        [PieceType.Pawn]:   [1, 6, [RayDirection.NW , RayDirection.NE], [RayDirection.N, RayDirection.N * 2]],
-        [PieceType.BPawn]:  [6, 1, [RayDirection.SW , RayDirection.SE], [RayDirection.S, RayDirection.S * 2]],
-    }
-}
-
 export class MoveFactory extends MoveHandler
 {
     options = {
@@ -87,7 +66,6 @@ export class MoveFactory extends MoveHandler
         const type = moving >> 1
         const color: Color = moving & 1
 
-
         if(type & PieceType.Pawn){
             return this.#getPawnMoves(from, moving)
         }
@@ -117,13 +95,11 @@ export class MoveFactory extends MoveHandler
             .concat(this.#getLateralMoves(from, moving, color))
     }
 
-    #getLateralMoves(from: Square, moving: Piece, color: Color): Move[]
-    {
+    #getMovesFromOffsets(from: Square, moving: Piece, color: Color, offsets: number[], maxRayLen: number): Move[] {
         const moves = []
-        const offsets = [1,10,-1,-10]
-        for(let i = 0; i<4;i++) {
+        for(let i = 0; i<offsets.length;i++) {
             const offset = offsets[i]
-            for (let j = 1; j <= 7; j++) {
+            for (let j = 1; j <= maxRayLen; j++) {
                 const to: number = from + j * offset
                 const captured = this.squareList[to]
                 if (captured == Square.Invalid) {
@@ -143,6 +119,11 @@ export class MoveFactory extends MoveHandler
             }
         }
         return moves
+    }
+
+    #getLateralMoves(from: Square, moving: Piece, color: Color): Move[]
+    {
+        return this.#getMovesFromOffsets(from, moving, color, [1,10,-1,-10], 7)
     }
 
     #hasLateralThreat(from: Square, color: Color): boolean
@@ -179,30 +160,7 @@ export class MoveFactory extends MoveHandler
 
     #getDiagonalMoves(from: Square, moving: Piece, color: Color): Move[]
     {
-        const moves = []
-        const offsets = [9,11,-9,-11]
-        for(let i = 0; i<4;i++) {
-            const offset = offsets[i]
-            for (let j = 1; j <= 7; j++) {
-                const to: number = from + j * offset
-                const captured = this.squareList[to]
-                if (captured == Square.Invalid) {
-                    break // square out of bounds
-                }
-                if (captured == 0) {
-                    // empty square
-                    moves.push(new Move(from, to, moving, 0, MoveType.Quiet))
-                    continue
-                }
-                if ((captured & 1) == color) {
-                    // friendly piece
-                    break
-                }
-                moves.push(new Move(from, to, moving, captured, MoveType.Capture))
-                break
-            }
-        }
-        return moves
+        return this.#getMovesFromOffsets(from, moving, color, [9,11,-9,-11], 7)
     }
 
     #hasDiagonalThreat(from: Square, color: Color): boolean
@@ -236,15 +194,12 @@ export class MoveFactory extends MoveHandler
                 if(capturedType & PieceType.King){
                     return true
                 }
-                if(capturedType & PieceType.Pawn){
-                    if(offset > 0){
-                        return true
-                    }
+
+                if(capturedType & PieceType.Pawn && offset > 0){
+                    return true
                 }
-                if(capturedType & PieceType.BPawn){
-                    if(offset < 0){
-                        return true
-                    }
+                if(capturedType & PieceType.BPawn && offset < 0){
+                    return true
                 }
                 break
             }
@@ -255,23 +210,7 @@ export class MoveFactory extends MoveHandler
 
     #getKnightMoves(from: Square, moving: Piece, color: Color): Move[]
     {
-        const moves = []
-        const offsets = [-21, -19,-12, -8, 8, 12, 19, 21]
-        for(let i = 0; i<8;i++) {
-            const to: number = from + offsets[i]
-            const captured = this.squareList[to]
-            if (captured == Square.Invalid) {
-                continue
-            }
-            if (captured == 0) {
-                // empty square
-                moves.push(new Move(from, to, moving, 0, MoveType.Quiet))
-            }else if ((captured & 1) != color) {
-                // enemy piece
-                moves.push(new Move(from, to, moving, captured, MoveType.Capture))
-            }
-        }
-        return moves
+        return this.#getMovesFromOffsets(from, moving, color, [-21, -19,-12, -8, 8, 12, 19, 21], 1)
     }
 
     #hasKnightThreat(from: Square, color: Color): boolean
@@ -292,22 +231,7 @@ export class MoveFactory extends MoveHandler
 
     #getKingMoves(from: Square, moving: Piece, color: Color): Move[]
     {
-        const moves = []
-        const offsets = [-10, -9, 1, 11, 10, 9, -1, -11]
-        for(let i = 0; i<8;i++) {
-            const to: number = from + offsets[i]
-            const captured = this.squareList[to]
-            if (captured == Square.Invalid) {
-                continue
-            }
-            if (captured == 0) {
-                // empty square
-                moves.push(new Move(from, to, moving, 0, MoveType.Quiet))
-            }else if ((captured & 1) != color) {
-                // enemy piece
-                moves.push(new Move(from, to, moving, captured, MoveType.Capture))
-            }
-        }
+        const moves = this.#getMovesFromOffsets(from, moving, color, [-10, -9, 1, 11, 10, 9, -1, -11], 1)
 
         if(from != CastlingMoveMap.kingSquareByColor[color]){
             return moves
