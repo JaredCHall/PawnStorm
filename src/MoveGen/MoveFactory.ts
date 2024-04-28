@@ -28,6 +28,10 @@ export class MoveFactory extends MoveHandler
             const from = this.square120Indexes[i]
             const piece = this.squareList[from]
             if(piece != 0 && (piece & 1) == color){
+                // if(this.hasLegalMoveFromSquare(from, piece)){
+                //     return true
+                // }
+
                 // TODO: This can be improved to early return on the first legal move within a single piece's move set
                 if(this.getLegalMovesFromSquare(from, piece).length > 0) {
                     // early return
@@ -58,11 +62,41 @@ export class MoveFactory extends MoveHandler
         const movingColor = this.state.sideToMove
         const enemyColor = this.state.sideToMove ? 0 : 1
         return this.getMovesFromSquare(from, moving).filter((move) => {
-            super.makeMove(move)
-            const isCheck = this.isSquareThreatened(this.kingSquares[movingColor], enemyColor)
-            super.unmakeMove(move)
-            return !isCheck
+            return this.#isMoveLegal(move, movingColor, enemyColor)
         })
+    }
+
+    hasLegalMoveFromSquare(from: Square, moving: Piece): boolean {
+        const type = moving >> 1
+        const color: Color = moving & 1
+
+        if(type & PieceType.Pawn){
+            return this.#hasLegalPawnMove(from, moving)
+        }
+
+        if(type & PieceType.BPawn){
+            return this.#hasLegalBPawnMove(from, moving)
+        }
+
+        if(type & PieceType.Knight){
+            return this.#hasLegalKnightMove(from, moving, color)
+        }
+
+        if(type & PieceType.King){
+            return this.#hasLegalKingMove(from, moving, color)
+        }
+
+        if(type & PieceType.Bishop){
+            return this.#hasLegalDiagonalMove(from, moving, color)
+        }
+
+        if(type & PieceType.Rook){
+            return this.#hasLegalLateralMove(from, moving, color)
+        }
+
+        // only the queen remains
+        return this.#hasLegalDiagonalMove(from, moving, color) || this.#hasLegalLateralMove(from, moving, color);
+
     }
 
     getMovesFromSquare(from: Square, moving: Piece): Move[]
@@ -129,9 +163,42 @@ export class MoveFactory extends MoveHandler
         return moves
     }
 
+    #hasLegalMoveFromOffsets(from: Square, moving: Piece, offsets: number[], maxRayLen: number, movingColor: Color, enemyColor: Color): boolean {
+        for(let i = 0; i<offsets.length;i++) {
+            const offset = offsets[i]
+            for (let j = 1; j <= maxRayLen; j++) {
+                const to: number = from + j * offset
+                const captured = this.squareList[to]
+                if (captured == Square.Invalid) {
+                    break // square out of bounds
+                }
+                if (captured == 0) {
+                    if(this.#isMoveLegal(new Move(from, to, moving, 0, MoveType.Quiet), movingColor, enemyColor)){
+                        return true
+                    }
+                    continue
+                }
+                if ((captured & 1) == movingColor) {
+                    // friendly piece
+                    break
+                }
+                if(this.#isMoveLegal(new Move(from, to, moving, captured, MoveType.Capture), movingColor, enemyColor)){
+                    return true
+                }
+                break
+            }
+        }
+        return false
+    }
+
     #getLateralMoves(from: Square, moving: Piece, color: Color): Move[]
     {
         return this.#getMovesFromOffsets(from, moving, color, [1,10,-1,-10], 7)
+    }
+
+    #hasLegalLateralMove(from: Square, moving: Piece, color: Color): boolean
+    {
+        return this.#hasLegalMoveFromOffsets(from, moving, [1,10,-1,-10], 7, color, color ? 0 : 1)
     }
 
     #hasLateralThreat(from: Square, color: Color): boolean
@@ -169,6 +236,11 @@ export class MoveFactory extends MoveHandler
     #getDiagonalMoves(from: Square, moving: Piece, color: Color): Move[]
     {
         return this.#getMovesFromOffsets(from, moving, color, [9,11,-9,-11], 7)
+    }
+
+    #hasLegalDiagonalMove(from: Square, moving: Piece, color: Color): boolean
+    {
+        return this.#hasLegalMoveFromOffsets(from, moving, [9,11,-9,-11], 7, color, color ? 0 : 1)
     }
 
     #hasDiagonalThreat(from: Square, color: Color): boolean
@@ -221,6 +293,11 @@ export class MoveFactory extends MoveHandler
         return this.#getMovesFromOffsets(from, moving, color, [-21, -19,-12, -8, 8, 12, 19, 21], 1)
     }
 
+    #hasLegalKnightMove(from: Square, moving: Piece, color: Color): boolean
+    {
+        return this.#hasLegalMoveFromOffsets(from, moving, [-21, -19,-12, -8, 8, 12, 19, 21], 1, color, color ? 0 : 1)
+    }
+
     #hasKnightThreat(from: Square, color: Color): boolean
     {
         const offsets = [-21, -19,-12, -8, 8, 12, 19, 21]
@@ -246,19 +323,49 @@ export class MoveFactory extends MoveHandler
         }
 
         //handle castling moves
-        this.state.getCastlingRights(color).forEach((right) => {
-            const castlingMove = CastlingMoveMap.byRight[right]
+        const castlingRights = this.state.getCastlingRights(color)
+        const enemyColor = color ? 0: 1
+        for(let i = 0; i < castlingRights.length; i++){
+            const castlingMove = CastlingMoveMap.byRight[castlingRights[i]]
             if(!castlingMove.emptySquares.every((square)=> this.squareList[square] == 0)){
-                return
+                continue
             }
-            const enemyColor = color ? 0: 1
+
             if(!castlingMove.safeSquares.every((square) => !this.isSquareThreatened(square,enemyColor))){
-                return
+                continue
             }
             moves.push(castlingMove.move)
-        })
+        }
 
         return moves
+    }
+
+    #hasLegalKingMove(from: Square, moving: Piece, color: Color): boolean
+    {
+        const enemyColor = color ? 0 : 1
+        if(this.#hasLegalMoveFromOffsets(from, moving, [-10, -9, 1, 11, 10, 9, -1, -11], 1, color, enemyColor)) {
+            return true
+        }
+
+        if(from != CastlingMoveMap.kingSquareByColor[color]){
+            return false
+        }
+
+        //handle castling moves
+        const castlingRights = this.state.getCastlingRights(color)
+        for(let i = 0; i < castlingRights.length; i++){
+            const castlingMove = CastlingMoveMap.byRight[castlingRights[i]]
+            if(!castlingMove.emptySquares.every((square)=> this.squareList[square] == 0)){
+                continue
+            }
+            if(!castlingMove.safeSquares.every((square) => !this.isSquareThreatened(square,enemyColor))){
+                continue
+            }
+            if(this.#isMoveLegal(castlingMove.move, color, enemyColor)){
+                return true
+            }
+        }
+       return false
     }
 
     isSquareThreatened(square: Square, enemyColor: Color)
@@ -283,6 +390,71 @@ export class MoveFactory extends MoveHandler
         }
         return moves
     }
+
+    #hasLegalPawnMove(from: Square, moving: Piece): boolean {
+        const rank = this.squareRanks[this.square64Indexes[from]]
+        return this.#hasLegalPawnQuietMove(from, moving, -10, rank == 1, 0, 1)
+            || this.#hasLegalPawnCaptureMove(from, moving, [-11,-9], 0 , 1)
+    }
+    #hasLegalBPawnMove(from: Square, moving: Piece): boolean {
+        const rank = this.squareRanks[this.square64Indexes[from]]
+        return this.#hasLegalPawnQuietMove(from, moving, 10, rank == 6, 1, 0)
+            || this.#hasLegalPawnCaptureMove(from, moving, [11,9], 1 , 0)
+    }
+
+    #isMoveLegal(move: Move, movingColor: Color, enemyColor: Color): boolean {
+        super.makeMove(move)
+        const isCheck = this.isSquareThreatened(this.kingSquares[movingColor], enemyColor)
+        super.unmakeMove(move)
+        return !isCheck
+    }
+
+    #hasLegalPawnQuietMove(from: Square, moving: Piece, offset: number, onStartSquare: boolean, movingColor: Color, enemyColor: Color): boolean
+    {
+        const to: number = from + offset
+        if(this.squareList[to] == 0){
+            if(this.#isMoveLegal(new Move(from, to, moving, 0, MoveType.Quiet), movingColor, enemyColor)) {
+                return true
+            }
+            if(onStartSquare
+                && this.squareList[to + offset] == 0
+                && this.#isMoveLegal(new Move(from, to + offset, moving, 0, MoveType.Quiet), movingColor, enemyColor)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    #hasLegalPawnCaptureMove(from: Square, moving: Piece, offsets: number[], movingColor: Color, enemyColor: Color): boolean
+    {
+        for(let i=0;i<2;i++){
+            const to: number = from + offsets[i]
+            const captured = this.squareList[to]
+
+            if(captured == 0){
+                if(to == this.state.enPassantTarget){
+                    const captureSquare = this.enPassantCaptureOnSquares[this.square64Indexes[to]]
+                    // @ts-ignore to is assumed to be valid if it matches the enPassantTarget
+                    if(this.#isMoveLegal(new Move(from, to, moving, this.squareList[captureSquare], MoveType.EnPassant), movingColor, enemyColor)){
+                        return true
+                    }
+                }
+                // cannot capture empty square if it's not en-passant.
+                continue
+            }
+            if(captured == Square.Invalid // cannot capture out of bounds square
+                || (captured & 1) == movingColor // cannot capture friendly piece
+            ){
+                continue
+            }
+
+            if(this.#isMoveLegal(new Move(from, to, moving, captured, MoveType.Capture), movingColor, enemyColor)){
+                return true
+            }
+        }
+        return false
+    }
+
 
     #getBPawnMoves(from: Square, moving: Piece): Move[]
     {
