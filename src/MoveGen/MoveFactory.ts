@@ -28,9 +28,7 @@ export class MoveFactory extends MoveHandler
             const from = this.square120Indexes[i]
             const piece = this.squareList[from]
             if(piece != 0 && (piece & 1) == color){
-                // TODO: This can be improved to early return on the first legal move within a single piece's move set
                 if(this.getLegalMovesFromSquare(from, piece).length > 0) {
-                    // early return
                     return true
                 }
             }
