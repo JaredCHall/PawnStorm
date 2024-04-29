@@ -1,3 +1,5 @@
+import {Square} from "./Square.ts";
+
 export enum Color { // 1 bit
     White= 0,
     Black= 1
@@ -31,7 +33,17 @@ export enum Piece { // 8 bits
     BlackKing = PieceType.King << 1 | Color.Black,
 }
 
-export const FenPieceMap = new Map([
-    ['p', Piece.BlackPawn], ['n', Piece.BlackKnight],['b', Piece.BlackBishop],['r', Piece.BlackRook],['q', Piece.BlackQueen],['k', Piece.BlackKing],
-    ['P', Piece.WhitePawn], ['N', Piece.WhiteKnight],['B', Piece.WhiteBishop],['R', Piece.WhiteRook],['Q', Piece.WhiteQueen],['K', Piece.WhiteKing],
-])
+export class FenPieceMap {
+    static readonly fenByBitType : {[key: number]: string} = {
+        [Piece.BlackPawn]: 'p', [Piece.BlackKnight]: 'n', [Piece.BlackBishop]: 'b',
+        [Piece.BlackRook]: 'r', [Piece.BlackQueen]:  'q', [Piece.BlackKing]:   'k',
+        [Piece.WhitePawn]: 'P', [Piece.WhiteKnight]: 'N', [Piece.WhiteBishop]: 'B',
+        [Piece.WhiteRook]: 'R', [Piece.WhiteQueen]:  'Q', [Piece.WhiteKing]:   'K',
+    }
+    static readonly bitTypeByFen: {[key: string]: number} = {
+        'p': Piece.BlackPawn, 'n': Piece.BlackKnight, 'b': Piece.BlackBishop,
+        'r': Piece.BlackRook, 'q': Piece.BlackQueen,  'k': Piece.BlackKing,
+        'P': Piece.WhitePawn, 'N': Piece.WhiteKnight, 'B': Piece.WhiteBishop,
+        'R': Piece.WhiteRook, 'Q': Piece.WhiteQueen,  'K': Piece.WhiteKing,
+    }
+}

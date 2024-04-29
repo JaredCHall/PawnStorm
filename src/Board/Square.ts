@@ -12,7 +12,7 @@ export enum Square { // 7 bits
 }
 
 export class SquareNameMap {
-    static readonly indexByName = {
+    static readonly indexByName : {[key: string]: Square} = {
         'a8': Square.a8, 'b8': Square.b8, 'c8': Square.c8, 'd8': Square.d8, 'e8': Square.e8, 'f8': Square.f8, 'g8': Square.g8, 'h8': Square.h8,
         'a7': Square.a7, 'b7': Square.b7, 'c7': Square.c7, 'd7': Square.d7, 'e7': Square.e7, 'f7': Square.f7, 'g7': Square.g7, 'h7': Square.h7,
         'a6': Square.a6, 'b6': Square.b6, 'c6': Square.c6, 'd6': Square.d6, 'e6': Square.e6, 'f6': Square.f6, 'g6': Square.g6, 'h6': Square.h6,
@@ -22,7 +22,7 @@ export class SquareNameMap {
         'a2': Square.a2, 'b2': Square.b2, 'c2': Square.c2, 'd2': Square.d2, 'e2': Square.e2, 'f2': Square.f2, 'g2': Square.g2, 'h2': Square.h2,
         'a1': Square.a1, 'b1': Square.b1, 'c1': Square.c1, 'd1': Square.d1, 'e1': Square.e1, 'f1': Square.f1, 'g1': Square.g1, 'h1': Square.h1,
     }
-    static readonly nameByIndex = {
+    static readonly nameByIndex: {[key: number]: string} = {
         21: 'a8',22: 'b8',23: 'c8',24: 'd8',25: 'e8',26: 'f8',27: 'g8',28: 'h8',
         31: 'a7',32: 'b7',33: 'c7',34: 'd7',35: 'e7',36: 'f7',37: 'g7',38: 'h7',
         41: 'a6',42: 'b6',43: 'c6',44: 'd6',45: 'e6',46: 'f6',47: 'g6',48: 'h6',

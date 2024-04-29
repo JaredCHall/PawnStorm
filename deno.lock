@@ -21,6 +21,7 @@
     "https://deno.land/x/chess@0.6.0/src/autoplayers/utils/evaluation/scoreBoard.ts": "14a5b952365dc048fa1307edd29371e6b18eeff72acc87aa9fec61ec24034dc5",
     "https://deno.land/x/chess@0.6.0/src/autoplayers/utils/gameScore.ts": "78bed4a68f3712bc73910c5fc8c4c6774adcb05a5b7b040276dd2a6607b225d2",
     "https://deno.land/x/chess@0.6.0/src/autoplayers/utils/miniMax.ts": "58255e2001bef68ef25056df7d4053bceaeae6cc6a742e6030bb8e9487c39d87",
+    "https://deno.land/x/chess@0.6.0/src/core/datatypes/BitMove.ts": "437585fe5f962ba9b18c18dd8170181e0b6120c07e947455989048ec2788071e",
     "https://deno.land/x/chess@0.6.0/src/core/datatypes/Board.ts": "f1f5dee16e70d5d49488d66280be61b125a8cf26787eeb19998ce8768453d41a",
     "https://deno.land/x/chess@0.6.0/src/core/datatypes/CastleMap.ts": "c2690ee7f204ba2a2cbc34204a1d9e084b94cae2aedc82bf4853f83a2b057091",
     "https://deno.land/x/chess@0.6.0/src/core/datatypes/ChessError.ts": "5ccd52613fc862c22e551add04e152824d6bb73d2a58ed49d6a5d6df64c53219",

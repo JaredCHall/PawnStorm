@@ -54,31 +54,20 @@ const game = new Game()
 // get all legal moves for player
 let moves = game.getLegalMoves('white')
 // get legal moves from a specific square
-moves = game.getLegalMoves('black','e4')
-moves.forEach((move) => {
-    console.log(`-- ${move.notation} --`)
-    console.log(`Piece: ${move.piece}`)
-    console.log(`Color: ${move.color}`)
-    console.log(`From: ${move.from}`)
-    console.log(`To: ${move.to}`)
-    console.log(`Promotion: ${move.promotes}`)
-})
+moves = game.getLegalMoves('e4')
+console.table(moves)
 ```
 The above might have the following output, as an example:
 ```text
--- e5 --
-Piece: pawn
-Color: white
-From: e4
-To: e5
-Promotion:
--- exd5 --
-Piece: pawn
-Color: white
-From: e4
-To: d5
-Promotion:
+┌───────┬───────┬──────┬──────┬──────────┐
+│ (idx) │ piece │ from │ to   │ promotes │
+├───────┼───────┼──────┼──────┼──────────┤
+│     0 │ "P"   │ "e2" │ "e3" │ null     │
+│     1 │ "P"   │ "e2" │ "e4" │ null     │
+└───────┴───────┴──────┴──────┴──────────┘
 ```
+
+The `piece` property is a fen or algebraic notation character representing both piece type and color. For example 'K' is the white king, and 'r' is a black rook. The `from` and `to` properties are the names of the origin and destination squares. The `promotes` property is usually null, but if a pawn is promoting, it is either 'N', 'B', 'R' or 'Q' for white, or 'n', 'b', 'r' or 'q' for black.
 
 ### Making Moves
 ```typescript
@@ -95,7 +84,7 @@ game.makeMove('e1e2')
 game.makeMove('e8e7')
 ```
 
-### Undo the Last Move
+### Undo the Last BitMove
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
 

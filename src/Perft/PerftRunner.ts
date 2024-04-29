@@ -1,6 +1,6 @@
 import {MoveFactory} from "../MoveGen/MoveFactory.ts";
 import {PerftCounter} from "./PerftCounter.ts";
-import {Move} from "../MoveGen/Move.ts";
+import {BitMove} from "../MoveGen/BitMove.ts";
 import { ChessGame } from "https://deno.land/x/chess@0.6.0/mod.ts";
 export class PerftRunner {
 
@@ -37,7 +37,7 @@ export class PerftRunner {
         return this.counter
     }
 
-    perft(depth: number = 0, lastMove: null|Move = null): void
+    perft(depth: number = 0, lastMove: null|BitMove = null): void
     {
         if(depth === 0 && lastMove){
             this.counter.update(lastMove)
@@ -45,7 +45,7 @@ export class PerftRunner {
         }
         const n_moves = this.factory.getLegalMoves()
 
-        n_moves.forEach((move: Move) => {
+        n_moves.forEach((move: BitMove) => {
 
             try{
                 this.denoChess?.move(move.serialize())

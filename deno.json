@@ -8,5 +8,5 @@
   },
   "test": {
     "include": ["tests/**/*Test.ts"]
-  },
+  }
 }

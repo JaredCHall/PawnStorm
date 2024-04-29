@@ -97,8 +97,7 @@ export class Board
                     }
                 } else if (/[rbnqkpRBNQKP]/.test(character)) {
                     // Handle Pieces
-                    // @ts-ignore it's fine
-                    const piece: Piece = FenPieceMap.get(character)
+                    const piece: Piece = FenPieceMap.bitTypeByFen[character]
                     this.squareList[squareIndex] = piece
                     // store king positions for quicker access
                     if((piece >> 1) & PieceType.King){
@@ -164,9 +163,6 @@ export class Board
     }
 
     serialize(): string {
-        const files = ['a','b','c','d','e','f','g','h']
-        // @ts-ignore let's try it
-        const pieceMap = new Map(Array.from(FenPieceMap, a => a.reverse()));
         let emptySquares = 0
         let serialized = ''
 
@@ -186,7 +182,7 @@ export class Board
                 emptySquares = 0
             }
             if(piece) {
-                const fenType = pieceMap.get(piece)
+                const fenType = FenPieceMap.fenByBitType[piece]
                 serialized += fenType
             }
             if(isLastInRow){

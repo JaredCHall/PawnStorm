@@ -1,5 +1,5 @@
 import {MoveHandler} from "../src/MoveGen/MoveHandler.ts";
-import {Move, MoveFlag, MoveType} from "../src/MoveGen/Move.ts";
+import {BitMove, MoveFlag, MoveType} from "../src/MoveGen/BitMove.ts";
 import {Color, Piece} from "../src/Board/Piece.ts";
 import {Square} from "../src/Board/Square.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
@@ -92,7 +92,7 @@ Deno.test('it serializes as FEN string', () => {
 Deno.test('it makes quiet moves for piece', () => {
 
     setBoard('8/8/8/6r1/8/5N2/8/8')
-    const move = new Move(Square.f3, Square.e5, Piece.WhiteKnight, 0, 0)
+    const move = new BitMove(Square.f3, Square.e5, Piece.WhiteKnight, 0, 0)
 
     // make move
     board.makeMove(move)
@@ -112,7 +112,7 @@ Deno.test('it makes quiet moves for piece', () => {
 Deno.test('it makes capture moves for piece', () => {
 
     setBoard('8/8/8/6r1/8/5N2/8/8')
-    const move = new Move(Square.f3, Square.g5, Piece.WhiteKnight, Piece.BlackRook, MoveType.Capture)
+    const move = new BitMove(Square.f3, Square.g5, Piece.WhiteKnight, Piece.BlackRook, MoveType.Capture)
 
     // make move
     board.makeMove(move)
@@ -132,7 +132,7 @@ Deno.test('it makes capture moves for piece', () => {
 Deno.test('it makes quiet moves for pawn', () => {
 
     setBoard('8/8/8/6r1/8/5P2/8/8')
-    const move = new Move(Square.f3, Square.f4, Piece.WhitePawn, 0, 0)
+    const move = new BitMove(Square.f3, Square.f4, Piece.WhitePawn, 0, 0)
 
     // make move
     board.makeMove(move)
@@ -151,7 +151,7 @@ Deno.test('it makes quiet moves for pawn', () => {
 
 Deno.test('it makes quiet knight promotions for pawn', () => {
     setBoard('8/5P2/8/6r1/8/8/8/8')
-    const move = new Move(Square.f7, Square.f8, Piece.WhitePawn, 0, MoveType.KnightPromote)
+    const move = new BitMove(Square.f7, Square.f8, Piece.WhitePawn, 0, MoveType.KnightPromote)
 
 
     board.makeMove(move)
@@ -169,7 +169,7 @@ Deno.test('it makes quiet knight promotions for pawn', () => {
 
 Deno.test('it makes quiet bishop promotions for pawn', () => {
     setBoard('8/5P2/8/6r1/8/8/8/8')
-    const move = new Move(Square.f7, Square.f8, Piece.WhitePawn, 0, MoveType.BishopPromote)
+    const move = new BitMove(Square.f7, Square.f8, Piece.WhitePawn, 0, MoveType.BishopPromote)
 
 
     board.makeMove(move)
@@ -187,7 +187,7 @@ Deno.test('it makes quiet bishop promotions for pawn', () => {
 
 Deno.test('it makes quiet rook promotions for pawn', () => {
     setBoard('8/5P2/8/6r1/8/8/8/8')
-    const move = new Move(Square.f7, Square.f8, Piece.WhitePawn, 0, MoveType.RookPromote)
+    const move = new BitMove(Square.f7, Square.f8, Piece.WhitePawn, 0, MoveType.RookPromote)
 
 
     board.makeMove(move)
@@ -205,7 +205,7 @@ Deno.test('it makes quiet rook promotions for pawn', () => {
 
 Deno.test('it makes quiet queen promotions for pawn', () => {
     setBoard('8/5P2/8/6r1/8/8/8/8')
-    const move = new Move(Square.f7, Square.f8, Piece.WhitePawn, 0, MoveType.QueenPromote)
+    const move = new BitMove(Square.f7, Square.f8, Piece.WhitePawn, 0, MoveType.QueenPromote)
 
     board.makeMove(move)
     board.render()
@@ -222,7 +222,7 @@ Deno.test('it makes quiet queen promotions for pawn', () => {
 
 Deno.test('it makes double pawn push for white', () => {
     setBoard('8/8/8/8/8/8/P7/8')
-    const move = new Move(Square.a2, Square.a4, Piece.WhitePawn,0, MoveType.DoublePawnPush)
+    const move = new BitMove(Square.a2, Square.a4, Piece.WhitePawn,0, MoveType.DoublePawnPush)
 
     board.makeMove(move)
     board.render()
@@ -240,7 +240,7 @@ Deno.test('it makes double pawn push for white', () => {
 
 Deno.test('it makes double pawn push for black', () => {
     setBoard('8/p7/8/8/8/8/8/8')
-    const move = new Move(Square.a7, Square.a5, Piece.BlackPawn,0, MoveType.DoublePawnPush)
+    const move = new BitMove(Square.a7, Square.a5, Piece.BlackPawn,0, MoveType.DoublePawnPush)
 
     board.makeMove(move)
     board.render()
@@ -259,7 +259,7 @@ Deno.test('it makes double pawn push for black', () => {
 Deno.test('it makes capture moves for pawn', () => {
 
     setBoard('8/8/8/8/8/2q5/1P6/8')
-    const move = new Move(Square.b2, Square.c3, Piece.WhitePawn, Piece.BlackQueen, MoveType.Capture)
+    const move = new BitMove(Square.b2, Square.c3, Piece.WhitePawn, Piece.BlackQueen, MoveType.Capture)
 
     // make move
     board.makeMove(move) // greatest day in the b-pawn's life
@@ -278,7 +278,7 @@ Deno.test('it makes capture moves for pawn', () => {
 
 Deno.test('it makes capture knight promotions for pawn', () => {
     setBoard('8/8/8/8/8/8/4p3/3R4', new BoardState(1))
-    const move = new Move(Square.e2, Square.d1, Piece.BlackPawn, Piece.WhiteRook, MoveType.KnightPromote | MoveFlag.Capture)
+    const move = new BitMove(Square.e2, Square.d1, Piece.BlackPawn, Piece.WhiteRook, MoveType.KnightPromote | MoveFlag.Capture)
 
     board.makeMove(move)
     board.render()
@@ -295,7 +295,7 @@ Deno.test('it makes capture knight promotions for pawn', () => {
 
 Deno.test('it makes capture bishop promotions for pawn', () => {
     setBoard('8/8/8/8/8/8/4p3/3R4', new BoardState(1))
-    const move = new Move(Square.e2, Square.d1, Piece.BlackPawn, Piece.WhiteRook, MoveType.BishopPromote | MoveFlag.Capture)
+    const move = new BitMove(Square.e2, Square.d1, Piece.BlackPawn, Piece.WhiteRook, MoveType.BishopPromote | MoveFlag.Capture)
 
     board.makeMove(move)
     board.render()
@@ -312,7 +312,7 @@ Deno.test('it makes capture bishop promotions for pawn', () => {
 
 Deno.test('it makes capture rook promotions for pawn', () => {
     setBoard('8/8/8/8/8/8/4p3/3R4', new BoardState(1))
-    const move = new Move(Square.e2, Square.d1, Piece.BlackPawn, Piece.WhiteRook, MoveType.RookPromote | MoveFlag.Capture)
+    const move = new BitMove(Square.e2, Square.d1, Piece.BlackPawn, Piece.WhiteRook, MoveType.RookPromote | MoveFlag.Capture)
 
     board.makeMove(move)
     board.render()
@@ -329,7 +329,7 @@ Deno.test('it makes capture rook promotions for pawn', () => {
 
 Deno.test('it makes capture queen promotions for pawn', () => {
     setBoard('8/8/8/8/8/8/4p3/3R4', new BoardState(1))
-    const move = new Move(Square.e2, Square.d1, Piece.BlackPawn, Piece.WhiteRook, MoveType.QueenPromote | MoveFlag.Capture)
+    const move = new BitMove(Square.e2, Square.d1, Piece.BlackPawn, Piece.WhiteRook, MoveType.QueenPromote | MoveFlag.Capture)
 
     board.makeMove(move)
     board.render()
@@ -346,7 +346,7 @@ Deno.test('it makes capture queen promotions for pawn', () => {
 
 Deno.test('it makes en-passant capture as white', () => {
     setBoard('8/8/3p4/3pPp2/8/8/8/8', new BoardState(0,0,Square.f6))
-    const move = new Move(Square.e5, Square.f6, Piece.WhitePawn, Piece.BlackPawn, MoveType.EnPassant)
+    const move = new BitMove(Square.e5, Square.f6, Piece.WhitePawn, Piece.BlackPawn, MoveType.EnPassant)
 
     board.makeMove(move)
     board.render()
@@ -365,7 +365,7 @@ Deno.test('it makes en-passant capture as white', () => {
 
 Deno.test('it makes en-passant capture as black', () => {
     setBoard('8/8/8/8/6Pp/8/8/8', new BoardState(1,0,Square.g3))
-    const move = new Move(Square.h4, Square.g3, Piece.BlackPawn, Piece.WhitePawn, MoveType.EnPassant)
+    const move = new BitMove(Square.h4, Square.g3, Piece.BlackPawn, Piece.WhitePawn, MoveType.EnPassant)
 
     board.makeMove(move)
     board.render()
@@ -386,7 +386,7 @@ Deno.test('it revokes long castles for white when a1 rook moves', () => {
 
     // setup
     setBoard('8/8/8/8/8/8/8/R7', new BoardState(0, 0b0011))
-    const move = new Move(Square.a1, Square.a8, Piece.WhiteRook, 0, 0)
+    const move = new BitMove(Square.a1, Square.a8, Piece.WhiteRook, 0, 0)
 
     // make
     board.makeMove(move)
@@ -406,7 +406,7 @@ Deno.test('it revokes long castles for white when a1 rook moves', () => {
 Deno.test('it revokes short castles for white when h1 rook moves', () => {
     // setup
     setBoard('8/8/8/8/8/8/8/7R', new BoardState(0, 0b0011))
-    const move = new Move(Square.h1, Square.h8, Piece.WhiteRook, 0, 0)
+    const move = new BitMove(Square.h1, Square.h8, Piece.WhiteRook, 0, 0)
 
     // make
     board.makeMove(move)
@@ -427,7 +427,7 @@ Deno.test('it revokes long castles for black when a8 rook moves', () => {
 
     // setup
     setBoard('r7/8/8/8/8/8/8/8', new BoardState(0, 0b1100))
-    const move = new Move(Square.a8, Square.a1, Piece.BlackRook, 0, 0)
+    const move = new BitMove(Square.a8, Square.a1, Piece.BlackRook, 0, 0)
 
     // make
     board.makeMove(move)
@@ -447,7 +447,7 @@ Deno.test('it revokes long castles for black when a8 rook moves', () => {
 Deno.test('it revokes short castles for black when h8 rook moves', () => {
     // setup
     setBoard('7r/8/8/8/8/8/8/8', new BoardState(0, 0b1100))
-    const move = new Move(Square.h8, Square.h1, Piece.BlackRook, 0, 0)
+    const move = new BitMove(Square.h8, Square.h1, Piece.BlackRook, 0, 0)
 
     // make
     board.makeMove(move)
@@ -467,7 +467,7 @@ Deno.test('it revokes short castles for black when h8 rook moves', () => {
 Deno.test('it updates king square when white king moves', () => {
 
     setBoard('8/8/8/4K3/8/8/8/8')
-    const move = new Move(Square.e5, Square.d5, Piece.WhiteKing, 0, 0)
+    const move = new BitMove(Square.e5, Square.d5, Piece.WhiteKing, 0, 0)
 
     //make
     board.makeMove(move)
@@ -487,7 +487,7 @@ Deno.test('it updates king square when white king moves', () => {
 Deno.test('it revokes castle rights when white king moves', () => {
 
     setBoard('8/8/8/4K3/8/8/8/8', new BoardState(0,0b0011))
-    const move = new Move(Square.e5, Square.d5, Piece.WhiteKing, 0, 0)
+    const move = new BitMove(Square.e5, Square.d5, Piece.WhiteKing, 0, 0)
 
     //make
     board.makeMove(move)
@@ -502,7 +502,7 @@ Deno.test('it revokes castle rights when white king moves', () => {
 
 Deno.test('it updates king square when black king moves', () => {
     setBoard('8/8/8/4k3/8/8/8/8')
-    const move = new Move(Square.e5, Square.d5, Piece.BlackKing, 0, 0)
+    const move = new BitMove(Square.e5, Square.d5, Piece.BlackKing, 0, 0)
 
     //make
     board.makeMove(move)
@@ -521,7 +521,7 @@ Deno.test('it updates king square when black king moves', () => {
 
 Deno.test('it revokes castle rights when black king moves', () => {
     setBoard('8/8/8/4k3/8/8/8/8', new BoardState(0,0b1100))
-    const move = new Move(Square.e5, Square.d5, Piece.BlackKing, 0, 0)
+    const move = new BitMove(Square.e5, Square.d5, Piece.BlackKing, 0, 0)
 
     //make
     board.makeMove(move)
@@ -537,7 +537,7 @@ Deno.test('it revokes castle rights when black king moves', () => {
 Deno.test('it revokes short castles for black when h8 rook is captured', () => {
     setBoard('1r2k2r/p1ppqNb1/bn2pnp1/3P4/1p2P3/2N2Q1p/PPPBBPPP/R3K2R', new BoardState(0,0b0111))
 
-    const move = new Move(Square.f7, Square.h8, Piece.WhiteKnight, Piece.BlackRook, MoveType.Capture)
+    const move = new BitMove(Square.f7, Square.h8, Piece.WhiteKnight, Piece.BlackRook, MoveType.Capture)
     board.makeMove(move)
     board.render()
     assertBoardStatePushed(new BoardState(1,0b0011))
@@ -548,7 +548,7 @@ Deno.test('it revokes short castles for black when h8 rook is captured', () => {
 Deno.test('it revokes long castles for black when a8 rook is captured', () => {
     setBoard('r3k2r/p1ppq1b1/bN2pnp1/3P4/1p2P3/2N2Q1p/PPPBBPPP/R3K2R', new BoardState(0,0b1101))
 
-    const move = new Move(Square.b6, Square.a8, Piece.WhiteKnight, Piece.BlackRook, MoveType.Capture)
+    const move = new BitMove(Square.b6, Square.a8, Piece.WhiteKnight, Piece.BlackRook, MoveType.Capture)
     board.makeMove(move)
     board.render()
     assertBoardStatePushed(new BoardState(1,0b0101))
@@ -559,7 +559,7 @@ Deno.test('it revokes long castles for black when a8 rook is captured', () => {
 Deno.test('it revokes short castles for white when h1 rook is captured', () => {
     setBoard('r3k2r/p1ppq1b1/bN2p1p1/3P4/1p2P3/2N2Qnp/PPPBBPPP/R3K2R', new BoardState(1,0b0111))
 
-    const move = new Move(Square.g3, Square.h1, Piece.BlackKnight, Piece.WhiteRook, MoveType.Capture)
+    const move = new BitMove(Square.g3, Square.h1, Piece.BlackKnight, Piece.WhiteRook, MoveType.Capture)
     board.makeMove(move)
     board.render()
     assertBoardStatePushed(new BoardState(0,0b0110))
@@ -570,7 +570,7 @@ Deno.test('it revokes short castles for white when h1 rook is captured', () => {
 Deno.test('it revokes long castles for white when a1 rook is captured', () => {
     setBoard('r3k2r/p1ppq1b1/bN2p1p1/3P4/1p2P3/1nN2Q1p/PPPBBPPP/R3K2R', new BoardState(1,0b0111))
 
-    const move = new Move(Square.b3, Square.a1, Piece.BlackKnight, Piece.WhiteRook, MoveType.Capture)
+    const move = new BitMove(Square.b3, Square.a1, Piece.BlackKnight, Piece.WhiteRook, MoveType.Capture)
     board.makeMove(move)
     board.render()
     assertBoardStatePushed(new BoardState(0,0b0101))
@@ -581,7 +581,7 @@ Deno.test('it revokes long castles for white when a1 rook is captured', () => {
 Deno.test('it revokes short castles for black when h8 rook is captured by pawn', () => {
     setBoard('r3k2r/p2pppPp/8/8/8/8/P2PPP1P/R3K2R', new BoardState(0,0b0111))
 
-    const move = new Move(Square.g7, Square.h8, Piece.WhitePawn, Piece.BlackRook, MoveType.KnightPromote | MoveFlag.Capture)
+    const move = new BitMove(Square.g7, Square.h8, Piece.WhitePawn, Piece.BlackRook, MoveType.KnightPromote | MoveFlag.Capture)
     board.makeMove(move)
     board.render()
     assertBoardStatePushed(new BoardState(1,0b0011))
@@ -592,7 +592,7 @@ Deno.test('it revokes short castles for black when h8 rook is captured by pawn',
 Deno.test('it revokes long castles for black when a8 rook is captured by pawn', () => {
     setBoard('r3k2r/pP1ppp1p/8/8/8/8/P2PPP1P/R3K2R', new BoardState(0,0b1101))
 
-    const move = new Move(Square.b7, Square.a8, Piece.WhitePawn, Piece.BlackRook, MoveType.KnightPromote | MoveFlag.Capture)
+    const move = new BitMove(Square.b7, Square.a8, Piece.WhitePawn, Piece.BlackRook, MoveType.KnightPromote | MoveFlag.Capture)
     board.makeMove(move)
     board.render()
     assertBoardStatePushed(new BoardState(1,0b0101))
@@ -603,7 +603,7 @@ Deno.test('it revokes long castles for black when a8 rook is captured by pawn', 
 Deno.test('it revokes short castles for white when h1 rook is captured by pawn', () => {
     setBoard('r3k2r/p2ppp1p/8/8/8/8/P2PPPpP/R3K2R', new BoardState(1,0b0111))
 
-    const move = new Move(Square.g2, Square.h1, Piece.BlackPawn, Piece.WhiteRook, MoveType.KnightPromote | MoveFlag.Capture)
+    const move = new BitMove(Square.g2, Square.h1, Piece.BlackPawn, Piece.WhiteRook, MoveType.KnightPromote | MoveFlag.Capture)
     board.makeMove(move)
     board.render()
     assertBoardStatePushed(new BoardState(0,0b0110))
@@ -614,7 +614,7 @@ Deno.test('it revokes short castles for white when h1 rook is captured by pawn',
 Deno.test('it revokes long castles for white when a1 rook is captured by pawn', () => {
     setBoard('r3k2r/p2ppp1p/8/8/8/8/Pp1PPP1P/R3K2R', new BoardState(1,0b0111))
 
-    const move = new Move(Square.b2, Square.a1, Piece.BlackPawn, Piece.WhiteRook,MoveType.KnightPromote | MoveFlag.Capture)
+    const move = new BitMove(Square.b2, Square.a1, Piece.BlackPawn, Piece.WhiteRook,MoveType.KnightPromote | MoveFlag.Capture)
     board.makeMove(move)
     board.render()
     assertBoardStatePushed(new BoardState(0,0b0101))
@@ -626,7 +626,7 @@ Deno.test('it revokes long castles for white when a1 rook is captured by pawn', 
 Deno.test('it castles short as white', () => {
     board.setPieces('r3k2r/8/8/8/8/8/8/R3K2R')
     setBoard('r3k2r/8/8/8/8/8/8/R3K2R', new BoardState(0,0b0011))
-    const move = new Move(Square.e1, Square.g1, Piece.WhiteKing, 0, MoveType.CastleShort)
+    const move = new BitMove(Square.e1, Square.g1, Piece.WhiteKing, 0, MoveType.CastleShort)
 
     //make
     board.makeMove(move)
@@ -650,7 +650,7 @@ Deno.test('it castles short as white', () => {
 Deno.test('it castles long as white', () => {
     board.setPieces('r3k2r/8/8/8/8/8/8/R3K2R')
     setBoard('r3k2r/8/8/8/8/8/8/R3K2R', new BoardState(0,0b0011))
-    const move = new Move(Square.e1, Square.c1, Piece.WhiteKing, 0, MoveType.CastleLong)
+    const move = new BitMove(Square.e1, Square.c1, Piece.WhiteKing, 0, MoveType.CastleLong)
 
     //make
     board.makeMove(move)
@@ -674,7 +674,7 @@ Deno.test('it castles long as white', () => {
 Deno.test('it castles short as black', () => {
     board.setPieces('r3k2r/8/8/8/8/8/8/R3K2R')
     setBoard('r3k2r/8/8/8/8/8/8/R3K2R', new BoardState(0,0b1100))
-    const move = new Move(Square.e8, Square.g8, Piece.BlackKing, 0, MoveType.CastleShort)
+    const move = new BitMove(Square.e8, Square.g8, Piece.BlackKing, 0, MoveType.CastleShort)
 
     //make
     board.makeMove(move)
@@ -698,7 +698,7 @@ Deno.test('it castles short as black', () => {
 Deno.test('it castles long as black', () => {
     board.setPieces('r3k2r/8/8/8/8/8/8/R3K2R')
     setBoard('r3k2r/8/8/8/8/8/8/R3K2R', new BoardState(0,0b1100))
-    const move = new Move(Square.e8, Square.c8, Piece.BlackKing, 0, MoveType.CastleLong)
+    const move = new BitMove(Square.e8, Square.c8, Piece.BlackKing, 0, MoveType.CastleLong)
 
     //make
     board.makeMove(move)

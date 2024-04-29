@@ -1,6 +1,6 @@
 import {Board} from "../Board/Board.ts";
 import {Piece, Color, PieceType} from "../Board/Piece.ts";
-import {Move, MoveFlag, MoveType} from "./Move.ts";
+import {BitMove, MoveFlag, MoveType} from "./BitMove.ts";
 import {Square, SquareNameMap} from "../Board/Square.ts";
 import {CastlingMove, CastlingMoveMap, CastlingRight} from "./CastlingMove.ts";
 import { BoardState } from "../Board/BoardState.ts";
@@ -86,7 +86,7 @@ export class MoveHandler extends Board
         }
     }
 
-    makeMove(move: Move)
+    makeMove(move: BitMove)
     {
         this.saveBoardState()
         this.state.toggleSideToMove()
@@ -133,7 +133,7 @@ export class MoveHandler extends Board
         }
     }
 
-    unmakeMove(move: Move){
+    unmakeMove(move: BitMove){
 
         const movingType = move.moving >> 1
         const movingColor = move.moving & 1
@@ -166,7 +166,7 @@ export class MoveHandler extends Board
         this.restoreLastState()
     }
 
-    #makePawnMove(move: Move, movingColor: Color)
+    #makePawnMove(move: BitMove, movingColor: Color)
     {
         this.state.halfMoveClock = 0
         if(move.flag == MoveType.DoublePawnPush){

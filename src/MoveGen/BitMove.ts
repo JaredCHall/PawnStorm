@@ -20,7 +20,7 @@ export enum MoveType {
     QueenPromote = MoveFlag.Promotion | MoveFlag.Flag1 | MoveFlag.Flag2,
 }
 
-export class Move {
+export class BitMove {
     readonly from: Square
     readonly to: Square
     readonly moving: number // moving piece
@@ -40,17 +40,22 @@ export class Move {
 
     serialize(): string
     {
-        // @ts-ignore ok
         let moveStr: string = SquareNameMap.nameByIndex[this.from] + SquareNameMap.nameByIndex[this.to]
+        moveStr += this.getPromotesType() ?? ''
+        return moveStr
+    }
+
+    getPromotesType(): string|null
+    {
         if(this.flag & MoveFlag.Promotion){
             switch(this.flag & 0b1011){
-                case MoveType.KnightPromote: moveStr += 'N'; break
-                case MoveType.BishopPromote: moveStr += 'B'; break
-                case MoveType.RookPromote: moveStr += 'R'; break
-                case MoveType.QueenPromote: moveStr += 'Q'; break
+                case MoveType.KnightPromote: return 'N';
+                case MoveType.BishopPromote: return 'B';
+                case MoveType.RookPromote: return 'R';
+                case MoveType.QueenPromote: return 'Q';
             }
         }
-        return moveStr
+        return null
     }
 
 }

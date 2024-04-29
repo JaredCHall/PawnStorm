@@ -1,5 +1,5 @@
 import {MoveFactory} from "../src/MoveGen/MoveFactory.ts";
-import {Move, MoveType} from "../src/MoveGen/Move.ts";
+import {BitMove, MoveType} from "../src/MoveGen/BitMove.ts";
 import {assertArrayIncludes} from "https://deno.land/std@0.219.0/assert/assert_array_includes.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 import {Square} from "../src/Board/Square.ts";
@@ -7,21 +7,21 @@ import {Piece, Color} from "../src/Board/Piece.ts";
 
 const board = new MoveFactory()
 
-const genMoves = (fen: string, from: Square): Move[] => {
+const genMoves = (fen: string, from: Square): BitMove[] => {
     board.setFromFenNumber(fen)
     const moves = board.getMovesFromSquare(from, board.squareList[from])
     board.render(moves.map((move) => move.to))
     return moves
 }
 
-const genLegalMoves = (fen: string, from: Square): Move[] => {
+const genLegalMoves = (fen: string, from: Square): BitMove[] => {
     board.setFromFenNumber(fen)
     const moves = board.getLegalMovesFromSquare(from, board.squareList[from])
     board.render(moves.map((move) => move.to))
     return moves
 }
 
-const assertMatchesSquareList = (actual: Move[], expected: Square[], message='Move list matches expected square names') => {
+const assertMatchesSquareList = (actual: BitMove[], expected: Square[], message='BitMove list matches expected square names') => {
     const actualSquares = actual.map((move) => move.to)
     assertArrayIncludes(actualSquares, expected, message)
     const extras = actualSquares.filter((square) => !expected.includes(square))
@@ -42,7 +42,7 @@ const assertNotSquareThreatened = (piecePositions: string, square: Square, color
     assertEquals(isThreatened, false, message)
 }
 
-const assertMatchesMoveList = (actual: Move[], expected: Move[], message: string = 'Move list matches expected Move list') => {
+const assertMatchesMoveList = (actual: BitMove[], expected: BitMove[], message: string = 'BitMove list matches expected BitMove list') => {
     assertEquals(actual, expected, message)
 }
 
@@ -151,30 +151,30 @@ Deno.test('it generates moves for king', () => {
 Deno.test('it generates castles as white', () => {
     let moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R w KQ', Square.e1)
     assertMatchesMoveList(moves,[
-        new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
-        new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
-        new Move(Square.e1, Square.g1, Piece.WhiteKing, 0, MoveType.CastleShort),
-        new Move(Square.e1, Square.c1, Piece.WhiteKing, 0, MoveType.CastleLong),
+        new BitMove(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
+        new BitMove(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
+        new BitMove(Square.e1, Square.g1, Piece.WhiteKing, 0, MoveType.CastleShort),
+        new BitMove(Square.e1, Square.c1, Piece.WhiteKing, 0, MoveType.CastleLong),
     ], 'Can castle either side if both rights exist')
 
     moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R w K', Square.e1)
     assertMatchesMoveList(moves,[
-        new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
-        new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
-        new Move(Square.e1, Square.g1, Piece.WhiteKing, 0, MoveType.CastleShort),
+        new BitMove(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
+        new BitMove(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
+        new BitMove(Square.e1, Square.g1, Piece.WhiteKing, 0, MoveType.CastleShort),
     ], 'Can castle castle short if right exists')
 
     moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R w Q', Square.e1)
     assertMatchesMoveList(moves,[
-        new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
-        new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
-        new Move(Square.e1, Square.c1, Piece.WhiteKing, 0, MoveType.CastleLong),
+        new BitMove(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
+        new BitMove(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
+        new BitMove(Square.e1, Square.c1, Piece.WhiteKing, 0, MoveType.CastleLong),
     ], 'Can castle castle long if right exists')
 
     moves = genMoves('8/8/8/8/8/8/3PPP2/R3K2R w kq', Square.e1)
     assertMatchesMoveList(moves,[
-        new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
-        new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
+        new BitMove(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
+        new BitMove(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
     ], 'Cannot castle if only black as castling rights')
 
     moves = genMoves('8/8/8/8/8/8/3PPP2/R2QKB1R w KQ', Square.e1)
@@ -182,44 +182,44 @@ Deno.test('it generates castles as white', () => {
 
     moves = genMoves('8/8/8/8/8/8/3PPP2/R1Q1K1NR w KQ', Square.e1)
     assertMatchesMoveList(moves,[
-        new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
-        new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
+        new BitMove(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
+        new BitMove(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
     ], 'Cannot castle if rook squares are blocked')
 
     moves = genMoves('8/8/8/8/8/8/3PPP2/RQ2K1NR w KQ', Square.e1)
     assertMatchesMoveList(moves,[
-        new Move(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
-        new Move(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
+        new BitMove(Square.e1, Square.f1, Piece.WhiteKing, 0, 0),
+        new BitMove(Square.e1, Square.d1, Piece.WhiteKing, 0, 0),
     ], 'Cannot castle long if b-file is blocked')
 })
 
 Deno.test('it generates castles as black', () => {
     let moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8 b kq', Square.e8)
     assertMatchesMoveList(moves,[
-        new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
-        new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
-        new Move(Square.e8, Square.g8, Piece.BlackKing, 0, MoveType.CastleShort),
-        new Move(Square.e8, Square.c8, Piece.BlackKing, 0, MoveType.CastleLong),
+        new BitMove(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
+        new BitMove(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
+        new BitMove(Square.e8, Square.g8, Piece.BlackKing, 0, MoveType.CastleShort),
+        new BitMove(Square.e8, Square.c8, Piece.BlackKing, 0, MoveType.CastleLong),
     ], 'Can castle either side if both rights exist')
 
     moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8 b k', Square.e8)
     assertMatchesMoveList(moves,[
-        new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
-        new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
-        new Move(Square.e8, Square.g8, Piece.BlackKing, 0, MoveType.CastleShort),
+        new BitMove(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
+        new BitMove(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
+        new BitMove(Square.e8, Square.g8, Piece.BlackKing, 0, MoveType.CastleShort),
     ], 'Can castle castle short if right exists')
 
     moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8 b q', Square.e8)
     assertMatchesMoveList(moves,[
-        new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
-        new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
-        new Move(Square.e8, Square.c8, Piece.BlackKing, 0, MoveType.CastleLong),
+        new BitMove(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
+        new BitMove(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
+        new BitMove(Square.e8, Square.c8, Piece.BlackKing, 0, MoveType.CastleLong),
     ], 'Can castle castle long if right exists')
 
     moves = genMoves('r3k2r/3ppp2/8/8/8/8/8/8 b KQ', Square.e8)
     assertMatchesMoveList(moves,[
-        new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
-        new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
+        new BitMove(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
+        new BitMove(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
     ], 'Cannot castle if only black as castling rights')
 
     moves = genMoves('r2qkb1r/3ppp2/8/8/8/8/8/8 b kq', Square.e8)
@@ -227,14 +227,14 @@ Deno.test('it generates castles as black', () => {
 
     moves = genMoves('r1q1k1nr/3ppp2/8/8/8/8/8/8 b kq', Square.e8)
     assertMatchesMoveList(moves,[
-        new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
-        new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
+        new BitMove(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
+        new BitMove(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
     ], 'Cannot castle if rook squares are blocked')
 
     moves = genMoves('rq2k1nr/3ppp2/8/8/8/8/8/8 b kq', Square.e8)
     assertMatchesMoveList(moves,[
-        new Move(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
-        new Move(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
+        new BitMove(Square.e8, Square.f8, Piece.BlackKing, 0, 0),
+        new BitMove(Square.e8, Square.d8, Piece.BlackKing, 0, 0),
     ], 'Cannot castle long if b-file is blocked')
 })
 
@@ -242,32 +242,32 @@ Deno.test('it generates castles as black', () => {
 Deno.test('it generates quiet moves for white pawn', () => {
     let moves = genMoves('8/8/8/8/8/8/4P3/8', Square.e2)
     assertMatchesMoveList(moves,[
-        new Move(Square.e2, Square.e3, Piece.WhitePawn, 0, 0),
-        new Move(Square.e2, Square.e4, Piece.WhitePawn, 0, MoveType.DoublePawnPush)
+        new BitMove(Square.e2, Square.e3, Piece.WhitePawn, 0, 0),
+        new BitMove(Square.e2, Square.e4, Piece.WhitePawn, 0, MoveType.DoublePawnPush)
     ], 'Pawn has expected moves from starting rank')
 
     moves = genMoves('8/4P3/8/8/8/8/8/8', Square.e7)
     assertMatchesMoveList(moves,[
-        new Move(Square.e7, Square.e8, Piece.WhitePawn, 0, MoveType.KnightPromote),
-        new Move(Square.e7, Square.e8, Piece.WhitePawn, 0, MoveType.BishopPromote),
-        new Move(Square.e7, Square.e8, Piece.WhitePawn, 0, MoveType.RookPromote),
-        new Move(Square.e7, Square.e8, Piece.WhitePawn, 0, MoveType.QueenPromote),
+        new BitMove(Square.e7, Square.e8, Piece.WhitePawn, 0, MoveType.KnightPromote),
+        new BitMove(Square.e7, Square.e8, Piece.WhitePawn, 0, MoveType.BishopPromote),
+        new BitMove(Square.e7, Square.e8, Piece.WhitePawn, 0, MoveType.RookPromote),
+        new BitMove(Square.e7, Square.e8, Piece.WhitePawn, 0, MoveType.QueenPromote),
     ], 'Pawn has expected promotions')
 });
 
 Deno.test('it generates quiet moves for black pawn', () => {
     let moves = genMoves('8/4p3/8/8/8/8/8/8', Square.e7)
     assertMatchesMoveList(moves,[
-        new Move(Square.e7, Square.e6, Piece.BlackPawn, 0, 0),
-        new Move(Square.e7, Square.e5, Piece.BlackPawn, 0, MoveType.DoublePawnPush)
+        new BitMove(Square.e7, Square.e6, Piece.BlackPawn, 0, 0),
+        new BitMove(Square.e7, Square.e5, Piece.BlackPawn, 0, MoveType.DoublePawnPush)
     ], 'Pawn has expected moves from starting rank')
 
     moves = genMoves('8/8/8/8/8/8/4p3/8', Square.e2)
     assertMatchesMoveList(moves,[
-        new Move(Square.e2, Square.e1, Piece.BlackPawn, 0, MoveType.KnightPromote),
-        new Move(Square.e2, Square.e1, Piece.BlackPawn, 0, MoveType.BishopPromote),
-        new Move(Square.e2, Square.e1, Piece.BlackPawn, 0, MoveType.RookPromote),
-        new Move(Square.e2, Square.e1, Piece.BlackPawn, 0, MoveType.QueenPromote),
+        new BitMove(Square.e2, Square.e1, Piece.BlackPawn, 0, MoveType.KnightPromote),
+        new BitMove(Square.e2, Square.e1, Piece.BlackPawn, 0, MoveType.BishopPromote),
+        new BitMove(Square.e2, Square.e1, Piece.BlackPawn, 0, MoveType.RookPromote),
+        new BitMove(Square.e2, Square.e1, Piece.BlackPawn, 0, MoveType.QueenPromote),
     ], 'Pawn has expected promotions')
 });
 
@@ -275,33 +275,33 @@ Deno.test('it generates quiet moves for black pawn', () => {
 Deno.test('it generates captures and en-passant for white pawn', () => {
     let moves = genMoves('8/8/8/4pn2/4P3/8/8/8', Square.e4)
     assertMatchesMoveList(moves,[
-        new Move(Square.e4, Square.f5, Piece.WhitePawn, Piece.BlackKnight, MoveType.Capture)
+        new BitMove(Square.e4, Square.f5, Piece.WhitePawn, Piece.BlackKnight, MoveType.Capture)
     ], 'Pawn has expected capture in middle of the board')
 
     moves = genMoves('8/8/8/6pn/7P/8/8/8', Square.h4)
     assertMatchesMoveList(moves,[
-        new Move(Square.h4, Square.g5, Piece.WhitePawn, Piece.BlackPawn, MoveType.Capture)
+        new BitMove(Square.h4, Square.g5, Piece.WhitePawn, Piece.BlackPawn, MoveType.Capture)
     ], 'Pawn has expected capture on edge of the board')
 
     moves = genMoves('5QRn/6P1/8/8/8/8/8/8', Square.g7)
     assertMatchesMoveList(moves,[
-        new Move(Square.g7, Square.h8, Piece.WhitePawn, Piece.BlackKnight, MoveType.KnightPromote | MoveType.Capture),
-        new Move(Square.g7, Square.h8, Piece.WhitePawn, Piece.BlackKnight, MoveType.BishopPromote | MoveType.Capture),
-        new Move(Square.g7, Square.h8, Piece.WhitePawn, Piece.BlackKnight, MoveType.RookPromote | MoveType.Capture),
-        new Move(Square.g7, Square.h8, Piece.WhitePawn, Piece.BlackKnight, MoveType.QueenPromote | MoveType.Capture),
+        new BitMove(Square.g7, Square.h8, Piece.WhitePawn, Piece.BlackKnight, MoveType.KnightPromote | MoveType.Capture),
+        new BitMove(Square.g7, Square.h8, Piece.WhitePawn, Piece.BlackKnight, MoveType.BishopPromote | MoveType.Capture),
+        new BitMove(Square.g7, Square.h8, Piece.WhitePawn, Piece.BlackKnight, MoveType.RookPromote | MoveType.Capture),
+        new BitMove(Square.g7, Square.h8, Piece.WhitePawn, Piece.BlackKnight, MoveType.QueenPromote | MoveType.Capture),
     ], 'Pawn has expected capture promotions')
 
     moves = genMoves('8/8/6b1/4pP2/8/8/8/8 w - e6', Square.f5)
     assertMatchesMoveList(moves,[
-        new Move(Square.f5, Square.f6, Piece.WhitePawn, 0, 0),
-        new Move(Square.f5, Square.e6, Piece.WhitePawn, Piece.BlackPawn, MoveType.EnPassant),
-        new Move(Square.f5, Square.g6, Piece.WhitePawn, Piece.BlackBishop, MoveType.Capture),
+        new BitMove(Square.f5, Square.f6, Piece.WhitePawn, 0, 0),
+        new BitMove(Square.f5, Square.e6, Piece.WhitePawn, Piece.BlackPawn, MoveType.EnPassant),
+        new BitMove(Square.f5, Square.g6, Piece.WhitePawn, Piece.BlackBishop, MoveType.Capture),
 
     ], 'Pawn has expected en-passant capture in middle of the board')
 
     moves = genMoves('8/8/N7/Pp6/8/8/8/8 w - b6', Square.a5)
     assertMatchesMoveList(moves,[
-        new Move(Square.a5, Square.b6, Piece.WhitePawn, Piece.BlackPawn, MoveType.EnPassant),
+        new BitMove(Square.a5, Square.b6, Piece.WhitePawn, Piece.BlackPawn, MoveType.EnPassant),
 
     ], 'Pawn has expected en-passant capture on edge of the board')
 })
@@ -310,33 +310,33 @@ Deno.test('it generates captures and en-passant for white pawn', () => {
 Deno.test('it generates captures and en-passant for black pawn', () => {
     let moves = genMoves('8/8/8/8/4p3/4PN2/8/8', Square.e4)
     assertMatchesMoveList(moves,[
-        new Move(Square.e4, Square.f3, Piece.BlackPawn, Piece.WhiteKnight, MoveType.Capture)
+        new BitMove(Square.e4, Square.f3, Piece.BlackPawn, Piece.WhiteKnight, MoveType.Capture)
     ], 'Pawn has expected capture in middle of the board')
 
     moves = genMoves('8/8/8/8/7p/6PN/8/8', Square.h4)
     assertMatchesMoveList(moves,[
-        new Move(Square.h4, Square.g3, Piece.BlackPawn, Piece.WhitePawn, MoveType.Capture)
+        new BitMove(Square.h4, Square.g3, Piece.BlackPawn, Piece.WhitePawn, MoveType.Capture)
     ], 'Pawn has expected capture on edge of the board')
 
     moves = genMoves('8/8/8/8/8/8/6p1/5qrN', Square.g2)
     assertMatchesMoveList(moves,[
-        new Move(Square.g2, Square.h1, Piece.BlackPawn, Piece.WhiteKnight, MoveType.KnightPromote | MoveType.Capture),
-        new Move(Square.g2, Square.h1, Piece.BlackPawn, Piece.WhiteKnight, MoveType.BishopPromote | MoveType.Capture),
-        new Move(Square.g2, Square.h1, Piece.BlackPawn, Piece.WhiteKnight, MoveType.RookPromote | MoveType.Capture),
-        new Move(Square.g2, Square.h1, Piece.BlackPawn, Piece.WhiteKnight, MoveType.QueenPromote | MoveType.Capture),
+        new BitMove(Square.g2, Square.h1, Piece.BlackPawn, Piece.WhiteKnight, MoveType.KnightPromote | MoveType.Capture),
+        new BitMove(Square.g2, Square.h1, Piece.BlackPawn, Piece.WhiteKnight, MoveType.BishopPromote | MoveType.Capture),
+        new BitMove(Square.g2, Square.h1, Piece.BlackPawn, Piece.WhiteKnight, MoveType.RookPromote | MoveType.Capture),
+        new BitMove(Square.g2, Square.h1, Piece.BlackPawn, Piece.WhiteKnight, MoveType.QueenPromote | MoveType.Capture),
     ], 'Pawn has expected capture promotions')
 
     moves = genMoves('8/8/8/8/4Pp2/6B1/8/8 b - e3', Square.f4)
     assertMatchesMoveList(moves,[
-        new Move(Square.f4, Square.f3, Piece.BlackPawn, 0, 0),
-        new Move(Square.f4, Square.e3, Piece.BlackPawn, Piece.WhitePawn, MoveType.EnPassant),
-        new Move(Square.f4, Square.g3, Piece.BlackPawn, Piece.WhiteBishop, MoveType.Capture),
+        new BitMove(Square.f4, Square.f3, Piece.BlackPawn, 0, 0),
+        new BitMove(Square.f4, Square.e3, Piece.BlackPawn, Piece.WhitePawn, MoveType.EnPassant),
+        new BitMove(Square.f4, Square.g3, Piece.BlackPawn, Piece.WhiteBishop, MoveType.Capture),
 
     ], 'Pawn has expected en-passant capture in middle of the board')
 
     moves = genMoves('8/8/8/8/pP6/n7/8/8 b - b3', Square.a4)
     assertMatchesMoveList(moves,[
-        new Move(Square.a4, Square.b3, Piece.BlackPawn, Piece.WhitePawn, MoveType.EnPassant),
+        new BitMove(Square.a4, Square.b3, Piece.BlackPawn, Piece.WhitePawn, MoveType.EnPassant),
 
     ], 'Pawn has expected en-passant capture on edge of the board')
 })

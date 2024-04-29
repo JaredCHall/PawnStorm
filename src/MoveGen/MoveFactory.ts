@@ -1,7 +1,7 @@
 import {MoveHandler} from "./MoveHandler.ts";
 import {Piece, Color, PieceType} from "../Board/Piece.ts";
 import {Square} from "../Board/Square.ts";
-import {Move, MoveType} from "./Move.ts";
+import {BitMove, MoveType} from "./BitMove.ts";
 import {CastlingMoveMap} from "./CastlingMove.ts";
 
 
@@ -11,7 +11,7 @@ export class MoveFactory extends MoveHandler
         evaluateChecksAndMates: false,
     }
 
-    makeMove(move: Move) {
+    makeMove(move: BitMove) {
         super.makeMove(move);
         if(this.options.evaluateChecksAndMates){
             const movingColor = move.moving & 1
@@ -37,7 +37,7 @@ export class MoveFactory extends MoveHandler
     }
 
     getLegalMoves(color: Color = this.state.sideToMove){
-        const moves: Move[] = []
+        const moves: BitMove[] = []
         for(let i=0;i<64;i++){
             const from = this.square120Indexes[i]
             const piece = this.squareList[from]
@@ -52,7 +52,7 @@ export class MoveFactory extends MoveHandler
         return moves
     }
 
-    getLegalMovesFromSquare(from: Square, moving: Piece): Move[] {
+    getLegalMovesFromSquare(from: Square, moving: Piece): BitMove[] {
         const movingColor = this.state.sideToMove
         const enemyColor = this.state.sideToMove ? 0 : 1
         return this.getMovesFromSquare(from, moving).filter((move) => {
@@ -63,7 +63,7 @@ export class MoveFactory extends MoveHandler
         })
     }
 
-    getMovesFromSquare(from: Square, moving: Piece): Move[]
+    getMovesFromSquare(from: Square, moving: Piece): BitMove[]
     {
         const type = moving >> 1
         const color: Color = moving & 1
@@ -101,7 +101,7 @@ export class MoveFactory extends MoveHandler
         return moves
     }
 
-    #getMovesFromOffsets(from: Square, moving: Piece, color: Color, offsets: number[], maxRayLen: number): Move[] {
+    #getMovesFromOffsets(from: Square, moving: Piece, color: Color, offsets: number[], maxRayLen: number): BitMove[] {
         const moves = []
         for(let i = 0; i<offsets.length;i++) {
             const offset = offsets[i]
@@ -113,21 +113,21 @@ export class MoveFactory extends MoveHandler
                 }
                 if (captured == 0) {
                     // empty square
-                    moves.push(new Move(from, to, moving, 0, MoveType.Quiet))
+                    moves.push(new BitMove(from, to, moving, 0, MoveType.Quiet))
                     continue
                 }
                 if ((captured & 1) == color) {
                     // friendly piece
                     break
                 }
-                moves.push(new Move(from, to, moving, captured, MoveType.Capture))
+                moves.push(new BitMove(from, to, moving, captured, MoveType.Capture))
                 break
             }
         }
         return moves
     }
 
-    #getLateralMoves(from: Square, moving: Piece, color: Color): Move[]
+    #getLateralMoves(from: Square, moving: Piece, color: Color): BitMove[]
     {
         return this.#getMovesFromOffsets(from, moving, color, [1,10,-1,-10], 7)
     }
@@ -164,7 +164,7 @@ export class MoveFactory extends MoveHandler
         return false
     }
 
-    #getDiagonalMoves(from: Square, moving: Piece, color: Color): Move[]
+    #getDiagonalMoves(from: Square, moving: Piece, color: Color): BitMove[]
     {
         return this.#getMovesFromOffsets(from, moving, color, [9,11,-9,-11], 7)
     }
@@ -214,7 +214,7 @@ export class MoveFactory extends MoveHandler
     }
 
 
-    #getKnightMoves(from: Square, moving: Piece, color: Color): Move[]
+    #getKnightMoves(from: Square, moving: Piece, color: Color): BitMove[]
     {
         return this.#getMovesFromOffsets(from, moving, color, [-21, -19,-12, -8, 8, 12, 19, 21], 1)
     }
@@ -235,7 +235,7 @@ export class MoveFactory extends MoveHandler
         return false
     }
 
-    #getKingMoves(from: Square, moving: Piece, color: Color): Move[]
+    #getKingMoves(from: Square, moving: Piece, color: Color): BitMove[]
     {
         const moves = this.#getMovesFromOffsets(from, moving, color, [-10, -9, 1, 11, 10, 9, -1, -11], 1)
 
@@ -270,7 +270,7 @@ export class MoveFactory extends MoveHandler
     #getPawnMoves(
         from: Square,
         moving: Piece,
-    ): Move[] {
+    ): BitMove[] {
         const rank = this.squareRanks[this.square64Indexes[from]]
         const promotes = rank == 6
 
@@ -282,7 +282,7 @@ export class MoveFactory extends MoveHandler
         return moves
     }
 
-    #getBPawnMoves(from: Square, moving: Piece): Move[]
+    #getBPawnMoves(from: Square, moving: Piece): BitMove[]
     {
         const rank = this.squareRanks[this.square64Indexes[from]]
         const promotes = rank == 1
@@ -295,22 +295,22 @@ export class MoveFactory extends MoveHandler
         return moves
     }
 
-    #getPawnQuietMoves(from: Square, moving: Piece, offset: number, doubleOffset: number, onStartSquare: boolean, promotes: boolean): Move[]
+    #getPawnQuietMoves(from: Square, moving: Piece, offset: number, doubleOffset: number, onStartSquare: boolean, promotes: boolean): BitMove[]
     {
-        const moves: Move[] = []
+        const moves: BitMove[] = []
         let to: number = from + offset
         if(this.squareList[to] == 0){
             if(promotes){
-                moves.push(new Move(from, to, moving, 0, MoveType.KnightPromote))
-                moves.push(new Move(from, to, moving, 0, MoveType.BishopPromote))
-                moves.push(new Move(from, to, moving, 0, MoveType.RookPromote))
-                moves.push(new Move(from, to, moving, 0, MoveType.QueenPromote))
+                moves.push(new BitMove(from, to, moving, 0, MoveType.KnightPromote))
+                moves.push(new BitMove(from, to, moving, 0, MoveType.BishopPromote))
+                moves.push(new BitMove(from, to, moving, 0, MoveType.RookPromote))
+                moves.push(new BitMove(from, to, moving, 0, MoveType.QueenPromote))
             }else{
-                moves.push(new Move(from, to, moving, 0, MoveType.Quiet))
+                moves.push(new BitMove(from, to, moving, 0, MoveType.Quiet))
                 if(onStartSquare){
                     to = from + doubleOffset
                     if(this.squareList[to] == 0){
-                        moves.push(new Move(from, to, moving, 0, MoveType.DoublePawnPush))
+                        moves.push(new BitMove(from, to, moving, 0, MoveType.DoublePawnPush))
                     }
                 }
             }
@@ -318,9 +318,9 @@ export class MoveFactory extends MoveHandler
         return moves
     }
 
-    #getPawnCaptureMoves(from: Square, moving: Piece, color: Color, offsets: number[], promotes: boolean): Move[]
+    #getPawnCaptureMoves(from: Square, moving: Piece, color: Color, offsets: number[], promotes: boolean): BitMove[]
     {
-        const moves: Move[] = []
+        const moves: BitMove[] = []
         for(let i=0;i<2;i++){
             const to: number = from + offsets[i]
             const captured = this.squareList[to]
@@ -329,7 +329,7 @@ export class MoveFactory extends MoveHandler
                 if(to == this.state.enPassantTarget){
                     const captureSquare = this.enPassantCaptureOnSquares[this.square64Indexes[to]]
                     // @ts-ignore to is assumed to be valid if it matches the enPassantTarget
-                    moves.push(new Move(from, to, moving, this.squareList[captureSquare], MoveType.EnPassant))
+                    moves.push(new BitMove(from, to, moving, this.squareList[captureSquare], MoveType.EnPassant))
                 }
                 // cannot capture empty square if it's not en-passant.
                 continue
@@ -341,12 +341,12 @@ export class MoveFactory extends MoveHandler
             }
 
             if(promotes){
-                moves.push(new Move(from, to, moving, captured, MoveType.KnightPromote | MoveType.Capture))
-                moves.push(new Move(from, to, moving, captured, MoveType.BishopPromote | MoveType.Capture))
-                moves.push(new Move(from, to, moving, captured, MoveType.RookPromote | MoveType.Capture))
-                moves.push(new Move(from, to, moving, captured, MoveType.QueenPromote | MoveType.Capture))
+                moves.push(new BitMove(from, to, moving, captured, MoveType.KnightPromote | MoveType.Capture))
+                moves.push(new BitMove(from, to, moving, captured, MoveType.BishopPromote | MoveType.Capture))
+                moves.push(new BitMove(from, to, moving, captured, MoveType.RookPromote | MoveType.Capture))
+                moves.push(new BitMove(from, to, moving, captured, MoveType.QueenPromote | MoveType.Capture))
             }else{
-                moves.push(new Move(from, to, moving, captured, MoveType.Capture))
+                moves.push(new BitMove(from, to, moving, captured, MoveType.Capture))
             }
         }
         return moves

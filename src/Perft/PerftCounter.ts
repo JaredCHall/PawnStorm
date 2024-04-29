@@ -1,4 +1,4 @@
-import {Move, MoveFlag, MoveType} from "../MoveGen/Move.ts";
+import {BitMove, MoveFlag, MoveType} from "../MoveGen/BitMove.ts";
 
 export class PerftCounter {
     nodes: number
@@ -33,7 +33,7 @@ export class PerftCounter {
         this.checkMates = checkMates
     }
 
-    update(move: Move): void
+    update(move: BitMove): void
     {
         this.nodes++
         if(move.flag & MoveFlag.Capture){
