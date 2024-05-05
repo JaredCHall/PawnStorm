@@ -32,4 +32,8 @@ export class SquareNameMap {
         81: 'a2',82: 'b2',83: 'c2',84: 'd2',85: 'e2',86: 'f2',87: 'g2',88: 'h2',
         91: 'a1',92: 'b1',93: 'c1',94: 'd1',95: 'e1',96: 'f1',97: 'g1',98: 'h1',
     }
+
+    static fileIndexes: {[key: string]: number} = {
+        'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7
+    }
 }

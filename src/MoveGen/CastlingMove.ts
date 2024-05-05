@@ -1,6 +1,6 @@
 import {Square} from "../Board/Square.ts";
 import {BitMove, MoveType} from "./BitMove.ts";
-import {Piece, PieceType} from "../Board/Piece.ts";
+import {Color, Piece} from "../Board/Piece.ts";
 
 export enum CastlingRight { // 4 bits
     K= 0b0001,
@@ -49,6 +49,14 @@ export class CastlingMove
         }
     }
 
+    static fromSanString(sanString: string, sideToMove: Color): CastlingMove
+    {
+        const right = sanString === 'O-O-O' ? 'Q' : 'K'
+
+        // @ts-ignore
+        return sideToMove === Color.White ? new CastlingMove(right) : new CastlingMove(right.toLowerCase())
+    }
+
 }
 
 export class CastlingMoveMap
@@ -61,10 +69,6 @@ export class CastlingMoveMap
     }
 
     static readonly kingSquareByColor = new Uint8Array([Square.e1, Square.e8])
-    static readonly byRookFromSquare: Partial<Record<Square, CastlingMove>> = {
-        [Square.h1]: this.byRight[CastlingRight.K], [Square.a1]: this.byRight[CastlingRight.Q],
-        [Square.h8]: this.byRight[CastlingRight.k], [Square.a8]: this.byRight[CastlingRight.q],
-    }
     static readonly byKingToSquare: Partial<Record<Square, CastlingMove>> = {
         [Square.g1]: this.byRight[CastlingRight.K], [Square.c1]: this.byRight[CastlingRight.Q],
         [Square.g8]: this.byRight[CastlingRight.k], [Square.c8]: this.byRight[CastlingRight.q],
