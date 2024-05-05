@@ -67,7 +67,7 @@ The above might have the following output, as an example:
 └───────┴───────┴──────┴──────┴──────────┘
 ```
 
-The `piece` property is a fen or algebraic notation character representing both piece type and color. For example 'K' is the white king, and 'r' is a black rook. The `from` and `to` properties are the names of the origin and destination squares. The `promotes` property is usually null, but if a pawn is promoting, it is either 'N', 'B', 'R' or 'Q' for white, or 'n', 'b', 'r' or 'q' for black.
+The `piece` property is a fen or algebraic notation character representing both piece type and color. For example 'K' is the white king, and 'r' is a black rook. The `from` and `to` properties are the names of the origin and destination squares. The `promotes` property is usually null, but if a pawn is promoting, it is either 'N', 'B', 'R' or 'Q' (always upper-case).
 
 ### Making Moves
 ```typescript
@@ -84,7 +84,7 @@ game.makeMove('e1e2')
 game.makeMove('e8e7')
 ```
 
-### Undo the Last BitMove
+### Undo the Last Move
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
 
@@ -113,11 +113,11 @@ game.getSquares().forEach((square) => {
     // coordinates are [0,0] to [7,7] representing the square's row/column location
     // on the 8x8 grid. The argument is the board's orientation
     square.getCoordinates('white') // if viewing the board from white's perspective
-    square.getCoordinates('black') // is viewing the board from black's perspective
+    square.getCoordinates('black') // if viewing the board from black's perspective
 })
 
 // can also access a single square at a time
-game.getSquare('a1')
+const a1 = game.getSquare('a1')
 
 ```
 
@@ -126,18 +126,20 @@ game.getSquare('a1')
 import {Game} from "BitChess/Game/Game.ts"
 
 const game = new Game()
+// which player's turn is it?
+game.getSideToMove() // 'white' or 'black'
 // is the game over (player to move has no legal moves)?
 game.isGameOver()
 // is the king in check
-game.state.isCheck()
+game.isCheck()
 // is there a checkmate on the board?
-game.state.isCheckMate()
+game.isCheckMate()
 // what about a stalemate?
-game.state.isStaleMate()
+game.isStaleMate()
 // do we have 3-fold repetition?
-game.state.is3FoldRepetitionDraw()
+game.is3FoldRepetitionDraw()
 // what about 50-move rule
-game.state.is50MoveRuleDraw()
+game.is50MoveRuleDraw()
 ```
 
 ### Resigns or Draw by Agreement
