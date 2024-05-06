@@ -71,6 +71,7 @@ Deno.test('it sets board from Fen Number', () => {
     assertEquals(board.state.enPassantTarget,0)
     assertEquals(board.state.castleRights, 0)
     assertEquals(board.state.halfMoveClock, 0)
+
 })
 
 Deno.test('it serializes as FEN string', () => {

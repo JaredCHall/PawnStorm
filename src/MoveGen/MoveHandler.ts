@@ -43,7 +43,7 @@ export class MoveHandler extends Board
         this.state = this.positionStack.pop()
     }
 
-    // with BoardState now available, we can pieces and state from a fenNumber
+    // with BoardState now available, we can set pieces and state from a fenNumber
     setFromFenNumber(fenNumber: string): void {
         const parts = fenNumber.split(' ')
         const sideToMove = parts[1] ?? 'w'
@@ -64,12 +64,7 @@ export class MoveHandler extends Board
 
         this.state.enPassantTarget = 0
         if(enPassantTarget != '-'){
-            // @ts-ignore it works fine
-            const enPassantSquare = SquareNameMap.indexByName[enPassantTarget] ?? null
-            if(!enPassantSquare){
-                throw new Error(`Invalid enPassantTarget: ${enPassantTarget}`)
-            }
-            this.state.enPassantTarget = enPassantSquare
+            this.state.enPassantTarget =  SquareNameMap.indexByName[enPassantTarget]
         }
 
         this.state.halfMoveClock = 0

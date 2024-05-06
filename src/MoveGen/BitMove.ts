@@ -1,4 +1,4 @@
-import {Square, SquareNameMap} from "../Board/Square.ts";
+import {Square} from "../Board/Square.ts";
 
 export enum MoveFlag {
     Flag1       = 0b0001,
@@ -36,13 +36,6 @@ export class BitMove {
         this.moving = moving
         this.captured = captured
         this.flag = flag
-    }
-
-    serialize(): string
-    {
-        let moveStr: string = SquareNameMap.nameByIndex[this.from] + SquareNameMap.nameByIndex[this.to]
-        moveStr += this.getPromotesType() ?? ''
-        return moveStr
     }
 
     getPromotesType(): string|null

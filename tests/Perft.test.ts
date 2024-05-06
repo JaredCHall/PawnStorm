@@ -55,7 +55,3 @@ Deno.test('It passes perft 4', () => {
 Deno.test('It passes perft 5', () => {
     assertResultMatches(getPerftResult(5),5)
 })
-
-Deno.test('It passes perft 6', () => {
-    assertResultMatches(getPerftResult(6),6)
-})

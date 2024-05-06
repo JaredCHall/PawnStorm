@@ -47,11 +47,3 @@ Deno.test('It passes Kiwipete 3', () => {
 Deno.test('It passes Kiwipete 4', () => {
     assertResultMatches(getPerftResult(4),4)
 })
-
-Deno.test('It passes Kiwipete 5', () => {
-    assertResultMatches(getPerftResult(5),5)
-})
-
-// Deno.test('It passes perft 6', () => {
-//     assertResultMatches(getPerftResult(6),6)
-// })

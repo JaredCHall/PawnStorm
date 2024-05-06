@@ -7,19 +7,15 @@ import {CastlingMoveMap} from "./CastlingMove.ts";
 
 export class MoveFactory extends MoveHandler
 {
-    options = {
-        evaluateChecksAndMates: false,
-    }
-
     makeMove(move: BitMove) {
         super.makeMove(move);
-        if(this.options.evaluateChecksAndMates){
-            const movingColor = move.moving & 1
-            const enemyColor = movingColor ? 0 : 1
-            move.isCheck = this.isSquareThreatened(this.kingSquares[enemyColor], movingColor)
-            if(move.isCheck){
-                move.isMate = !this.hasLegalMoves(enemyColor)
-            }
+
+        // evaluate checks and mates
+        const movingColor = move.moving & 1
+        const enemyColor = movingColor ? 0 : 1
+        move.isCheck = this.isSquareThreatened(this.kingSquares[enemyColor], movingColor)
+        if(move.isCheck){
+            move.isMate = !this.hasLegalMoves(enemyColor)
         }
     }
 
