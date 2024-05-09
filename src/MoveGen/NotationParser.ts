@@ -17,6 +17,18 @@ export class NotationParser {
         this.notationType = type
     }
 
+    serializeMove(move: BitMove)
+    {
+        let notation = ''
+        if(this.notationType == 'coordinate'){
+            notation += SquareNameMap.nameByIndex[move.from] + SquareNameMap.nameByIndex[move.to]
+        }else if(this.notationType == 'algebraic'){
+            notation += FenPieceMap.fenByBitType[move.moving].toUpperCase() + SquareNameMap.nameByIndex[move.to]
+        }
+        // TODO: make it work correctly
+        return notation
+    }
+
     parse(notation: string): BitMove {
         if(this.notationType === 'coordinate'){
             return this.#parseCoordinateNotation(notation)

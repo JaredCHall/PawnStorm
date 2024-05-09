@@ -4,25 +4,51 @@ import {Move} from "./Move.ts";
 import {BitMove} from "../MoveGen/BitMove.ts";
 import {Color} from "../Board/Piece.ts";
 import {NotationParser} from "../MoveGen/NotationParser.ts";
+import {MainLine} from "./MainLine.ts";
+import {RecordedMove} from "./RecordedMove.ts";
 
 export class Game {
 
-    readonly moveFactory = new MoveFactory();
+    private readonly moveFactory = new MoveFactory();
 
-    readonly notationParser = new NotationParser(this.moveFactory)
+    private mainLine: MainLine = new MainLine()
+
+    private readonly notationParser = new NotationParser(this.moveFactory)
 
     constructor(fen: string|null = null) {
-        fen ??= 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-        this.moveFactory.setFromFenNumber(fen)
+        this.setBoard(fen ?? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+    }
+
+    setBoard(fenString: string): void
+    {
+        this.moveFactory.setFromFenNumber(fenString)
+        this.mainLine = new MainLine()
+    }
+
+    getFenNotation(): string
+    {
+        return this.moveFactory.serialize()
+    }
+
+    getMainLine(): MainLine
+    {
+        return this.mainLine
     }
 
     setNotation(type: 'algebraic'|'coordinate') {
         this.notationParser.setNotationType(type)
     }
 
-    makeMove(notation: string){
+    makeMove(notation: string, newVariation: boolean = false){
         const move = this.notationParser.parse(notation)
         this.moveFactory.makeMove(move)
+
+        const recordedMove = new RecordedMove(
+            move,
+            this.getFenNotation(),
+            this.notationParser.serializeMove(move)
+        )
+        this.mainLine.addMove(recordedMove, newVariation)
     }
 
     getSideToMove(): string {

@@ -2,7 +2,7 @@
 
 The Game API is where to start if you are wiring a UI. The following documents the most useful and common methods needed for the task.
 
-### Creating the Game object
+## Creating the Game object
 
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
@@ -32,7 +32,7 @@ Queen.--Fischer} b5 10.Nxb5 cxb5 11.Bxb5+ Nbd7 12.O-O-O Rd8
 game = Game.fromPGN(fileContents)
 ```
 
-### Game Notation
+## Game Notation
 By default, BitChess will represent moves in algebraic notation, but coordinate notation is also supported.
 
 ```typescript
@@ -46,7 +46,10 @@ game.setNotation('algebriac')
 
 ```
 
-### Get Moves List
+## Get Legal Moves
+
+You may need a list legal moves in a position, or from a square. This is particular useful for user prompts such as move indicators when selecting a piece to move.
+
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
 
@@ -69,7 +72,7 @@ The above might have the following output, as an example:
 
 The `piece` property is a fen or algebraic notation character representing both piece type and color. For example 'K' is the white king, and 'r' is a black rook. The `from` and `to` properties are the names of the origin and destination squares. The `promotes` property is usually null, but if a pawn is promoting, it is either 'N', 'B', 'R' or 'Q' (always upper-case).
 
-### Making Moves
+## Making Moves
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
 
@@ -84,7 +87,7 @@ game.makeMove('e1e2')
 game.makeMove('e8e7')
 ```
 
-### Undo the Last Move
+## Undo the Last Move
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
 
@@ -97,7 +100,7 @@ game.undoMove()
 // game is back at starting position
 ```
 
-### Rendering the Board
+## Rendering the Board
 ```typescript
 
 import {Game} from "BitChess/Game/Game.ts"
@@ -121,7 +124,72 @@ const a1 = game.getSquare('a1')
 
 ```
 
-### Checking Game State
+## Rendering the MainLine
+
+The `MainLine` contains all the moves for the current game, as well as any variations that have been loaded via PGN. It is common in chess UIs to display the full list of moves, and in studies to additionally display variations.
+
+```typescript
+import {Game} from "BitChess/Game/Game.ts"
+import {MainLine} from "BitChess/Game/MainLine.ts"
+import {RecordedMove} from "BitChess/Game/RecordedMove.ts"
+
+const moveList = game.getMoveList()
+
+const mainLine: RecordedMove[] = moveList.getMainLine();
+
+console.table(mainLine)
+```
+
+```text
+id | notation | variations
+```
+
+```typescript
+import {Game} from "BitChess/Game/Game.ts"
+import {MainLine} from "BitChess/Game/MainLine.ts"
+import {RecordedMove} from "BitChess/Game/RecordedMove.ts"
+
+const moveList = game.getMoveList()
+
+const mainLine: RecordedMove[] = moveList.getMainLine();
+
+
+// variations can be deeply nested, so recursion is best
+const renderMoveList = (moveList: MainLine, depth: number = 0): string => {
+    let html = ''
+    moveList.forEach((move: RecordedMove) => {
+        
+        if(move.color == 'white'){
+            html += '<div class="full-move">'
+            html += `<strong>${move.fullMoveCount}.</strong>`
+        }
+        html += ${move.notation} + ' '
+        
+        move.getVariations().forEach((variation: MainLine) => {
+            html += '<div class="variation">'
+            renderMoveList(moveList, depth + 1)
+            html += '</div>'
+        })
+        html += '</div>'
+    })
+    return html
+}
+
+const html = renderMoveList()
+
+mainLine.forEach((move: RecordedMove) => {
+    move.getVariations().forEach((variation: MainLine) => {
+        move.get
+    })
+})
+
+console.table(mainLine)
+```
+
+
+
+
+## Checking Game State
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
 
@@ -142,7 +210,7 @@ game.is3FoldRepetitionDraw()
 game.is50MoveRuleDraw()
 ```
 
-### Resigns or Draw by Agreement
+## Resigns or Draw by Agreement
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
 
@@ -153,7 +221,7 @@ game.setDrawByAgreement()
 
 ```
 
-### Export PGN
+## Export PGN
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
 
@@ -162,7 +230,7 @@ const pgnFileContents = game.exportPgnFile()
 
 ```
 
-### Get the FEN string
+## Get the FEN string
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
 
