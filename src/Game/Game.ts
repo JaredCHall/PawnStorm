@@ -11,18 +11,19 @@ export class Game {
 
     private readonly moveFactory = new MoveFactory();
 
-    private mainLine: MainLine = new MainLine()
+    private mainLine: MainLine
 
     private readonly notationParser = new NotationParser(this.moveFactory)
 
     constructor(fen: string|null = null) {
-        this.setBoard(fen ?? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+        fen ??= 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+        this.setBoard(fen)
+        this.mainLine = new MainLine(fen)
     }
 
     setBoard(fenString: string): void
     {
         this.moveFactory.setFromFenNumber(fenString)
-        this.mainLine = new MainLine()
     }
 
     getFenNotation(): string
@@ -33,6 +34,16 @@ export class Game {
     getMainLine(): MainLine
     {
         return this.mainLine
+    }
+
+    gotoMove(moveId: number): void
+    {
+       const move = this.mainLine.getMove(moveId)
+       if(!move){
+           throw new Error(`Could not find move for move "${moveId}"`)
+       }
+       this.mainLine.setCursor(moveId)
+       this.moveFactory.setFromFenNumber(this.mainLine.getFenBeforeMove(moveId))
     }
 
     setNotation(type: 'algebraic'|'coordinate') {

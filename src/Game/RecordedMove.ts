@@ -5,6 +5,10 @@ export class RecordedMove {
 
     private cursorId: number = -1 // a sentinel value of sorts
 
+    private prev: RecordedMove|null = null
+
+    private next: RecordedMove|null = null
+
     readonly move: BitMove
 
     constructor(
@@ -17,8 +21,27 @@ export class RecordedMove {
         this.move = move
     }
 
+    setPrev(move: RecordedMove|null): void{
+        this.prev = move
+    }
+    setNext(move: RecordedMove|null): void{
+        this.next = move
+    }
+
+    getPrev(): RecordedMove|null{
+        return this.prev
+    }
+
+    getNext(): RecordedMove|null{
+        return this.next
+    }
+
     setParent(parent: RecordedMove|null): void {
         this.parent = parent
+    }
+
+    getChildren(): RecordedMove[] {
+        return this.children
     }
 
     addChild(child: RecordedMove): void {
@@ -35,6 +58,15 @@ export class RecordedMove {
     getCursorId(): number
     {
         return this.cursorId
+    }
+
+    getColor(): 'white' | 'black' {
+        return this.move.moving & 1 ? 'black' : 'white'
+    }
+
+    getFullMoveCounter(): number
+    {
+        return parseInt(this.fen.substring(this.fen.lastIndexOf(' ') + 1))
     }
 
 }
