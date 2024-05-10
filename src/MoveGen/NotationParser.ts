@@ -1,5 +1,5 @@
 import {MoveFactory} from "./MoveFactory.ts";
-import {BitMove} from "./BitMove.ts";
+import {BitMove, MoveType} from "./BitMove.ts";
 import {SquareNameMap} from "../Board/Square.ts";
 import {CastlingMoveMap, CastlingRight} from "./CastlingMove.ts";
 import {Color, FenPieceMap, PieceType} from "../Board/Piece.ts";
@@ -22,10 +22,32 @@ export class NotationParser {
         let notation = ''
         if(this.notationType == 'coordinate'){
             notation += SquareNameMap.nameByIndex[move.from] + SquareNameMap.nameByIndex[move.to]
+            if(move.getPromotesType() !== null){
+                notation += move.getPromotesType()
+            }
         }else if(this.notationType == 'algebraic'){
-            notation += FenPieceMap.fenByBitType[move.moving].toUpperCase() + SquareNameMap.nameByIndex[move.to]
+            if(move.flag == MoveType.CastleShort){
+                notation = 'O-O'
+            }else if(move.flag == MoveType.CastleLong){
+                notation = 'O-O-O'
+            }else{
+                const isPawn = move.moving >> 1 & (PieceType.BPawn | PieceType.Pawn)
+                if(!isPawn){
+                    notation += FenPieceMap.fenByBitType[move.moving].toUpperCase()
+                }
+                notation += this.#getMoveDisambiguation(move)
+                if(move.captured != 0){
+                    notation += 'x'
+                }
+                notation += SquareNameMap.nameByIndex[move.to]
+                if(move.getPromotesType() !== null){
+                    notation += '='+move.getPromotesType()
+                }
+            }
+            if(move.isCheck){
+                notation += move.isMate ? '#' : '+'
+            }
         }
-        // TODO: make it work correctly
         return notation
     }
 
@@ -35,6 +57,68 @@ export class NotationParser {
         }else{
             return this.#parseAlgebraicNotation(notation)
         }
+    }
+
+    #getMoveDisambiguation(move: BitMove): string {
+
+        const square64Index = this.moveFactory.square64Indexes[move.from]
+        const startFile = this.moveFactory.squareFiles[square64Index]
+        const startRank = this.moveFactory.squareRanks[square64Index]
+
+        const pieceType = move.moving >> 1
+        const color = move.moving & 1
+
+        if(pieceType & (PieceType.BPawn | PieceType.Pawn)){
+            return move.captured != 0 ? SquareNameMap.files[startFile] : ''
+        }
+
+        if(pieceType & PieceType.King){
+            return ''
+        }
+
+        let requiresRank = false
+        let requiresFile = false
+
+        for(let i=0;i<64;i++){
+            const from = this.moveFactory.square120Indexes[i]
+            const piece = this.moveFactory.squareList[from]
+
+            const file =  this.moveFactory.squareFiles[i]
+            const rank = this.moveFactory.squareRanks[i]
+
+            if(i == square64Index){
+                continue
+            }
+
+            if(startRank != rank && startFile != file){
+                continue
+            }
+
+            if(piece != 0 && (piece >> 1) & pieceType && (piece & 1) == color) {
+                const movesForSquare = this.moveFactory.getLegalMovesFromSquare(from, piece)
+                for (let j = 0; j < movesForSquare.length; j++) {
+                    const otherMove = movesForSquare[j]
+                    if(move.to == otherMove.to){
+                        if(startFile == file){
+                            requiresRank = true
+                        }else{
+                            requiresFile = true
+                        }
+                    }
+                }
+            }
+        }
+
+        if(requiresFile){
+            if(requiresRank){
+                return SquareNameMap.files[startFile] + SquareNameMap.ranks[startRank]
+            }
+            return SquareNameMap.files[startFile]
+        }else if(requiresRank){
+            return SquareNameMap.ranks[startRank]
+        }
+
+        return ''
     }
 
     #parseCoordinateNotation(notation: string): BitMove {

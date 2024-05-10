@@ -78,6 +78,19 @@ Deno.test('it handles invalid coordinate notation moves', () => {
 
 })
 
+Deno.test("it serializes coordinate moves", () => {
+    const parser = getParser('2bq1b1r/1Pp2Qpp/3k4/3Bp3/3n4/2N5/P1PP1PPP/R1B1K2R w KQ - 3 11', 'coordinate')
+    // quiet move
+    assertEquals(parser.serializeMove(new BitMove(Square.c3,Square.e4, Piece.WhiteKnight, 0,0)), 'c3e4')
+    // capture
+    assertEquals(parser.serializeMove(new BitMove(Square.f7,Square.f8, Piece.WhiteQueen, Piece.BlackBishop,MoveType.Capture)), 'f7f8')
+    // castles
+    assertEquals(parser.serializeMove(new BitMove(Square.e1,Square.g1, Piece.WhiteKing, 0,MoveType.CastleShort)), 'e1g1')
+    // pawn promotion
+    assertEquals(parser.serializeMove(new BitMove(Square.b7,Square.b8, Piece.WhitePawn, 0,MoveType.BishopPromote)), 'b7b8B')
+    assertEquals(parser.serializeMove(new BitMove(Square.b7,Square.b8, Piece.WhitePawn, 0,MoveType.QueenPromote)), 'b7b8Q')
+})
+
 
 Deno.test("it parses algebraic notation moves", () => {
 
@@ -120,6 +133,28 @@ Deno.test("it parses algebraic notation moves", () => {
     move = parser.parse('b8Q')
     assertEquals(move, new BitMove(Square.b7,Square.b8, Piece.WhitePawn, 0,MoveType.QueenPromote))
 
+})
+
+Deno.test("it serializes algebraic notation moves", () => {
+
+    const parser = getParser('2bq1b1r/1Pp2Qpp/3k4/3Bp3/3n4/2N1P3/P1P2PPP/R3K2R w KQ - 3 11', 'algebraic')
+    let move
+
+    // pawn move
+    assertEquals(parser.serializeMove(new BitMove(Square.a2,Square.a4, Piece.WhitePawn, 0,MoveType.DoublePawnPush)), 'a4')
+    // pawn capture
+    assertEquals(parser.serializeMove(new BitMove(Square.e3,Square.d4, Piece.WhitePawn, Piece.BlackKnight,MoveType.Capture)), 'exd4')
+    // quiet move
+    assertEquals(parser.serializeMove(new BitMove(Square.c3,Square.e4, Piece.WhiteKnight, 0,0)), 'Ne4')
+    // capture
+    assertEquals(parser.serializeMove(new BitMove(Square.f7,Square.f8, Piece.WhiteQueen, Piece.BlackBishop,MoveType.Capture)), 'Qxf8')
+    // castles short
+    assertEquals(parser.serializeMove(new BitMove(Square.e1,Square.g1, Piece.WhiteKing, 0,MoveType.CastleShort)), 'O-O')
+    // castles long
+    assertEquals(parser.serializeMove(new BitMove(Square.e1,Square.c1, Piece.WhiteKing, 0,MoveType.CastleLong)), 'O-O-O')
+    // pawn promotion
+    assertEquals(parser.serializeMove(new BitMove(Square.b7,Square.b8, Piece.WhitePawn, 0,MoveType.BishopPromote)), 'b8=B')
+    assertEquals(parser.serializeMove(new BitMove(Square.b7,Square.c8, Piece.WhitePawn, Piece.BlackBishop, MoveType.QueenPromote)), 'bxc8=Q')
 })
 
 Deno.test('it handles invalid algebraic notation moves', () => {
@@ -200,9 +235,19 @@ Deno.test('it handles disambiguation for algebraic notation', () => {
         Error,
         '"Ngf4" is ambiguous.',
     )
-    // correct bishop move
+    // correct knight move
     move = parser.parse('Ng2f4')
     assertEquals(move, new BitMove(Square.g2,Square.f4, Piece.WhiteKnight, 0,0))
 
 
+})
+
+
+Deno.test('it serializes disambiguous moves for algebraic notation', () => {
+    const parser = getParser('R7/8/6N1/2B1B3/8/2n5/1P2N1N1/R7 w - - 0 1', 'algebraic')
+    assertEquals(parser.serializeMove(new BitMove(Square.a1,Square.a5, Piece.WhiteRook, 0,0)),'R1a5')
+    assertEquals(parser.serializeMove(new BitMove(Square.e5,Square.d4, Piece.WhiteBishop, 0,0)),'Bed4')
+    assertEquals(parser.serializeMove(new BitMove(Square.g2,Square.f4, Piece.WhiteKnight, 0,0)),'Ng2f4')
+    assertEquals(parser.serializeMove(new BitMove(Square.b2,Square.b3, Piece.WhitePawn, 0,0)),'b3')
+    assertEquals(parser.serializeMove(new BitMove(Square.b2,Square.c3, Piece.WhitePawn, Piece.BlackKnight,0)),'bxc3')
 })
