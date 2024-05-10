@@ -51,13 +51,18 @@ export class Game {
     }
 
     makeMove(notation: string, newVariation: boolean = false){
+
+        // determine before making move
+        const moveCounter = (Math.floor(this.moveFactory.ply / 2) + 1)
+
         const move = this.notationParser.parse(notation)
         this.moveFactory.makeMove(move)
 
         const recordedMove = new RecordedMove(
             move,
             this.getFenNotation(),
-            this.notationParser.serializeMove(move)
+            this.notationParser.serializeMove(move),
+            moveCounter
         )
         this.mainLine.addMove(recordedMove, newVariation)
     }

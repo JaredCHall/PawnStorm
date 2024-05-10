@@ -65,7 +65,7 @@ Deno.test('it handles move list and variations', () => {
 
     assertEquals(
         moveNav.serialize(),
-        '1. Re4 (1. Re5 Kf8 2. Rg5 Ke8 3. Rg8# (3. Rg6 Kf8 4. Rg5 Ke8 5. Rg8#)) (1. Re1 Kf8 2. Rg1 Ke8 3. Rg8#) Kf8 2. Rg4 Ke8 3. Rg8#'
+        '1. Re4 (1. Re5 Kf8 2. Rg5 Ke8 3. Rg8# (3. Rg6 Kf8 4. Rg5 Ke8 5. Rg8#)) (1. Re1 Kf8 2. Rg1 Ke8 3. Rg8#) 1... Kf8 2. Rg4 Ke8 3. Rg8#'
     )
 
     console.log(moveNav.serialize())

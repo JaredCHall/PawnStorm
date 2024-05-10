@@ -58,18 +58,29 @@ export class MainLine {
 
     serialize(): string
     {
+
+        const renderMoveCountAnnotation = (move: RecordedMove): string => {
+            return move.moveCounter.toString()
+                + (move.getColor() == 'white' ? '.' : '...')
+                + ' '
+        }
+
         const renderLine = (startMove: RecordedMove): string => {
             let movesStr = ''
             let current: RecordedMove | null = startMove;
+            let prevHadChild = false
             do {
-                if (current.getColor() == 'white') {
-                    movesStr += current.getFullMoveCounter().toString() + '. '
+                if (current === startMove || prevHadChild || current.getColor() == 'white') {
+                    movesStr += renderMoveCountAnnotation(current)
                 }
                 movesStr += current.notation + ' '
 
+                prevHadChild = false
                 current.getChildren().forEach((move: RecordedMove) => {
+                    prevHadChild = true
                     movesStr += '(' + renderLine(move) + ') '
                 })
+
                 current = current.getNext()
             } while (current != null)
 

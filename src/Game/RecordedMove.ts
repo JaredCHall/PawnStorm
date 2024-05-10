@@ -15,6 +15,7 @@ export class RecordedMove {
         move: BitMove,
         readonly fen: string,
         readonly notation: string,
+        readonly moveCounter: number,
         private parent: RecordedMove|null = null, // moves have a parent move, if they are the first move in a variation
         private children: RecordedMove[] = [], // child variations if they exist
     ) {
@@ -62,11 +63,6 @@ export class RecordedMove {
 
     getColor(): 'white' | 'black' {
         return this.move.moving & 1 ? 'black' : 'white'
-    }
-
-    getFullMoveCounter(): number
-    {
-        return parseInt(this.fen.substring(this.fen.lastIndexOf(' ') + 1))
     }
 
 }

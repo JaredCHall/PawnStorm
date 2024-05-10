@@ -243,7 +243,7 @@ export class MoveHandler extends Board
         serialized += ' '
         serialized += this.state.halfMoveClock.toString()
         serialized += ' '
-        serialized += Math.ceil((this.ply + 1) / 2).toString()
+        serialized += (Math.floor(this.ply / 2) + 1).toString()
 
         return serialized
 
