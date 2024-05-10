@@ -85,6 +85,7 @@ export class MoveHandler extends Board
     {
         this.saveBoardState()
         this.state.toggleSideToMove()
+        this.ply++;
 
         this.squareList[move.from] = 0
         const movingType = move.moving >> 1
@@ -159,6 +160,7 @@ export class MoveHandler extends Board
             this.kingSquares[movingColor] = move.from
         }
         this.restoreLastState()
+        this.ply--
     }
 
     #makePawnMove(move: BitMove, movingColor: Color)
@@ -241,7 +243,7 @@ export class MoveHandler extends Board
         serialized += ' '
         serialized += this.state.halfMoveClock.toString()
         serialized += ' '
-        serialized += Math.floor((this.ply + 2) / 2).toString()
+        serialized += Math.ceil((this.ply + 1) / 2).toString()
 
         return serialized
 

@@ -76,9 +76,16 @@ Deno.test('it sets board from Fen Number', () => {
 
 Deno.test('it serializes as FEN string', () => {
 
-    let fen = '8/8/8/8/8/8/8/8 w KQ e3 4 20'
+    let fen
+
+    fen = '8/8/8/8/8/8/8/8 w KQ e3 4 1'
     board.setFromFenNumber(fen)
     assertEquals(board.serialize(), fen)
+
+    fen = '8/8/8/8/8/8/8/8 b KQ e3 4 20'
+    board.setFromFenNumber(fen)
+    assertEquals(board.serialize(), fen)
+
 
     fen = '8/8/4r1pk/1p1pP1R1/p4KP1/2P5/PP6/8 b - - 10 47'
     board.setFromFenNumber(fen)
@@ -101,6 +108,7 @@ Deno.test('it makes quiet moves for piece', () => {
     assertSquareEquals(Square.f3, 0)
     assertSquareEquals(Square.e5, Piece.WhiteKnight)
     assertBoardStatePushed(new BoardState(1,0,0,1))
+    assertEquals(board.ply, 1)
 
     // unmake
     board.unmakeMove(move)
@@ -108,6 +116,7 @@ Deno.test('it makes quiet moves for piece', () => {
     assertSquareEquals(Square.f3, Piece.WhiteKnight)
     assertSquareEquals(Square.e5, 0)
     assertBoardStatePopped()
+    assertEquals(board.ply, 0)
 })
 
 Deno.test('it makes capture moves for piece', () => {
