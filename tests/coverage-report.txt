@@ -1,18 +1,23 @@
-------------------------------------------------
-File                       | Branch % | Line % |
-------------------------------------------------
- [0m[32mBoard/Board.ts           [0m | [0m[32m    97.1[0m | [0m[32m  99.4[0m |
- [0m[32mBoard/BoardState.ts      [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mBoard/Piece.ts           [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mBoard/Square.ts          [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mMoveGen/BitMove.ts       [0m | [0m[32m   100.0[0m | [0m[32m  89.7[0m |
- [0m[32mMoveGen/CastlingMove.ts  [0m | [0m[32m   100.0[0m | [0m[32m  90.0[0m |
- [0m[32mMoveGen/MoveFactory.ts   [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mMoveGen/MoveHandler.ts   [0m | [0m[32m    98.1[0m | [0m[32m  94.4[0m |
- [0m[32mMoveGen/NotationParser.ts[0m | [0m[32m    97.5[0m | [0m[32m  95.8[0m |
- [0m[32mPerft/PerftCounter.ts    [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[33mPerft/PerftRunner.ts     [0m | [0m[33m    56.2[0m | [0m[33m  62.2[0m |
- [0m[33mUtils.ts                 [0m | [0m[32m   100.0[0m | [0m[33m  50.0[0m |
-------------------------------------------------
- [0m[32mAll files                [0m | [0m[32m    97.8[0m | [0m[32m  95.8[0m |
-------------------------------------------------
+-----------------------------------------------------------------
+File                                        | Branch % | Line % |
+-----------------------------------------------------------------
+ [0m[32mBoard/Board.ts                            [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
+ [0m[32mBoard/BoardState.ts                       [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
+ [0m[32mBoard/Piece.ts                            [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
+ [0m[32mBoard/Square.ts                           [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
+ [0m[33mGame/Game.ts                              [0m | [0m[31m     0.0[0m | [0m[33m  58.7[0m |
+ [0m[31mGame/Move.ts                              [0m | [0m[32m   100.0[0m | [0m[31m  14.3[0m |
+ [0m[32mGame/MoveNavigator.ts                     [0m | [0m[32m    86.7[0m | [0m[32m  88.3[0m |
+ [0m[32mGame/RecordedMove.ts                      [0m | [0m[32m   100.0[0m | [0m[32m  86.0[0m |
+ [0m[32mMoveGen/BitMove.ts                        [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
+ [0m[32mMoveGen/CastlingMove.ts                   [0m | [0m[32m   100.0[0m | [0m[32m  90.0[0m |
+ [0m[32mMoveGen/MoveFactory.ts                    [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
+ [0m[32mMoveGen/MoveHandler.ts                    [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
+ [0m[32mNotationParser/AlgebraicNotationParser.ts [0m | [0m[32m   100.0[0m | [0m[32m  97.8[0m |
+ [0m[32mNotationParser/CoordinateNotationParser.ts[0m | [0m[32m   100.0[0m | [0m[32m  93.0[0m |
+ [0m[32mPerft/PerftCounter.ts                     [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
+ [0m[32mPerft/PerftRunner.ts                      [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
+ [0m[33mUtils.ts                                  [0m | [0m[32m   100.0[0m | [0m[33m  50.0[0m |
+-----------------------------------------------------------------
+ [0m[32mAll files                                 [0m | [0m[32m    99.2[0m | [0m[32m  94.1[0m |
+-----------------------------------------------------------------

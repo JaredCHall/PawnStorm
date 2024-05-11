@@ -15,10 +15,6 @@ export class PerftRunner {
 
     run(depth: number=0): PerftCounter
     {
-        if(depth === 0){
-            this.counter.nodes++
-            return this.counter
-        }
         const start = (new Date()).getTime()
         this.perft(depth)
         this.runTime = new Date().getTime() - start

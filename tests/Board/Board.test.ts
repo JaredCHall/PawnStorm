@@ -3,6 +3,7 @@ import {Board} from "../../src/Board/Board.ts";
 import {Square} from "../../src/Board/Square.ts";
 import {binToString} from "../../src/Utils.ts";
 import {Piece, Color} from "../../src/Board/Piece.ts";
+import {assertThrows} from "https://deno.land/std@0.219.0/assert/assert_throws.ts";
 
 const board = new Board()
 
@@ -81,8 +82,6 @@ Deno.test('it initializes square distances correctly', () => {
     assertEquals(board.getDistanceBetweenSquares(Square.a2, Square.a6), 4, 'calculates 4 king moves from a2 to a6')
 })
 
-
-
 Deno.test('it sets board representation', () => {
 
     board.setPieces('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')
@@ -136,6 +135,29 @@ Deno.test('it sets board representation', () => {
     assertEquals(board.kingSquares[Color.White], Square.e1, 'White king is on expected square')
     assertEquals(board.kingSquares[Color.Black], Square.e8, 'Black king is on expected square')
 
+})
+
+Deno.test('it errors on invalid piece places', () => {
+    // gibberish
+    assertThrows(
+        () => {board.setPieces('The lazy dog saw a cat or something')},
+        Error,'Invalid piece placement'
+    )
+    // too few ranks
+    assertThrows(
+        () => {board.setPieces('rnbqkbnr/pppppppp/8/8/8/8')},
+        Error,'Invalid piece placement'
+    )
+    // too many ranks
+    assertThrows(
+        () => {board.setPieces('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/8/8')},
+        Error,'Invalid piece placement'
+    )
+    // invalid characters
+    assertThrows(
+        () => {board.setPieces('rnbqkbnr/ppppp$pp/8/8/8/8/PPPPPPPP/RNBQKBNR/8/8')},
+        Error,'Invalid piece placement'
+    )
 })
 
 Deno.test('it renders board with highlights', () => {

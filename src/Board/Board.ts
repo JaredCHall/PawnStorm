@@ -84,7 +84,13 @@ export class Board
 
     setPieces(piecePlacementsString: string) {
         const rows = piecePlacementsString.split('/').reverse()
-        if (rows.length !== 8) {throw new Error('FEN piece placement must include all eight rows')}
+
+        // This is not a foolproof regex as it does not count the number of allowed squares per row
+        const isValidString = /^([rnbqkpRNBQKP1-8]{1,8}\/){7}[rnbqkpRNBQKP1-8]{1,8}$/.test(piecePlacementsString)
+        if(!isValidString){
+            throw new Error(`Cannot parse: "${piecePlacementsString}". Invalid piece placements.`)
+        }
+
         let squareIndex = 21
         for (let row = 8; row > 0; row--) {
             rows[row - 1].split('').forEach((character) => {
