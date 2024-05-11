@@ -7,8 +7,6 @@ export class PerftCounter {
     castles: number
     promotions: number
     checks: number
-    discoveredChecks: number
-    doubleChecks: number
     checkMates: number
 
     constructor(
@@ -18,8 +16,6 @@ export class PerftCounter {
         castles: number = 0,
         promotions: number = 0,
         checks: number =  0,
-        discoveredChecks: number = 0,
-        doubleChecks: number = 0,
         checkMates: number = 0,
     ) {
         this.nodes = nodes
@@ -28,8 +24,6 @@ export class PerftCounter {
         this.castles = castles
         this.promotions = promotions
         this.checks = checks
-        this.discoveredChecks = discoveredChecks
-        this.doubleChecks = doubleChecks
         this.checkMates = checkMates
     }
 
