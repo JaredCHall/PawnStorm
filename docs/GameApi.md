@@ -124,13 +124,13 @@ const a1 = game.getSquare('a1')
 
 ```
 
-## Rendering the MainLine
+## Rendering the MoveNavigator
 
-The `MainLine` contains all the moves for the current game, as well as any variations that have been loaded via PGN. It is common in chess UIs to display the full list of moves, and in studies to additionally display variations.
+The `MoveNavigator` contains all the moves for the current game, as well as any variations that have been loaded via PGN. It is common in chess UIs to display the full list of moves, and in studies to additionally display variations.
 
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
-import {MainLine} from "BitChess/Game/MainLine.ts"
+import {MoveNavigator} from "BitChess/Game/MoveNavigator.ts"
 import {RecordedMove} from "BitChess/Game/RecordedMove.ts"
 
 const moveList = game.getMoveList()
@@ -146,7 +146,7 @@ id | notation | variations
 
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
-import {MainLine} from "BitChess/Game/MainLine.ts"
+import {MoveNavigator} from "BitChess/Game/MoveNavigator.ts"
 import {RecordedMove} from "BitChess/Game/RecordedMove.ts"
 
 const moveList = game.getMoveList()
@@ -155,7 +155,7 @@ const mainLine: RecordedMove[] = moveList.getMainLine();
 
 
 // variations can be deeply nested, so recursion is best
-const renderMoveList = (moveList: MainLine, depth: number = 0): string => {
+const renderMoveList = (moveList: MoveNavigator, depth: number = 0): string => {
     let html = ''
     moveList.forEach((move: RecordedMove) => {
         
@@ -165,7 +165,7 @@ const renderMoveList = (moveList: MainLine, depth: number = 0): string => {
         }
         html += ${move.notation} + ' '
         
-        move.getVariations().forEach((variation: MainLine) => {
+        move.getVariations().forEach((variation: MoveNavigator) => {
             html += '<div class="variation">'
             renderMoveList(moveList, depth + 1)
             html += '</div>'
@@ -178,7 +178,7 @@ const renderMoveList = (moveList: MainLine, depth: number = 0): string => {
 const html = renderMoveList()
 
 mainLine.forEach((move: RecordedMove) => {
-    move.getVariations().forEach((variation: MainLine) => {
+    move.getVariations().forEach((variation: MoveNavigator) => {
         move.get
     })
 })

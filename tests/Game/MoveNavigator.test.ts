@@ -1,10 +1,9 @@
-import {Game} from "../src/Game/Game.ts";
+import {Game} from "BitChess/Game/Game.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 
 
-Deno.test('it handles move list and variations', () => {
 
-
+Deno.test('it navigates moves and variations in algebraic notation', () => {
     const game = new Game('4k3/8/4K3/8/8/4R3/8/8 w - - 0 1')
 
     game.render()
@@ -69,8 +68,4 @@ Deno.test('it handles move list and variations', () => {
     )
 
     console.log(moveNav.serialize())
-
-
-
-
 })

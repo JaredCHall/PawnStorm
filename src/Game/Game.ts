@@ -3,22 +3,24 @@ import {Square, SquareNameMap} from "../Board/Square.ts";
 import {Move} from "./Move.ts";
 import {BitMove} from "../MoveGen/BitMove.ts";
 import {Color} from "../Board/Piece.ts";
-import {NotationParser} from "../MoveGen/NotationParser.ts";
-import {MainLine} from "./MainLine.ts";
+import {MoveNavigator} from "./MoveNavigator.ts";
 import {RecordedMove} from "./RecordedMove.ts";
+import {ParserInterface} from "../NotationParser/ParserInterface.ts";
+import {AlgebraicNotationParser} from "../NotationParser/AlgebraicNotationParser.ts";
+import {CoordinateNotationParser} from "../NotationParser/CoordinateNotationParser.ts";
 
 export class Game {
 
     private readonly moveFactory = new MoveFactory();
 
-    private mainLine: MainLine
+    private readonly mainLine: MoveNavigator
 
-    private readonly notationParser = new NotationParser(this.moveFactory)
+    private notationParser: ParserInterface = new AlgebraicNotationParser(this.moveFactory)
 
     constructor(fen: string|null = null) {
         fen ??= 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
         this.setBoard(fen)
-        this.mainLine = new MainLine(fen)
+        this.mainLine = new MoveNavigator(fen)
     }
 
     setBoard(fenString: string): void
@@ -31,7 +33,7 @@ export class Game {
         return this.moveFactory.serialize()
     }
 
-    getMainLine(): MainLine
+    getMainLine(): MoveNavigator
     {
         return this.mainLine
     }
@@ -47,21 +49,34 @@ export class Game {
     }
 
     setNotation(type: 'algebraic'|'coordinate') {
-        this.notationParser.setNotationType(type)
+        if(type == this.notationParser.getType()){
+            return
+        }
+
+        switch(type){
+            case 'algebraic':
+                this.notationParser = new AlgebraicNotationParser(this.moveFactory)
+                break
+            case 'coordinate':
+                this.notationParser = new CoordinateNotationParser(this.moveFactory)
+                break
+        }
     }
 
     makeMove(notation: string, newVariation: boolean = false){
-
-        // determine before making move
-        const moveCounter = (Math.floor(this.moveFactory.ply / 2) + 1)
-
         const move = this.notationParser.parse(notation)
+
+        // serialize the notation before the move is made as it is necessary for disambiguation
+        // in algebraic notation. We could unmake/make again, but that is not efficient
+        const moveCounter = (Math.floor(this.moveFactory.ply / 2) + 1)
+        const serialized = this.notationParser.serialize(move)
+
         this.moveFactory.makeMove(move)
 
         const recordedMove = new RecordedMove(
             move,
             this.getFenNotation(),
-            this.notationParser.serializeMove(move),
+            serialized + this.notationParser.getCheckOrMateIndicator(move),
             moveCounter
         )
         this.mainLine.addMove(recordedMove, newVariation)

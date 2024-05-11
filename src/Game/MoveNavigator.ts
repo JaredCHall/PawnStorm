@@ -1,6 +1,6 @@
 import {RecordedMove} from "./RecordedMove.ts";
 
-export class MainLine {
+export class MoveNavigator {
 
     readonly moves: RecordedMove[] = []; // always only mainline moves
 
@@ -26,6 +26,11 @@ export class MainLine {
         this.moves.push(move)
         this.byCursor[id] = move
         this.cursor = id
+    }
+
+    deleteFrom(id: number): void
+    {
+
     }
 
     setCursor(id: number): void

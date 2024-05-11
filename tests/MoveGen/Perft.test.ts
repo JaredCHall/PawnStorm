@@ -1,8 +1,8 @@
 
 // https://www.chessprogramming.org/Perft_Results
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
-import { PerftCounter } from "../src/Perft/PerftCounter.ts";
-import {PerftRunner} from "../src/Perft/PerftRunner.ts";
+import { PerftCounter } from "../../src/Perft/PerftCounter.ts";
+import {PerftRunner} from "../../src/Perft/PerftRunner.ts";
 
 const expectedResults = {
     1: new PerftCounter(20,0,0,0,0,0,0,0,0),
