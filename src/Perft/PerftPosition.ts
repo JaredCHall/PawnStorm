@@ -42,4 +42,46 @@ export class PerftPosition {
         return position
     }
 
+    static endgamePosition(): PerftPosition {
+        const position = new PerftPosition('8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -')
+
+        position.addResult(new PerftCounter(14, 1, 0 , 0, 0, 2))
+        position.addResult(new PerftCounter(191, 14, 0,0,0, 10))
+        position.addResult(new PerftCounter(2812,209,2,0,0,267,0))
+        position.addResult(new PerftCounter(43238, 3348, 123, 0,0,1680, 17))
+        position.addResult(new PerftCounter(674624, 52051, 1165, 0,0,52950, 0))
+        position.addResult(new PerftCounter(11030083, 940350, 33325, 0, 7552, 452473, 2733))
+        position.addResult(new PerftCounter(178633661, 14519036, 294874, 0, 140024, 12797406, 87))
+        position.addResult(new PerftCounter(3009794393, 267586558, 8009239, 0, 6578076, 135626805, 450410))
+
+        return position
+    }
+
+    static composedPosition(): PerftPosition {
+        const position = new PerftPosition('r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1')
+
+        position.addResult(new PerftCounter(6))
+        position.addResult(new PerftCounter( 264, 87,0,6,48,10,0))
+        position.addResult(new PerftCounter(9467,1021,4,0,120,38,22))
+        position.addResult(new PerftCounter(422333,131393,0,7795,60032,15492,5))
+        position.addResult(new PerftCounter(15833292,2046173,6512,0,329464,200568,50562))
+        position.addResult(new PerftCounter(706045033,270369132,212,10882006,81102984,26973664,81076))
+
+        return position
+    }
+
+    // This is the mirrored image of position 4
+    static composedPositionMirrored(): PerftPosition {
+        const position = new PerftPosition('r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1')
+
+        position.addResult(new PerftCounter(6))
+        position.addResult(new PerftCounter( 264, 87,0,6,48,10,0))
+        position.addResult(new PerftCounter(9467,1021,4,0,120,38,22))
+        position.addResult(new PerftCounter(422333,131393,0,7795,60032,15492,5))
+        position.addResult(new PerftCounter(15833292,2046173,6512,0,329464,200568,50562))
+        position.addResult(new PerftCounter(706045033,270369132,212,10882006,81102984,26973664,81076))
+
+        return position
+    }
+
 }
