@@ -1,4 +1,4 @@
-import {BitMove, MoveFlag, MoveType} from "../MoveGen/BitMove.ts";
+import {BitMove, MoveFlag} from "../MoveGen/BitMove.ts";
 
 export class PerftCounter {
     nodes: number
@@ -30,15 +30,16 @@ export class PerftCounter {
     update(move: BitMove): void
     {
         this.nodes++
-        if(move.flag & MoveFlag.Capture){
-            this.captures++
-            if(move.flag == MoveType.EnPassant){
-                this.passants++
-            }
-        }
-
         if(move.flag & MoveFlag.Promotion) {
             this.promotions++
+            if(move.flag & MoveFlag.Capture){
+                this.captures++
+            }
+        }else if(move.flag & MoveFlag.Capture){
+            this.captures++
+            if(move.flag & MoveFlag.Flag1){
+                this.passants++
+            }
         }else if(move.flag & MoveFlag.Flag2){
             this.castles++
         }

@@ -7,7 +7,7 @@ export class PerftRunner {
     counter: PerftCounter
     runTime: number = 0// milliseconds
 
-    constructor(startFen: string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') {
+    constructor(startFen: string) {
         this.factory = new MoveFactory()
         this.factory.setFromFenNumber(startFen)
         this.counter = new PerftCounter()
@@ -24,7 +24,7 @@ export class PerftRunner {
 
     perft(depth: number = 0, lastMove: null|BitMove = null): void
     {
-        if(depth === 0 && lastMove){
+        if(depth == 0 && lastMove){
             this.counter.update(lastMove)
             return
         }
