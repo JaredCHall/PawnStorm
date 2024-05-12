@@ -1,12 +1,11 @@
 import {Game} from "../Game/Game.ts";
-import {BitMove} from "../MoveGen/BitMove.ts";
 
 export class ConsoleApp {
 
     private game: Game
 
     constructor() {
-        this.game = new Game('rnbqkbnr/p2p1ppp/2p1p3/1p6/3N4/2N5/PPPPPPPP/R1BQKB1R w KQkq - 0 4')
+        this.game = new Game()
     }
 
 
