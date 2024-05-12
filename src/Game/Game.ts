@@ -13,14 +13,14 @@ export class Game {
 
     private readonly moveFactory = new MoveFactory();
 
-    private readonly mainLine: MoveNavigator
+    private readonly moveNavigator: MoveNavigator
 
     private notationParser: ParserInterface = new AlgebraicNotationParser(this.moveFactory)
 
     constructor(fen: string|null = null) {
         fen ??= 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
         this.setBoard(fen)
-        this.mainLine = new MoveNavigator(fen)
+        this.moveNavigator = new MoveNavigator(fen)
     }
 
     setBoard(fenString: string): void
@@ -33,19 +33,19 @@ export class Game {
         return this.moveFactory.serialize()
     }
 
-    getMainLine(): MoveNavigator
+    getMoveNavigator(): MoveNavigator
     {
-        return this.mainLine
+        return this.moveNavigator
     }
 
     gotoMove(moveId: number): void
     {
-       const move = this.mainLine.getMove(moveId)
+       const move = this.moveNavigator.getMove(moveId)
        if(!move){
            throw new Error(`Could not find move for move "${moveId}"`)
        }
-       this.mainLine.setCursor(moveId)
-       this.moveFactory.setFromFenNumber(this.mainLine.getFenBeforeMove(moveId))
+       this.moveNavigator.setCursor(moveId)
+       this.moveFactory.setFromFenNumber(this.moveNavigator.getFenBeforeMove(moveId))
     }
 
     setNotation(type: 'algebraic'|'coordinate') {
@@ -79,7 +79,18 @@ export class Game {
             serialized + this.notationParser.getCheckOrMateIndicator(move),
             moveCounter
         )
-        this.mainLine.addMove(recordedMove, newVariation)
+        this.moveNavigator.addMove(recordedMove, newVariation)
+    }
+
+    undoMove(): void
+    {
+        const recordedMove = this.moveNavigator.getLast()
+        if(!recordedMove){
+            throw new Error('Cannot undo last move. No moves have been played.')
+        }
+
+        this.moveFactory.unmakeMove(recordedMove.move)
+        this.moveNavigator.deleteFrom(recordedMove.getId())
     }
 
     getSideToMove(): string {

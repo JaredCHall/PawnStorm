@@ -3,7 +3,7 @@ import {BitMove} from "../MoveGen/BitMove.ts";
 
 export class RecordedMove {
 
-    private cursorId: number = -1 // a sentinel value of sorts
+    private id: number = -1 // a sentinel value of sorts
 
     private prev: RecordedMove|null = null
 
@@ -49,16 +49,20 @@ export class RecordedMove {
         this.children.push(child)
     }
 
+    removeChild(child: RecordedMove): void {
+        this.children.splice(this.children.indexOf(child), 1)
+    }
+
     getParent(): RecordedMove|null {
         return this.parent
     }
 
-    setCursorId(id: number): void {
-        this.cursorId = id
+    setId(id: number): void {
+        this.id = id
     }
-    getCursorId(): number
+    getId(): number
     {
-        return this.cursorId
+        return this.id
     }
 
     getColor(): 'white' | 'black' {

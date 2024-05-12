@@ -13,7 +13,7 @@ Deno.test('it navigates moves and variations in algebraic notation', () => {
     game.makeMove('Ke8')
     game.makeMove('Rg8#')
 
-    const moveNav = game.getMainLine()
+    const moveNav = game.getMoveNavigator()
 
     // main line is good
     assertEquals(moveNav.getMove(0).notation, 'Re4')
@@ -67,5 +67,18 @@ Deno.test('it navigates moves and variations in algebraic notation', () => {
         '1. Re4 (1. Re5 Kf8 2. Rg5 Ke8 3. Rg8# (3. Rg6 Kf8 4. Rg5 Ke8 5. Rg8#)) (1. Re1 Kf8 2. Rg1 Ke8 3. Rg8#) 1... Kf8 2. Rg4 Ke8 3. Rg8#'
     )
 
-    console.log(moveNav.serialize())
+    game.undoMove()
+
+    assertEquals(
+        moveNav.serialize(),
+        '1. Re4 (1. Re5 Kf8 2. Rg5 Ke8 3. Rg8# (3. Rg6 Kf8 4. Rg5 Ke8 5. Rg8#)) (1. Re1 Kf8 2. Rg1 Ke8) 1... Kf8 2. Rg4 Ke8 3. Rg8#'
+    )
+
+    moveNav.deleteFrom(5)
+
+    assertEquals(
+        moveNav.serialize(),
+        '1. Re4 (1. Re1 Kf8 2. Rg1 Ke8) 1... Kf8 2. Rg4 Ke8 3. Rg8#'
+    )
+
 })
