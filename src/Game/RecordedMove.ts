@@ -69,4 +69,14 @@ export class RecordedMove {
         return this.move.moving & 1 ? 'black' : 'white'
     }
 
+    serialize(includeMoveCounter: boolean = false): string
+    {
+        let serialized = ''
+        if(includeMoveCounter){
+            serialized = this.moveCounter.toString()
+                + (this.getColor() == 'white' ? '.' : '...') + ' '
+        }
+        return serialized + this.notation
+    }
+
 }

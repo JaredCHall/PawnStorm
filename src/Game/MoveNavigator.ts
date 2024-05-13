@@ -1,35 +1,52 @@
 import {RecordedMove} from "./RecordedMove.ts";
 
+/**
+ *  MoveNavigator
+ *
+ *  Moves are stored as a linked list in which each move may have the following relations:
+ *
+ *  previous/next - reference the next or previous move in list. Always available unless move
+ *                  is the first or last move in a line. Traversing this relationship will let you
+ *                  walk from the first to last move in a line.
+ *  parent/child - a child move references an alternative move or the start of a variation line. Moves
+ *                 may have multiple children, but only one parent. Traversing this tree will allow moving
+ *                 between the mainline and variations.
+ *
+ */
 export class MoveNavigator {
 
-    readonly moves: RecordedMove[] = []; // always only mainline moves
+    readonly moves: RecordedMove[] = []; // the mainline moves
 
-    private idMap: (RecordedMove|null)[] = []; // all moves including within variations indexed by when they were added to the list
+    private idMap: (RecordedMove|null)[] = []; // all moves indexed by id
 
-    private cursor: number = -1
+    private cursor: number = -1 // id of the currently selected move
 
     constructor(readonly startFen: string) {}
 
-    addMove(move: RecordedMove, isNewVariation: boolean = false): void {
-        const current = this.cursor == -1 ? null : this.getMove(this.cursor)
-        const id = this.idMap.length
+    addMove(move: RecordedMove): void {
+
+        const prev = this.getLast()
+        const next = prev?.getNext() ?? null
+        const isNewVariation = (this.cursor == -1 && this.moves.length > 0) || (next != null && this.cursor > -1)
+
         if(isNewVariation){
-            move.setParent(current)
-            if(!current){
-                throw new Error(`Cannot create new variation when there are no moves in the mainline.`)
-            }
-            current.addChild(move)
+            const parent = next ?? this.getMove(0)
+            move.setParent(parent)
+            parent.addChild(move)
         }else{
-            current?.setNext(move)
+            move.setPrev(prev)
+            prev?.setNext(move)
         }
+
+        const id = this.idMap.length
         move.setId(id)
-        move.setPrev(current)
+        this.idMap[id] = move
+        this.cursor = id
+
+        // add to mainline if there is no parent
         if(!move.getParent()){
             this.moves.push(move)
         }
-
-        this.idMap[id] = move
-        this.cursor = id
     }
 
     getLast(): RecordedMove|null {
@@ -66,8 +83,16 @@ export class MoveNavigator {
         this.#removeMainLineMove(move)
     }
 
-    setCursor(id: number): void {
-        this.getMove(id) // to trigger error if move does not exist
+    setCursor(id: number, setBefore: boolean = false): void {
+        if(id == -1){
+            this.cursor = -1
+            return
+        }
+
+        const move =  this.getMove(id)
+        if(setBefore){
+            id = move.getPrev()?.getId() ?? -1
+        }
         this.cursor = id
     }
 
@@ -79,47 +104,73 @@ export class MoveNavigator {
         return move
     }
 
-    getFenBeforeMove(id: number): string {
+    getFenBefore(id: number): string {
         if(id === 0){
             return this.startFen
         }
         const move = this.getMove(id)
         const parent = move.getParent()
         if(parent != null){
-            return this.getFenBeforeMove(parent.getId())
+            return this.getFenBefore(parent.getId())
         }
 
         return this.getMove(id - 1).fen
     }
 
     serialize(): string {
-        const renderMoveCountAnnotation = (move: RecordedMove): string => {
-            return move.moveCounter.toString()
-                + (move.getColor() == 'white' ? '.' : '...')
-                + ' '
-        }
         const renderLine = (startMove: RecordedMove): string => {
             let movesStr = ''
             let current: RecordedMove | null = startMove;
             let prevHadChild = false
             do {
-                if (current === startMove || prevHadChild || current.getColor() == 'white') {
-                    movesStr += renderMoveCountAnnotation(current)
-                }
-                movesStr += current.notation + ' '
-
+                const includeMoveCounter = current === startMove || prevHadChild || current.getColor() == 'white'
+                movesStr += current.serialize(includeMoveCounter) + ' '
                 prevHadChild = false
                 current.getChildren().forEach((move: RecordedMove) => {
                     prevHadChild = true
                     movesStr += '(' + renderLine(move) + ') '
                 })
-
                 current = current.getNext()
             } while (current != null)
 
             return movesStr.trimEnd()
         }
         return renderLine(this.getMove(0))
+    }
+
+    dumpRelations(): void
+    {
+        const rows: {
+            id: number,
+            notation: string,
+            prev: number|null,
+            next: number|null,
+            parent: number|null,
+        }[] = []
+
+        const makeRows = (move: RecordedMove|null) => {
+            while(move != null){
+                const row = {
+                    id: move.getId(),
+                    notation: move.serialize(true),
+                    prev: move.getPrev()?.getId() ?? null,
+                    next: move.getNext()?.getId() ?? null,
+                    parent: move.getParent()?.getId() ?? null,
+                }
+                rows.push(row)
+
+                move.getChildren().forEach((child: RecordedMove) => {
+                    makeRows(child)
+                })
+
+                move = move.getNext()
+            }
+        }
+
+        makeRows(this.getMove(0))
+
+        console.table(rows)
+
     }
 
     #removeMainLineMove(move: RecordedMove): void {

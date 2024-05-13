@@ -24,8 +24,8 @@ Deno.test('it navigates moves and variations in algebraic notation', () => {
 
 
     // first variation
-    game.gotoMove(0)
-    game.makeMove('Re5', true)
+    game.gotoMove(0, true)
+    game.makeMove('Re5')
     game.makeMove('Kf8')
     game.makeMove('Rg5')
     game.makeMove('Ke8')
@@ -37,8 +37,8 @@ Deno.test('it navigates moves and variations in algebraic notation', () => {
     assertEquals(moveNav.getMove(9).notation, 'Rg8#')
 
     // sub variation
-    game.gotoMove(9)
-    game.makeMove('Rg6', true)
+    game.gotoMove(9, true)
+    game.makeMove('Rg6')
     game.makeMove('Kf8')
     game.makeMove('Rg5')
     game.makeMove('Ke8')
@@ -50,8 +50,8 @@ Deno.test('it navigates moves and variations in algebraic notation', () => {
     assertEquals(moveNav.getMove(14).notation, 'Rg8#')
 
     // second variation
-    game.gotoMove(0)
-    game.makeMove('Re1', true)
+    game.gotoMove(0, true)
+    game.makeMove('Re1')
     game.makeMove('Kf8')
     game.makeMove('Rg1')
     game.makeMove('Ke8')

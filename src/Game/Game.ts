@@ -38,14 +38,14 @@ export class Game {
         return this.moveNavigator
     }
 
-    gotoMove(moveId: number): void
-    {
-       const move = this.moveNavigator.getMove(moveId)
-       if(!move){
-           throw new Error(`Could not find move for move "${moveId}"`)
-       }
-       this.moveNavigator.setCursor(moveId)
-       this.moveFactory.setFromFenNumber(this.moveNavigator.getFenBeforeMove(moveId))
+    gotoMove(moveId: number, goBefore: boolean = false): void {
+        const move = this.moveNavigator.getMove(moveId)
+        if(!move){
+            throw new Error(`Could not find move for move "${moveId}"`)
+        }
+        this.moveNavigator.setCursor(moveId, goBefore)
+        const fen = goBefore ? this.moveNavigator.getFenBefore(moveId) : move.fen
+        this.moveFactory.setFromFenNumber(fen)
     }
 
     setNotation(type: 'algebraic'|'coordinate') {
@@ -63,7 +63,7 @@ export class Game {
         }
     }
 
-    makeMove(notation: string, newVariation: boolean = false){
+    makeMove(notation: string){
         const move = this.notationParser.parse(notation)
 
         // serialize the notation before the move is made as it is necessary for disambiguation
@@ -79,7 +79,7 @@ export class Game {
             serialized + this.notationParser.getCheckOrMateIndicator(move),
             moveCounter
         )
-        this.moveNavigator.addMove(recordedMove, newVariation)
+        this.moveNavigator.addMove(recordedMove)
     }
 
     undoMove(): void
