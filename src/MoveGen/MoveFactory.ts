@@ -39,7 +39,7 @@ export class MoveFactory extends MoveHandler
             const piece = this.squareList[from]
 
             if(piece != 0 && (piece & 1) == color){
-                const movesForSquare = this.getLegalMovesFromSquare(from, piece)
+                const movesForSquare = this.getLegalMovesFromSquare(from, piece, color)
                 for(let j=0;j<movesForSquare.length;j++){
                     moves.push(movesForSquare[j])
                 }
@@ -48,9 +48,9 @@ export class MoveFactory extends MoveHandler
         return moves
     }
 
-    getLegalMovesFromSquare(from: Square, moving: Piece): BitMove[] {
-        const movingColor = this.state.sideToMove
-        const enemyColor = this.state.sideToMove ? 0 : 1
+    getLegalMovesFromSquare(from: Square, moving: Piece, movingColor: Color|null = null): BitMove[] {
+        movingColor ??= this.state.sideToMove
+        const enemyColor = movingColor ? 0 : 1
         return this.getMovesFromSquare(from, moving).filter((move) => {
             super.makeMove(move)
             const isCheck = this.isSquareThreatened(this.kingSquares[movingColor], enemyColor)

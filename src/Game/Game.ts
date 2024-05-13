@@ -103,7 +103,7 @@ export class Game {
         return this.moveFactory.state.sideToMove ? 'black' : 'white'
     }
 
-    getLegalMoves(colorOrSquare: string) {
+    getCandidateMoves(colorOrSquare: string) {
         let moves: BitMove[]
 
         if(colorOrSquare === 'white'){
