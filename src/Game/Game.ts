@@ -38,14 +38,20 @@ export class Game {
         return this.moveNavigator
     }
 
-    gotoMove(moveId: number, goBefore: boolean = false): void {
+    gotoMove(moveId: number): void {
+
+        if(moveId == -1){
+            this.moveNavigator.setCursor(moveId)
+            this.moveFactory.setFromFenNumber(this.moveNavigator.startFen)
+            return
+        }
+
         const move = this.moveNavigator.getMove(moveId)
         if(!move){
             throw new Error(`Could not find move for move "${moveId}"`)
         }
-        this.moveNavigator.setCursor(moveId, goBefore)
-        const fen = goBefore ? this.moveNavigator.getFenBefore(moveId) : move.fen
-        this.moveFactory.setFromFenNumber(fen)
+        this.moveNavigator.setCursor(moveId)
+        this.moveFactory.setFromFenNumber(move.fen)
     }
 
     setNotation(type: 'algebraic'|'coordinate') {

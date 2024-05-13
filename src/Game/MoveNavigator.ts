@@ -5,8 +5,7 @@ import {RecordedMove} from "./RecordedMove.ts";
  *
  *  Moves are stored as a linked list in which each move may have the following relations:
  *
- *  previous/next - reference the next or previous move in list. Always available unless move
- *                  is the first or last move in a line. Traversing this relationship will let you
+ *  previous/next - reference the next or previous move in list.Traversing this relationship will let you
  *                  walk from the first to last move in a line.
  *  parent/child - a child move references an alternative move or the start of a variation line. Moves
  *                 may have multiple children, but only one parent. Traversing this tree will allow moving
@@ -34,9 +33,10 @@ export class MoveNavigator {
             move.setParent(parent)
             parent.addChild(move)
         }else{
-            move.setPrev(prev)
             prev?.setNext(move)
         }
+
+        move.setPrev(prev)
 
         const id = this.idMap.length
         move.setId(id)
@@ -59,11 +59,11 @@ export class MoveNavigator {
 
         const getDescendantIds = (startMove: RecordedMove): number[] => {
             let current: RecordedMove | null = startMove;
-            const ids: number[] = []
+            let ids: number[] = []
             do {
                 ids.push(current.getId())
                 current.getChildren().forEach((move: RecordedMove) => {
-                    ids.concat(getDescendantIds(move))
+                    ids = ids.concat(getDescendantIds(move))
                 })
 
                 current = current.getNext()
@@ -71,7 +71,10 @@ export class MoveNavigator {
             return ids
         }
         const descendantIds = getDescendantIds(move)
-        descendantIds.forEach(id => {this.idMap[id] = null})
+        descendantIds.forEach(id => {
+            this.idMap[id] = null
+            this.#removeMainLineMove(move)
+        })
 
         // break the link from previous / parent move
         if(parent){
@@ -80,19 +83,15 @@ export class MoveNavigator {
         }else{
             move.getPrev()?.setNext(null)
         }
-        this.#removeMainLineMove(move)
     }
 
-    setCursor(id: number, setBefore: boolean = false): void {
+    setCursor(id: number): void {
         if(id == -1){
             this.cursor = -1
             return
         }
 
-        const move =  this.getMove(id)
-        if(setBefore){
-            id = move.getPrev()?.getId() ?? -1
-        }
+        this.getMove(id) // throws if move does not exist
         this.cursor = id
     }
 
@@ -104,20 +103,11 @@ export class MoveNavigator {
         return move
     }
 
-    getFenBefore(id: number): string {
-        if(id === 0){
-            return this.startFen
-        }
-        const move = this.getMove(id)
-        const parent = move.getParent()
-        if(parent != null){
-            return this.getFenBefore(parent.getId())
-        }
-
-        return this.getMove(id - 1).fen
-    }
-
     serialize(): string {
+        if(this.moves.length == 0){
+            return ''
+        }
+
         const renderLine = (startMove: RecordedMove): string => {
             let movesStr = ''
             let current: RecordedMove | null = startMove;
@@ -136,41 +126,6 @@ export class MoveNavigator {
             return movesStr.trimEnd()
         }
         return renderLine(this.getMove(0))
-    }
-
-    dumpRelations(): void
-    {
-        const rows: {
-            id: number,
-            notation: string,
-            prev: number|null,
-            next: number|null,
-            parent: number|null,
-        }[] = []
-
-        const makeRows = (move: RecordedMove|null) => {
-            while(move != null){
-                const row = {
-                    id: move.getId(),
-                    notation: move.serialize(true),
-                    prev: move.getPrev()?.getId() ?? null,
-                    next: move.getNext()?.getId() ?? null,
-                    parent: move.getParent()?.getId() ?? null,
-                }
-                rows.push(row)
-
-                move.getChildren().forEach((child: RecordedMove) => {
-                    makeRows(child)
-                })
-
-                move = move.getNext()
-            }
-        }
-
-        makeRows(this.getMove(0))
-
-        console.table(rows)
-
     }
 
     #removeMainLineMove(move: RecordedMove): void {
