@@ -42,11 +42,7 @@ export class CoordinateNotationParser implements ParserInterface{
     }
 
     serialize(move: BitMove): string {
-        let notation = SquareNameMap.nameByIndex[move.from] + SquareNameMap.nameByIndex[move.to]
-        if(move.getPromotesType() !== null){
-            notation += move.getPromotesType()
-        }
-        return notation
+        return move.serialize()
     }
 
     getCheckOrMateIndicator(move: BitMove): string {

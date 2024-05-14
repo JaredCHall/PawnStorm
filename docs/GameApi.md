@@ -153,6 +153,24 @@ const moveList = game.getMoveList()
 
 const mainLine: RecordedMove[] = moveList.getMainLine();
 
+const renderLine = (startMove: RecordedMove): string => {
+    let movesStr = ''
+    let current: RecordedMove | null = startMove;
+    let prevHadChild = false
+    do {
+        const includeMoveCounter = current === startMove || prevHadChild || current.getColor() == 'white'
+        movesStr += current.serialize(includeMoveCounter) + ' '
+        prevHadChild = false
+        current.getChildren().forEach((move: RecordedMove) => {
+            prevHadChild = true
+            movesStr += '(' + renderLine(move) + ') '
+        })
+        current = current.getNext()
+    } while (current != null)
+
+    return movesStr.trimEnd()
+}
+return renderLine(this.getMove(0))
 
 // variations can be deeply nested, so recursion is best
 const renderMoveList = (moveList: MoveNavigator, depth: number = 0): string => {

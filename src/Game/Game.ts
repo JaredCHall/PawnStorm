@@ -69,11 +69,11 @@ export class Game {
         }
     }
 
-    makeMove(notation: string){
+    makeMove(notation: string): RecordedMove{
         const move = this.notationParser.parse(notation)
 
         // serialize the notation before the move is made as it is necessary for disambiguation
-        // in algebraic notation. We could unmake/make again, but that is not efficient
+        // in algebraic notation. We could unmake/make again, but that is less efficient
         const moveCounter = (Math.floor(this.moveFactory.ply / 2) + 1)
         const serialized = this.notationParser.serialize(move)
 
@@ -86,6 +86,7 @@ export class Game {
             moveCounter
         )
         this.moveNavigator.addMove(recordedMove)
+        return recordedMove
     }
 
     undoMove(): void

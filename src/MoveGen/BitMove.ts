@@ -1,4 +1,4 @@
-import {Square} from "../Board/Square.ts";
+import {Square, SquareNameMap} from "../Board/Square.ts";
 
 export enum MoveFlag {
     Flag1       = 0b0001,
@@ -49,6 +49,16 @@ export class BitMove {
             }
         }
         return null
+    }
+
+    // BitMove always serializes as coordinate notation. Algebraic notation requires higher-level logic
+    serialize(): string
+    {
+        let notation = SquareNameMap.nameByIndex[this.from] + SquareNameMap.nameByIndex[this.to]
+        if(this.getPromotesType() !== null){
+            notation += this.getPromotesType()
+        }
+        return notation
     }
 
 }
