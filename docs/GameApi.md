@@ -46,18 +46,18 @@ game.setNotation('algebriac')
 
 ```
 
-## Get Legal Moves
+## Get Candidate Moves
 
-You may need a list legal moves in a position, or from a square. This is particular useful for user prompts such as move indicators when selecting a piece to move.
+You may need a list legal moves in a position, or from a square. This can be useful for user prompts such as move indicators when selecting a piece to move.
 
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
 
 const game = new Game()
 // get all legal moves for player
-let moves = game.getLegalMoves('white')
+let moves = game.getCandidateMoves('white')
 // get legal moves from a specific square
-moves = game.getLegalMoves('e4')
+moves = game.getCandidateMoves('e2')
 console.table(moves)
 ```
 The above might have the following output, as an example:
