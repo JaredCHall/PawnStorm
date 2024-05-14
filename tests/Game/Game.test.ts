@@ -53,7 +53,7 @@ Deno.test('it goes to previous move and makes a variation', () => {
 
 
     // test a couple throws
-    assertThrows(() => {game.gotoMove(99)},'throws on invalid move id')
+    assertThrows(() => {game.gotoMove(99)},Error, 'Could not find','throws on invalid move id')
 
 
 })

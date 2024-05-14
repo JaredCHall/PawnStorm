@@ -1,7 +1,7 @@
 import {Move} from "./Move.ts";
 import {BitMove} from "../MoveGen/BitMove.ts";
 
-export class RecordedMove {
+export class RecordedMove extends Move {
 
     private id: number = -1 // a sentinel value of sorts
 
@@ -9,7 +9,7 @@ export class RecordedMove {
 
     private next: RecordedMove|null = null
 
-    readonly move: BitMove
+    readonly bitMove: BitMove
 
     constructor(
         move: BitMove,
@@ -19,7 +19,8 @@ export class RecordedMove {
         private parent: RecordedMove|null = null, // moves have a parent move, if they are the first move in a variation
         private children: RecordedMove[] = [], // child variations if they exist
     ) {
-        this.move = move
+        super(move)
+        this.bitMove = move
     }
 
     setPrev(move: RecordedMove|null): void{
@@ -66,7 +67,7 @@ export class RecordedMove {
     }
 
     getColor(): 'white' | 'black' {
-        return this.move.moving & 1 ? 'black' : 'white'
+        return this.bitMove.moving & 1 ? 'black' : 'white'
     }
 
     serialize(includeMoveCounter: boolean = false): string

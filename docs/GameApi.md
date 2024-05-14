@@ -128,84 +128,45 @@ const a1 = game.getSquare('a1')
 
 The `MoveNavigator` contains all the moves for the current game, as well as any variations that have been loaded via PGN. It is common in chess UIs to display the full list of moves, and in studies to additionally display variations.
 
-```typescript
-import {Game} from "BitChess/Game/Game.ts"
-import {MoveNavigator} from "BitChess/Game/MoveNavigator.ts"
-import {RecordedMove} from "BitChess/Game/RecordedMove.ts"
+Moves are stored as a linked list. Useful methods off the `MoveNavigator` include:
 
-const moveList = game.getMoveList()
-
-const mainLine: RecordedMove[] = moveList.getMainLine();
-
-console.table(mainLine)
-```
-
-```text
-id | notation | variations
-```
+- `.getPrev()` - returns the previous move
+- `.getNext()` - returns the next move
+- `.getParent()` - returns the parent move
+- `.getChild()` - an alternative move that starts a variation line
 
 ```typescript
 import {Game} from "BitChess/Game/Game.ts"
 import {MoveNavigator} from "BitChess/Game/MoveNavigator.ts"
 import {RecordedMove} from "BitChess/Game/RecordedMove.ts"
 
-const moveList = game.getMoveList()
+const navigator = game.getMoveNavigator()
 
-const mainLine: RecordedMove[] = moveList.getMainLine();
-
-const renderLine = (startMove: RecordedMove): string => {
-    let movesStr = ''
-    let current: RecordedMove | null = startMove;
-    let prevHadChild = false
-    do {
-        const includeMoveCounter = current === startMove || prevHadChild || current.getColor() == 'white'
-        movesStr += current.serialize(includeMoveCounter) + ' '
-        prevHadChild = false
-        current.getChildren().forEach((move: RecordedMove) => {
-            prevHadChild = true
-            movesStr += '(' + renderLine(move) + ') '
-        })
-        current = current.getNext()
-    } while (current != null)
-
-    return movesStr.trimEnd()
-}
-return renderLine(this.getMove(0))
-
-// variations can be deeply nested, so recursion is best
-const renderMoveList = (moveList: MoveNavigator, depth: number = 0): string => {
+// variations can be deeply nested, so recursion is necessary
+const renderLine = (move: RecordedMove|null): string => {
     let html = ''
-    moveList.forEach((move: RecordedMove) => {
-        
+    while(move != null){
         if(move.color == 'white'){
             html += '<div class="full-move">'
             html += `<strong>${move.fullMoveCount}.</strong>`
         }
         html += ${move.notation} + ' '
-        
-        move.getVariations().forEach((variation: MoveNavigator) => {
+        move.getChildren().forEach((child: RecordedMove) => {
             html += '<div class="variation">'
-            renderMoveList(moveList, depth + 1)
+            renderLine(child, depth + 1)
             html += '</div>'
         })
-        html += '</div>'
-    })
+        move = move.getNext() // next move in linked list
+        if(move.color == 'black' && move == null){
+            html += '</div>'
+        }
+        
+    }
     return html
 }
+renderLine(navigator.getMove(0))
 
-const html = renderMoveList()
-
-mainLine.forEach((move: RecordedMove) => {
-    move.getVariations().forEach((variation: MoveNavigator) => {
-        move.get
-    })
-})
-
-console.table(mainLine)
 ```
-
-
-
 
 ## Checking Game State
 ```typescript

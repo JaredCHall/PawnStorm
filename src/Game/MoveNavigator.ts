@@ -108,22 +108,22 @@ export class MoveNavigator {
             return ''
         }
 
-        const renderLine = (startMove: RecordedMove): string => {
-            let movesStr = ''
-            let current: RecordedMove | null = startMove;
+        const renderLine = (move: RecordedMove|null): string => {
+            let outLine = ''
+            let isFirst = true
             let prevHadChild = false
-            do {
-                const includeMoveCounter = current === startMove || prevHadChild || current.getColor() == 'white'
-                movesStr += current.serialize(includeMoveCounter) + ' '
+            while(move != null){
+                const includeMoveCounter = isFirst || prevHadChild || move.color == 'white'
+                isFirst = false
                 prevHadChild = false
-                current.getChildren().forEach((move: RecordedMove) => {
+                outLine += move.serialize(includeMoveCounter) + ' '
+                move.getChildren().forEach((move: RecordedMove) => {
                     prevHadChild = true
-                    movesStr += '(' + renderLine(move) + ') '
+                    outLine += '(' + renderLine(move) + ') '
                 })
-                current = current.getNext()
-            } while (current != null)
-
-            return movesStr.trimEnd()
+                move = move.getNext()
+            }
+            return outLine.trimEnd()
         }
         return renderLine(this.getMove(0))
     }

@@ -47,9 +47,6 @@ export class Game {
         }
 
         const move = this.moveNavigator.getMove(moveId)
-        if(!move){
-            throw new Error(`Could not find move for move "${moveId}"`)
-        }
         this.moveNavigator.setCursor(moveId)
         this.moveFactory.setFromFenNumber(move.fen)
     }
@@ -96,7 +93,7 @@ export class Game {
             throw new Error('Cannot undo last move. No moves have been played.')
         }
 
-        this.moveFactory.unmakeMove(recordedMove.move)
+        this.moveFactory.unmakeMove(recordedMove.bitMove)
         this.moveNavigator.deleteFrom(recordedMove.getId())
     }
 
