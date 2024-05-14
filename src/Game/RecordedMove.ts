@@ -1,4 +1,4 @@
-import {CandidateMove} from "./CandidateMove.ts";
+import {Move} from "./Move.ts";
 import {BitMove} from "../MoveGen/BitMove.ts";
 
 export class RecordedMove {

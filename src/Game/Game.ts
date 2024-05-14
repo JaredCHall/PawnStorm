@@ -1,6 +1,6 @@
 import {MoveFactory} from "../MoveGen/MoveFactory.ts";
 import {Square, SquareNameMap} from "../Board/Square.ts";
-import {CandidateMove} from "./CandidateMove.ts";
+import {Move} from "./Move.ts";
 import {BitMove} from "../MoveGen/BitMove.ts";
 import {Color} from "../Board/Piece.ts";
 import {MoveNavigator} from "./MoveNavigator.ts";
@@ -123,7 +123,7 @@ export class Game {
             moves = this.moveFactory.getLegalMovesFromSquare(squareIndex, piece)
         }
 
-        return moves.map((move) => new CandidateMove(move))
+        return moves.map((move) => new Move(move))
     }
 
     render(highlights: Square[] = [])
