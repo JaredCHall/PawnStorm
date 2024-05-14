@@ -1,4 +1,3 @@
-import {Square} from "./Square.ts";
 
 export enum Color { // 1 bit
     White= 0,

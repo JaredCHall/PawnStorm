@@ -2,14 +2,17 @@ import {MoveFactory} from "../MoveGen/MoveFactory.ts";
 import {Square, SquareNameMap} from "../Board/Square.ts";
 import {Move} from "./Move.ts";
 import {BitMove} from "../MoveGen/BitMove.ts";
-import {Color} from "../Board/Piece.ts";
+import {Color, FenPieceMap} from "../Board/Piece.ts";
 import {MoveNavigator} from "./MoveNavigator.ts";
 import {RecordedMove} from "./RecordedMove.ts";
 import {ParserInterface} from "../NotationParser/ParserInterface.ts";
 import {AlgebraicNotationParser} from "../NotationParser/AlgebraicNotationParser.ts";
 import {CoordinateNotationParser} from "../NotationParser/CoordinateNotationParser.ts";
+import {GameStatus} from "./GameStatus.ts";
 
 export class Game {
+
+    private gameStatus: GameStatus = new GameStatus();
 
     private readonly moveFactory = new MoveFactory();
 
@@ -31,6 +34,11 @@ export class Game {
     getFenNotation(): string
     {
         return this.moveFactory.serialize()
+    }
+
+    getStatus(): GameStatus
+    {
+        return this.gameStatus
     }
 
     getMoveNavigator(): MoveNavigator
@@ -83,8 +91,96 @@ export class Game {
             moveCounter
         )
         this.moveNavigator.addMove(recordedMove)
+        this.#updateGameTermination(recordedMove)
+
         return recordedMove
     }
+
+    getSquares(): (string|null)[]
+    {
+        const squares: (string|null)[] = []
+        for(let i=0;i<64;i++){
+            const piece = this.moveFactory.squareList[this.moveFactory.square64Indexes[i]]
+            if(piece != 0){
+                squares[i] = null
+            }else{
+                squares[i] = FenPieceMap.fenByBitType[piece]
+            }
+        }
+        return squares
+    }
+
+    getPieces(color: string|null = null): (string)[] {
+        //@ts-ignore - filter removes null values
+        return this.getSquares().filter((piece) => {
+            if(!piece){
+                return false
+            }
+            return !color || color == (piece.toUpperCase() == piece ? 'white' : 'black')
+        })
+    }
+
+    // determine if last move resulted in end of game
+    #updateGameTermination(move: RecordedMove): void
+    {
+        // checkmate
+        if(move.bitMove.isMate){
+            this.gameStatus = new GameStatus('normal', move.color)
+            return
+        }
+        // stalemate
+        if(this.getCandidateMoves(this.getSideToMove()).length == 0){
+            this.gameStatus = new GameStatus('normal', null, 'stalemate')
+            return
+        }
+
+        if(this.#hasInsufficientMaterial()){
+            this.gameStatus = new GameStatus('normal', null, 'insufficient-material')
+            return
+        }
+
+
+    }
+
+    #hasInsufficientMaterial(): boolean
+    {
+        // insufficient material
+        const whitePieces: string[] = this.getPieces('white')
+        const blackPieces: string[] = this.getPieces('black')
+
+        if(whitePieces.length > 4 || blackPieces.length > 4){
+            return false
+        }
+
+        if(whitePieces.includes('P') || blackPieces.includes('p')){
+            return false
+        }
+        if(whitePieces.includes('Q') || blackPieces.includes('q')){
+            return false
+        }
+        if(whitePieces.includes('R') || blackPieces.includes('r')){
+            return false
+        }
+
+        // king vs. king
+        if(whitePieces.length == 1 && blackPieces.length == 1){
+            return true
+        }
+
+        // king + minor piece vs. king
+        if((whitePieces.length == 2 && blackPieces.length == 1)
+            || (whitePieces.length == 1 && blackPieces.length == 2)){
+            return true
+        }
+
+
+        // TODO: Add King + Bishop vs. King + Bishop (if bishops are same color)
+
+
+        return false
+
+    }
+
 
     undoMove(): void
     {
