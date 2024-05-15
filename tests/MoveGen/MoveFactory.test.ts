@@ -46,6 +46,31 @@ const assertMatchesMoveList = (actual: BitMove[], expected: BitMove[], message: 
     assertEquals(actual, expected, message)
 }
 
+Deno.test('it determines if there is sufficient material', () => {
+
+    // K v. K
+    board.setPieces('8/8/3k4/8/8/3K4/8/8');
+    assertEquals(board.hasSufficientMaterialForMate(), false, 'K vs K is stalemate')
+    // K + B v. K
+    board.setPieces('8/8/3k4/8/5B2/3K4/8/8');
+    assertEquals(board.hasSufficientMaterialForMate(), false, 'K + B v. K is stalemate')
+    // K + N v. K
+    board.setPieces('8/8/3k4/8/8/N2K4/8/8');
+    assertEquals(board.hasSufficientMaterialForMate(), false, 'K + N v. K is stalemate')
+    // K v. K + B
+    board.setPieces('8/8/3k1b2/8/8/3K4/8/8');
+    assertEquals(board.hasSufficientMaterialForMate(), false, 'K v. K + B is stalemate')
+    // K v. K + N
+    board.setPieces('8/8/3k1n2/8/8/3K4/8/8');
+    assertEquals(board.hasSufficientMaterialForMate(), false, 'K v. K + N is stalemate')
+    // K + same color bishops
+    board.setPieces('8/8/3k1b2/8/8/3K4/3B4/8');
+    assertEquals(board.hasSufficientMaterialForMate(), false, 'Kings + same-color bishops is stalemate')
+    // K + opposite color bishops
+    board.setPieces('8/8/3k1b2/8/8/3K1B2/8/8');
+    assertEquals(board.hasSufficientMaterialForMate(), true, 'Kings + opposite-color bishops is not stalemate')
+})
+
 Deno.test('it calculates if square is threatened', () => {
     assertNotSquareThreatened('7n/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'h8 knight does not threaten f6 king')
     assertSquareThreatened('6n1/8/5K2/8/8/8/8/8', Square.f6, Color.Black, 'g8 knight threatens f6 king')

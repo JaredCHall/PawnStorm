@@ -3,6 +3,7 @@ import {Piece, Color, PieceType, FenPieceMap} from "../Board/Piece.ts";
 import {Square, SquareNameMap} from "../Board/Square.ts";
 import {BitMove, MoveType} from "./BitMove.ts";
 import {CastlingMoveMap} from "./CastlingMove.ts";
+import { dumpBin } from "BitChess/Utils.ts";
 
 
 export class MoveFactory extends MoveHandler
@@ -116,7 +117,7 @@ export class MoveFactory extends MoveHandler
             [Piece.BlackKing]: 0,
         }
         for(let i=0;i<64;i++){
-            const piece: Piece = this.squareList[this.square64Indexes[i]]
+            const piece: Piece = this.squareList[this.square120Indexes[i]]
             pieceCounts[piece]++
         }
 
@@ -157,18 +158,18 @@ export class MoveFactory extends MoveHandler
         }
 
         if(pieceCounts[Piece.BlackBishop] == 1 && pieceCounts[Piece.WhiteBishop] == 1){
+
             // check if bishops are on same color square
             let bishopSquareColorSum = 0
             for(let i=0;i<64;i++){
-                const piece: Piece = this.squareList[this.square64Indexes[i]]
+                const index120 = this.square120Indexes[i]
+                const piece: Piece = this.squareList[index120]
                 if(piece >> 1 & PieceType.Bishop){
-                    bishopSquareColorSum += SquareNameMap.colorByIndex[this.square64Indexes[i]]
+                    bishopSquareColorSum += SquareNameMap.colorByIndex[index120]
                 }
             }
-            if(bishopSquareColorSum == 1){
-                return false;
-            }
 
+            return bishopSquareColorSum == 1
         }
         return true
     }
