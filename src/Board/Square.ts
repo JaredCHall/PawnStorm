@@ -11,6 +11,11 @@ export enum Square { // 7 bits
     Invalid = 255
 }
 
+export enum SquareColor {
+    Light = 0,
+    Dark = 1
+}
+
 export class SquareNameMap {
     static readonly indexByName : {[key: string]: Square} = {
         'a8': Square.a8, 'b8': Square.b8, 'c8': Square.c8, 'd8': Square.d8, 'e8': Square.e8, 'f8': Square.f8, 'g8': Square.g8, 'h8': Square.h8,
@@ -31,6 +36,17 @@ export class SquareNameMap {
         71: 'a3',72: 'b3',73: 'c3',74: 'd3',75: 'e3',76: 'f3',77: 'g3',78: 'h3',
         81: 'a2',82: 'b2',83: 'c2',84: 'd2',85: 'e2',86: 'f2',87: 'g2',88: 'h2',
         91: 'a1',92: 'b1',93: 'c1',94: 'd1',95: 'e1',96: 'f1',97: 'g1',98: 'h1',
+    }
+
+    static readonly colorByIndex: {[key: number]: number} = {
+        21: 0, 22: 1, 23: 0, 24: 1, 25: 0, 26: 1, 27: 0, 28: 1,
+        31: 1, 32: 0, 33: 1, 34: 0, 35: 1, 36: 0, 37: 1, 38: 0,
+        41: 0, 42: 1, 43: 0, 44: 1, 45: 0, 46: 1, 47: 0, 48: 1,
+        51: 1, 52: 0, 53: 1, 54: 0, 55: 1, 56: 0, 57: 1, 58: 0,
+        61: 0, 62: 1, 63: 0, 64: 1, 65: 0, 66: 1, 67: 0, 68: 1,
+        71: 1, 72: 0, 73: 1, 74: 0, 75: 1, 76: 0, 77: 1, 78: 0,
+        81: 0, 82: 1, 83: 0, 84: 1, 85: 0, 86: 1, 87: 0, 88: 1,
+        91: 1, 92: 0, 93: 1, 94: 0, 95: 1, 96: 0, 97: 1, 98: 0,
     }
 
     static fileIndexes: {[key: string]: number} = {

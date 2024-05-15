@@ -134,51 +134,10 @@ export class Game {
             return
         }
 
-        if(this.#hasInsufficientMaterial()){
+        if(!this.moveFactory.hasSufficientMaterialForMate()){
             this.gameStatus = new GameStatus('normal', null, 'insufficient-material')
             return
         }
-
-
-    }
-
-    #hasInsufficientMaterial(): boolean
-    {
-        // insufficient material
-        const whitePieces: string[] = this.getPieces('white')
-        const blackPieces: string[] = this.getPieces('black')
-
-        if(whitePieces.length > 4 || blackPieces.length > 4){
-            return false
-        }
-
-        if(whitePieces.includes('P') || blackPieces.includes('p')){
-            return false
-        }
-        if(whitePieces.includes('Q') || blackPieces.includes('q')){
-            return false
-        }
-        if(whitePieces.includes('R') || blackPieces.includes('r')){
-            return false
-        }
-
-        // king vs. king
-        if(whitePieces.length == 1 && blackPieces.length == 1){
-            return true
-        }
-
-        // king + minor piece vs. king
-        if((whitePieces.length == 2 && blackPieces.length == 1)
-            || (whitePieces.length == 1 && blackPieces.length == 2)){
-            return true
-        }
-
-
-        // TODO: Add King + Bishop vs. King + Bishop (if bishops are same color)
-
-
-        return false
-
     }
 
 

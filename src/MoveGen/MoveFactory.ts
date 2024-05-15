@@ -1,6 +1,6 @@
 import {MoveHandler} from "./MoveHandler.ts";
-import {Piece, Color, PieceType} from "../Board/Piece.ts";
-import {Square} from "../Board/Square.ts";
+import {Piece, Color, PieceType, FenPieceMap} from "../Board/Piece.ts";
+import {Square, SquareNameMap} from "../Board/Square.ts";
 import {BitMove, MoveType} from "./BitMove.ts";
 import {CastlingMoveMap} from "./CastlingMove.ts";
 
@@ -96,6 +96,83 @@ export class MoveFactory extends MoveHandler
         }
         return moves
     }
+
+
+    getPieceCounts(): Record<Piece,number>
+    {
+        const pieceCounts: Record<Piece,number> = {
+            [Piece.None]: 0,
+            [Piece.WhitePawn]: 0,
+            [Piece.WhiteKnight]: 0,
+            [Piece.WhiteBishop]: 0,
+            [Piece.WhiteRook]: 0,
+            [Piece.WhiteQueen]: 0,
+            [Piece.WhiteKing]: 0,
+            [Piece.BlackPawn]: 0,
+            [Piece.BlackKnight]: 0,
+            [Piece.BlackBishop]: 0,
+            [Piece.BlackRook]: 0,
+            [Piece.BlackQueen]: 0,
+            [Piece.BlackKing]: 0,
+        }
+        for(let i=0;i<64;i++){
+            const piece: Piece = this.squareList[this.square64Indexes[i]]
+            pieceCounts[piece]++
+        }
+
+        return pieceCounts
+    }
+
+
+    hasSufficientMaterialForMate(): boolean
+    {
+
+        const pieceCounts = this.getPieceCounts()
+        if(pieceCounts[Piece.WhitePawn] > 0
+            || pieceCounts[Piece.BlackPawn] > 0
+            || pieceCounts[Piece.WhiteQueen] > 0
+            || pieceCounts[Piece.BlackQueen] > 0
+            || pieceCounts[Piece.WhiteRook] > 0
+            || pieceCounts[Piece.BlackRook] > 0
+        ){
+            return true
+        }
+
+        const whiteMinorPieceCount = pieceCounts[Piece.WhiteBishop] + pieceCounts[Piece.WhiteKnight]
+        const blackMinorPieceCount =  pieceCounts[Piece.BlackBishop] + pieceCounts[Piece.BlackKnight]
+
+        // king vs. king
+        if(whiteMinorPieceCount == 0 && blackMinorPieceCount == 0){
+            return false
+        }
+
+        // king + minor piece vs. king
+        if((whiteMinorPieceCount == 1 && blackMinorPieceCount == 0)
+            || (whiteMinorPieceCount == 0 && blackMinorPieceCount == 1)){
+            return false
+        }
+
+        if(pieceCounts[Piece.WhiteKnight] > 0 || pieceCounts[Piece.BlackKnight] > 0){
+            return true
+        }
+
+        if(pieceCounts[Piece.BlackBishop] == 1 && pieceCounts[Piece.WhiteBishop] == 1){
+            // check if bishops are on same color square
+            let bishopSquareColorSum = 0
+            for(let i=0;i<64;i++){
+                const piece: Piece = this.squareList[this.square64Indexes[i]]
+                if(piece >> 1 & PieceType.Bishop){
+                    bishopSquareColorSum += SquareNameMap.colorByIndex[this.square64Indexes[i]]
+                }
+            }
+            if(bishopSquareColorSum == 1){
+                return false;
+            }
+
+        }
+        return true
+    }
+
 
     #getMovesFromOffsets(from: Square, moving: Piece, color: Color, offsets: number[], maxRayLen: number): BitMove[] {
         const moves = []
