@@ -1,5 +1,5 @@
-import {BitMove} from "../MoveGen/BitMove.ts";
-import {MoveFactory} from "../MoveGen/MoveFactory.ts";
+import {BitMove} from "../../MoveGen/BitMove.ts";
+import {MoveFactory} from "../../MoveGen/MoveFactory.ts";
 
 
 export type NotationType = 'coordinate'|'algebraic'

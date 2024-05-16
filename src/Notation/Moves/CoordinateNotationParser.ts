@@ -1,7 +1,7 @@
 import {NotationType, ParserInterface} from "./ParserInterface.ts";
-import {BitMove} from "../MoveGen/BitMove.ts";
-import {SquareNameMap} from "../Board/Square.ts";
-import {MoveFactory} from "../MoveGen/MoveFactory.ts";
+import {BitMove} from "../../MoveGen/BitMove.ts";
+import {SquareNameMap} from "../../Board/Square.ts";
+import {MoveFactory} from "../../MoveGen/MoveFactory.ts";
 
 export class CoordinateNotationParser implements ParserInterface{
 

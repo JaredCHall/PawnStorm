@@ -1,6 +1,6 @@
 import {Move} from "./Move.ts";
 import {BitMove} from "../MoveGen/BitMove.ts";
-import {FenNumber} from "./FenNumber.ts";
+import {FenNumber} from "../Notation/FenNumber.ts";
 
 export class RecordedMove extends Move {
 

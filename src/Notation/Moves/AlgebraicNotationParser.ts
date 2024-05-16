@@ -1,9 +1,9 @@
 import {NotationType, ParserInterface} from "./ParserInterface.ts";
-import {BitMove, MoveType} from "../MoveGen/BitMove.ts";
-import {SquareNameMap} from "../Board/Square.ts";
-import {MoveFactory} from "../MoveGen/MoveFactory.ts";
-import {Color, FenPieceMap, PieceType} from "../Board/Piece.ts";
-import {CastlingMoveMap, CastlingRight} from "../MoveGen/CastlingMove.ts";
+import {BitMove, MoveType} from "../../MoveGen/BitMove.ts";
+import {SquareNameMap} from "../../Board/Square.ts";
+import {MoveFactory} from "../../MoveGen/MoveFactory.ts";
+import {Color, FenPieceMap, PieceType} from "../../Board/Piece.ts";
+import {CastlingMoveMap, CastlingRight} from "../../MoveGen/CastlingMove.ts";
 
 export class AlgebraicNotationParser implements ParserInterface{
 

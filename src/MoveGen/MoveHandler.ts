@@ -4,7 +4,7 @@ import {BitMove, MoveFlag, MoveType} from "./BitMove.ts";
 import {Square, SquareNameMap} from "../Board/Square.ts";
 import {CastlingMove, CastlingMoveMap, CastlingRight} from "./CastlingMove.ts";
 import { BoardState } from "../Board/BoardState.ts";
-import {FenNumber} from "../Game/FenNumber.ts";
+import {FenNumber} from "../Notation/FenNumber.ts";
 
 
 

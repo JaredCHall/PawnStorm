@@ -1,12 +1,11 @@
-import {Game} from "BitChess/Game/Game.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
+import {assertThrows} from "https://deno.land/std@0.219.0/assert/assert_throws.ts";
 import {RecordedMove} from "../../src/Game/RecordedMove.ts";
 import { BitMove } from "BitChess/MoveGen/BitMove.ts";
 import {Square} from "../../src/Board/Square.ts";
 import {Piece} from "../../src/Board/Piece.ts";
 import {MoveNavigator} from "../../src/Game/MoveNavigator.ts";
-import {assertThrows} from "https://deno.land/std@0.219.0/assert/assert_throws.ts";
-import { FenNumber } from "BitChess/Game/FenNumber.ts";
+import { FenNumber } from "../../src/Notation/FenNumber.ts";
 
 
 const mockMove = (notation: string, color: number, moveCounter: number): RecordedMove => {
@@ -16,7 +15,7 @@ const mockMove = (notation: string, color: number, moveCounter: number): Recorde
     const bitMove = new BitMove(Square.e4, Square.e5,piece,0,0)
     return new RecordedMove(
         bitMove,
-        new FenNumber('pieces','w','-','-',4,5),
+        new FenNumber('8/8/8/8/8/8/8/8','w','-','-',4,5),
         notation,
         moveCounter
     )

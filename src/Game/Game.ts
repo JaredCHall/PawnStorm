@@ -5,11 +5,11 @@ import {BitMove} from "../MoveGen/BitMove.ts";
 import {Color, FenPieceMap} from "../Board/Piece.ts";
 import {MoveNavigator} from "./MoveNavigator.ts";
 import {RecordedMove} from "./RecordedMove.ts";
-import {ParserInterface} from "../NotationParser/ParserInterface.ts";
-import {AlgebraicNotationParser} from "../NotationParser/AlgebraicNotationParser.ts";
-import {CoordinateNotationParser} from "../NotationParser/CoordinateNotationParser.ts";
+import {ParserInterface} from "../Notation/Moves/ParserInterface.ts";
+import {AlgebraicNotationParser} from "../Notation/Moves/AlgebraicNotationParser.ts";
+import {CoordinateNotationParser} from "../Notation/Moves/CoordinateNotationParser.ts";
 import {GameStatus} from "./GameStatus.ts";
-import {FenNumber} from "./FenNumber.ts";
+import {FenNumber} from "../Notation/FenNumber.ts";
 import {RepetitionTracker} from "./RepetitionTracker.ts";
 
 export class Game {
