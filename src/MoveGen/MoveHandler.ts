@@ -4,6 +4,7 @@ import {BitMove, MoveFlag, MoveType} from "./BitMove.ts";
 import {Square, SquareNameMap} from "../Board/Square.ts";
 import {CastlingMove, CastlingMoveMap, CastlingRight} from "./CastlingMove.ts";
 import { BoardState } from "../Board/BoardState.ts";
+import {FenNumber} from "../Game/FenNumber.ts";
 
 
 
@@ -220,33 +221,28 @@ export class MoveHandler extends Board
 
     }
 
+    getFenNumber(): FenNumber
+    {
+        let castleRights = ''
+        if(this.state.castleRights == 0){castleRights += '-'}
+        if(this.state.castleRights & CastlingRight.K){castleRights += 'K'}
+        if(this.state.castleRights & CastlingRight.Q){castleRights += 'Q'}
+        if(this.state.castleRights & CastlingRight.k){castleRights += 'k'}
+        if(this.state.castleRights & CastlingRight.q){castleRights += 'q'}
+
+        return new FenNumber(
+            this.serializePiecePositions(),
+            this.state.sideToMove == 0 ? 'w' : 'b',
+            castleRights,
+            this.state.enPassantTarget ? SquareNameMap.nameByIndex[this.state.enPassantTarget] : '-',
+            this.state.halfMoveClock,
+            Math.floor(this.ply / 2) + 1
+        )
+    }
+
 
     serialize(): string {
-        let serialized = super.serialize();
-        serialized += ' ' + (this.state.sideToMove == 0 ? 'w' : 'b')
-
-        serialized += ' '
-        if(this.state.castleRights == 0){serialized += '-'}
-        if(this.state.castleRights & CastlingRight.K){serialized += 'K'}
-        if(this.state.castleRights & CastlingRight.Q){serialized += 'Q'}
-        if(this.state.castleRights & CastlingRight.k){serialized += 'k'}
-        if(this.state.castleRights & CastlingRight.q){serialized += 'q'}
-        serialized += ' '
-
-        if(this.state.enPassantTarget){
-            // @ts-ignore
-            serialized += SquareNameMap.nameByIndex[this.state.enPassantTarget]
-        }else{
-            serialized += '-'
-        }
-
-        serialized += ' '
-        serialized += this.state.halfMoveClock.toString()
-        serialized += ' '
-        serialized += (Math.floor(this.ply / 2) + 1).toString()
-
-        return serialized
-
+        return this.getFenNumber().serialize()
     }
 
 }

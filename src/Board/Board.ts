@@ -168,7 +168,8 @@ export class Board
         return moving & 1 ? bold(black(formatted)) : bold(white(formatted))
     }
 
-    serialize(): string {
+    serializePiecePositions(): string
+    {
         let emptySquares = 0
         let serialized = ''
 
@@ -199,5 +200,9 @@ export class Board
             }
         }
         return serialized
+    }
+
+    serialize(): string {
+        return this.serializePiecePositions()
     }
 }

@@ -10,7 +10,7 @@ Deno.test('it starts a new game', () => {
 
     const game = new Game()
 
-    assertEquals(game.getFenNotation(), 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+    assertEquals(game.getFenNotation().serialize(), 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
     assertEquals('white', game.getSideToMove())
 })
 
@@ -19,11 +19,11 @@ Deno.test('it makes moves and un-does them', () => {
     game.makeMove('e4')
     game.undoMove()
 
-    assertEquals(game.getFenNotation(), 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+    assertEquals(game.getFenNotation().serialize(), 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
     assertEquals('white', game.getSideToMove())
 
     game.makeMove('e4')
-    assertEquals(game.getFenNotation(), 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1')
+    assertEquals(game.getFenNotation().serialize(), 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1')
     assertEquals('black', game.getSideToMove())
 })
 
@@ -119,6 +119,10 @@ Deno.test('it plays the opera game', () => {
         '1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8#'
     )
 
+    // sets game termination?
+    assertEquals(game.getStatus().terminationType, 'normal')
+    assertEquals(game.getStatus().winner, 'white')
+
 
     console.log(game.getMoveNavigator().serialize())
 
@@ -148,12 +152,12 @@ Deno.test('it plays the opera game in coordinate notation', () => {
         '1. e2e4 e7e5 2. g1f3 d7d6 3. d2d4 c8g4'
     )
 
+    assertEquals(game.getStatus().terminationType, 'unterminated')
+    assertEquals(game.getStatus().winner, null)
 
     console.log(game.getMoveNavigator().serialize())
 
 })
-
-
 
 Deno.test('it gets candidate moves', () => {
 
@@ -205,8 +209,84 @@ Deno.test('it handles undo moves', () => {
     game.render()
 
     assertEquals(
-        game.getFenNotation(),
+        game.getFenNotation().serialize(),
         'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2'
     )
 
+})
+
+Deno.test('it handles resignation', () => {
+
+    let game
+
+    game = new Game()
+    game.setResigns('white')
+    assertEquals(game.getStatus().terminationType, 'normal')
+    assertEquals(game.getStatus().winner, 'black')
+    assertEquals(game.getStatus().drawType, null)
+
+    game = new Game()
+    game.setResigns('black')
+    assertEquals(game.getStatus().terminationType, 'normal')
+    assertEquals(game.getStatus().winner, 'white')
+    assertEquals(game.getStatus().drawType, null)
+
+    // cannot make a move after game is over
+    assertThrows(() => {game.makeMove('e4')})
+})
+
+Deno.test('it handles draw by agreement', () => {
+    const game = new Game()
+    game.setDrawByAgreement()
+    assertEquals(game.getStatus().terminationType, 'normal')
+    assertEquals(game.getStatus().winner, null)
+    assertEquals(game.getStatus().drawType, 'agreement')
+
+    // cannot make a move after game is over
+    assertThrows(() => {game.makeMove('e4')})
+})
+
+Deno.test('it handles stalemate with no legal moves', () => {
+    const game = new Game('8/8/8/8/8/7k/4q2P/7K b - - 0 1')
+    game.makeMove('Qf2')
+    game.getStatus()
+    assertEquals(game.getStatus().terminationType, 'normal')
+    assertEquals(game.getStatus().winner, null)
+    assertEquals(game.getStatus().drawType, 'stalemate')
+})
+
+Deno.test('it handles draw by insufficient material', () => {
+    const game = new Game('8/8/8/8/8/7k/6N1/7K w - - 0 1')
+    game.makeMove('Ne1')
+    game.getStatus()
+    assertEquals(game.getStatus().terminationType, 'normal')
+    assertEquals(game.getStatus().winner, null)
+    assertEquals(game.getStatus().drawType, 'insufficient-material')
+})
+
+Deno.test('it handles draw by fifty move rule', () => {
+    const game = new Game('8/3q4/8/8/3Q4/7k/6N1/7K b - - 49 1')
+    game.makeMove('Qa7')
+    game.getStatus()
+    assertEquals(game.getStatus().terminationType, 'normal')
+    assertEquals(game.getStatus().winner, null)
+    assertEquals(game.getStatus().drawType, 'fifty-move-rule')
+})
+
+Deno.test('it handles draw by three fold repetition', () => {
+    const game = new Game('rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2')
+    game.makeMove('Ke2')
+    game.makeMove('Ke7') // first - repetition starts here because castle rights have finished changing
+    game.makeMove('Ke1')
+    game.makeMove('Ke8')
+    game.makeMove('Ke2')
+    game.makeMove('Ke7') // second
+    game.makeMove('Ke1')
+    game.makeMove('Ke8')
+    game.makeMove('Ke2')
+    game.makeMove('Ke7')  // third
+    game.getStatus()
+    assertEquals(game.getStatus().terminationType, 'normal')
+    assertEquals(game.getStatus().winner, null)
+    assertEquals(game.getStatus().drawType, 'three-fold-repetition')
 })

@@ -1,5 +1,6 @@
 import {Move} from "./Move.ts";
 import {BitMove} from "../MoveGen/BitMove.ts";
+import {FenNumber} from "./FenNumber.ts";
 
 export class RecordedMove extends Move {
 
@@ -13,7 +14,7 @@ export class RecordedMove extends Move {
 
     constructor(
         move: BitMove,
-        readonly fen: string,
+        readonly fen: FenNumber,
         readonly notation: string,
         readonly moveCounter: number,
         private parent: RecordedMove|null = null, // moves have a parent move, if they are the first move in a variation

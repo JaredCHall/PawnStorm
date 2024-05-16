@@ -9,6 +9,8 @@ import {ParserInterface} from "../NotationParser/ParserInterface.ts";
 import {AlgebraicNotationParser} from "../NotationParser/AlgebraicNotationParser.ts";
 import {CoordinateNotationParser} from "../NotationParser/CoordinateNotationParser.ts";
 import {GameStatus} from "./GameStatus.ts";
+import {FenNumber} from "./FenNumber.ts";
+import {RepetitionTracker} from "./RepetitionTracker.ts";
 
 export class Game {
 
@@ -19,6 +21,8 @@ export class Game {
     private readonly moveNavigator: MoveNavigator
 
     private notationParser: ParserInterface = new AlgebraicNotationParser(this.moveFactory)
+
+    private repetitionTracker: RepetitionTracker = new RepetitionTracker();
 
     constructor(fen: string|null = null) {
         fen ??= 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
@@ -31,9 +35,9 @@ export class Game {
         this.moveFactory.setFromFenNumber(fenString)
     }
 
-    getFenNotation(): string
+    getFenNotation(): FenNumber
     {
-        return this.moveFactory.serialize()
+        return this.moveFactory.getFenNumber()
     }
 
     getStatus(): GameStatus
@@ -51,12 +55,14 @@ export class Game {
         if(moveId == -1){
             this.moveNavigator.setCursor(moveId)
             this.moveFactory.setFromFenNumber(this.moveNavigator.startFen)
+            this.repetitionTracker.buildFromMove(null)
             return
         }
 
         const move = this.moveNavigator.getMove(moveId)
         this.moveNavigator.setCursor(moveId)
-        this.moveFactory.setFromFenNumber(move.fen)
+        this.repetitionTracker.buildFromMove(move)
+        this.moveFactory.setFromFenNumber(move.fen.serialize())
     }
 
     setNotation(type: 'algebraic'|'coordinate') {
@@ -75,6 +81,11 @@ export class Game {
     }
 
     makeMove(notation: string): RecordedMove{
+
+        if(this.gameStatus.terminationType != 'unterminated'){
+            throw new Error('Cannot make move. Game is already terminated.')
+        }
+
         const move = this.notationParser.parse(notation)
 
         // serialize the notation before the move is made as it is necessary for disambiguation
@@ -91,6 +102,7 @@ export class Game {
             moveCounter
         )
         this.moveNavigator.addMove(recordedMove)
+        this.repetitionTracker.addMove(recordedMove)
         this.#updateGameTermination(recordedMove)
 
         return recordedMove
@@ -120,6 +132,16 @@ export class Game {
         })
     }
 
+    setDrawByAgreement(): void {
+        this.gameStatus = new GameStatus('normal', null, 'agreement')
+    }
+
+    setResigns(color: 'white'|'black'): void {
+        const winner = color == 'white' ? 'black' : 'white'
+
+        this.gameStatus = new GameStatus('normal', winner, null)
+    }
+
     // determine if last move resulted in end of game
     #updateGameTermination(move: RecordedMove): void
     {
@@ -128,7 +150,7 @@ export class Game {
             this.gameStatus = new GameStatus('normal', move.color)
             return
         }
-        // stalemate
+        // stalemates
         if(this.getCandidateMoves(this.getSideToMove()).length == 0){
             this.gameStatus = new GameStatus('normal', null, 'stalemate')
             return
@@ -138,6 +160,14 @@ export class Game {
             this.gameStatus = new GameStatus('normal', null, 'insufficient-material')
             return
         }
+        if(this.moveFactory.state.halfMoveClock >= 50){
+            this.gameStatus = new GameStatus('normal', null, 'fifty-move-rule')
+            return
+        }
+        if(this.repetitionTracker.repetitionCount > 2){
+            this.gameStatus = new GameStatus('normal', null, 'three-fold-repetition')
+        }
+
     }
 
 
