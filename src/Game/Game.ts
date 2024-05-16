@@ -23,8 +23,6 @@ export class Game {
         Black: '?',
     }
 
-    private startAtTime: Date = new Date();
-
     private gameStatus: GameStatus = new GameStatus();
 
     private readonly moveFactory = new MoveFactory();
@@ -41,23 +39,19 @@ export class Game {
         this.moveNavigator = new MoveNavigator(fen)
     }
 
-    setBoard(fenString: string): void
-    {
+    setBoard(fenString: string): void {
         this.moveFactory.setFromFenNumber(fenString)
     }
 
-    getFenNotation(): FenNumber
-    {
+    getFenNotation(): FenNumber {
         return this.moveFactory.getFenNumber()
     }
 
-    getStatus(): GameStatus
-    {
+    getStatus(): GameStatus {
         return this.gameStatus
     }
 
-    getMoveNavigator(): MoveNavigator
-    {
+    getMoveNavigator(): MoveNavigator {
         return this.moveNavigator
     }
 
@@ -91,7 +85,7 @@ export class Game {
         }
     }
 
-    makeMove(notation: string): RecordedMove{
+    makeMove(notation: string): RecordedMove {
 
         if(this.gameStatus.terminationType != 'unterminated'){
             throw new Error('Cannot make move. Game is already terminated.')
@@ -135,14 +129,11 @@ export class Game {
         return this.tags[tagName] ?? null
     }
 
-    allTags(): {[key: string]: string}
-    {
+    allTags(): {[key: string]: string} {
         return this.tags
     }
 
-
-    getSquares(): (string|null)[]
-    {
+    getSquares(): (string|null)[] {
         const squares: (string|null)[] = []
         for(let i=0;i<64;i++){
             const piece = this.moveFactory.squareList[this.moveFactory.square64Indexes[i]]
@@ -153,16 +144,6 @@ export class Game {
             }
         }
         return squares
-    }
-
-    getPieces(color: string|null = null): (string)[] {
-        //@ts-ignore - filter removes null values
-        return this.getSquares().filter((piece) => {
-            if(!piece){
-                return false
-            }
-            return !color || color == (piece.toUpperCase() == piece ? 'white' : 'black')
-        })
     }
 
     setDrawByAgreement(): void {
@@ -176,8 +157,7 @@ export class Game {
     }
 
     // determine if last move resulted in end of game
-    #updateGameTermination(move: RecordedMove): void
-    {
+    #updateGameTermination(move: RecordedMove): void {
         // checkmate
         if(move.bitMove.isMate){
             this.gameStatus = new GameStatus('normal', move.color)
@@ -204,8 +184,7 @@ export class Game {
     }
 
 
-    undoMove(): void
-    {
+    undoMove(): void {
         const recordedMove = this.moveNavigator.getLast()
         if(!recordedMove){
             throw new Error('Cannot undo last move. No moves have been played.')

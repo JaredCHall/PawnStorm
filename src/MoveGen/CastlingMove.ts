@@ -48,15 +48,6 @@ export class CastlingMove
                 this.safeSquares = [Square.e8, Square.d8]
         }
     }
-
-    static fromSanString(sanString: string, sideToMove: Color): CastlingMove
-    {
-        const right = sanString === 'O-O-O' ? 'Q' : 'K'
-
-        // @ts-ignore
-        return sideToMove === Color.White ? new CastlingMove(right) : new CastlingMove(right.toLowerCase())
-    }
-
 }
 
 export class CastlingMoveMap

@@ -16,6 +16,8 @@ const getParser = (fen: string): CoordinateNotationParser => {
 Deno.test('it parses notation', () => {
     const parser = getParser('2bq1b1r/1Pp2Qpp/3k4/3Bp3/3n4/2N5/P1PP1PPP/R1B1K2R w KQ - 3 11')
 
+    assertEquals(parser.getType(), 'coordinate')
+
     // quiet move
     let move = parser.parse('c3e4')
     assertEquals(move, new BitMove(Square.c3,Square.e4, Piece.WhiteKnight, 0,0))
