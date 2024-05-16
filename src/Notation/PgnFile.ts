@@ -12,15 +12,7 @@ export class PgnFile {
     {
         const file = new PgnFile()
         file.moveText = game.getMoveNavigator().serialize()
-        file.gameTags = {
-            Event: 'Casual Game',
-            Site: '?',
-            Date: file.#formatDateHeader(new Date()),
-            Round: '1',
-            White: '?',
-            Black: '?',
-            Result: file.#formatResultHeader(game.getStatus())
-        }
+        file.gameTags = game.allTags()
 
         return file
     }
@@ -44,7 +36,7 @@ export class PgnFile {
         return new PgnFile()
     }
 
-    #formatDateHeader(date: Date): string
+    static formatDateTag(date: Date): string
     {
         const pad2 = (val: number) => {
             return val.toString().padStart(2, '0')
@@ -58,12 +50,12 @@ export class PgnFile {
         return `${yyyy}.${mm}.${dd}`
     }
 
-    #formatResultHeader(status: GameStatus): string
+    static formatResultTag(status: GameStatus): string
     {
-        if(status.winner === 'white'){
+        if(status.winner == 'white'){
             return '1-0'
         }
-        if(status.winner === 'black'){
+        if(status.winner == 'black'){
             return '0-1'
         }
         if(status.terminationType != 'unterminated'){

@@ -11,8 +11,19 @@ import {CoordinateNotationParser} from "../Notation/Moves/CoordinateNotationPars
 import {GameStatus} from "./GameStatus.ts";
 import {FenNumber} from "../Notation/FenNumber.ts";
 import {RepetitionTracker} from "./RepetitionTracker.ts";
+import {PgnFile} from "../Notation/PgnFile.ts";
 
 export class Game {
+
+    private tags: {[key: string]: string} = {
+        Event: 'Casual Game',
+        Site: '?',
+        Round: '1',
+        White: '?',
+        Black: '?',
+    }
+
+    private startAtTime: Date = new Date();
 
     private gameStatus: GameStatus = new GameStatus();
 
@@ -93,6 +104,13 @@ export class Game {
         const moveCounter = (Math.floor(this.moveFactory.ply / 2) + 1)
         const serialized = this.notationParser.serialize(move)
 
+        // game officially starts on first move
+        if(moveCounter == 1 && this.getSideToMove() == 'white'){
+            if(!this.getTag('Date')){
+                this.setTag('Date', PgnFile.formatDateTag(new Date()))
+            }
+        }
+
         this.moveFactory.makeMove(move)
 
         const recordedMove = new RecordedMove(
@@ -104,9 +122,24 @@ export class Game {
         this.moveNavigator.addMove(recordedMove)
         this.repetitionTracker.addMove(recordedMove)
         this.#updateGameTermination(recordedMove)
+        this.setTag('Result', PgnFile.formatResultTag(this.gameStatus))
 
         return recordedMove
     }
+
+    setTag(tagName: string, tagValue: string): void {
+        this.tags[tagName] = tagValue
+    }
+
+    getTag(tagName: string): string|null {
+        return this.tags[tagName] ?? null
+    }
+
+    allTags(): {[key: string]: string}
+    {
+        return this.tags
+    }
+
 
     getSquares(): (string|null)[]
     {

@@ -3,7 +3,7 @@
     "BitChess/": "./src/"
   },
   "tasks": {
-    "test-coverage": "rm cov_profile/*.json && rm -r cov_profile/html && deno test -q --coverage=cov_profile && deno coverage cov_profile | tee tests/coverage-report.txt",
+    "test-coverage": "mkdir -p cov_profile && deno test -q --coverage=cov_profile && deno coverage cov_profile | tee tests/coverage-report.txt",
     "test-coverage-html": "deno task test-coverage && deno coverage cov_profile --html && xdg-open cov_profile/html/index.html"
   }
 }
