@@ -5,6 +5,7 @@ import {BitMove} from "../../src/MoveGen/BitMove.ts";
 import {Square} from "../../src/Board/Square.ts";
 import { Piece } from "BitChess/Board/Piece.ts";
 import {assertThrows} from "https://deno.land/std@0.219.0/assert/assert_throws.ts";
+import {PgnFile} from "../../src/Notation/PgnFile.ts";
 
 Deno.test('it starts a new game', () => {
 
@@ -125,6 +126,10 @@ Deno.test('it plays the opera game', () => {
 
 
     console.log(game.getMoveNavigator().serialize())
+
+    const file = PgnFile.fromGame(game)
+    
+    console.log(file.serialize())
 
 })
 
