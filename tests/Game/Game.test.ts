@@ -128,6 +128,11 @@ Deno.test('it plays the opera game', () => {
     // sets game termination?
     assertEquals(game.getStatus().terminationType, 'normal')
     assertEquals(game.getStatus().winner, 'white')
+    assertEquals(game.isGameOver(), true)
+    assertEquals(game.isCheck(), true)
+    assertEquals(game.isMate(), true)
+    assertEquals(game.isDraw(), false)
+
 
     const file = PgnFile.fromGame(game)
     assertEquals(file.serialize(), `[Event "Casual Game"]
@@ -171,6 +176,10 @@ Deno.test('it plays the opera game in coordinate notation', () => {
 
     assertEquals(game.getStatus().terminationType, 'unterminated')
     assertEquals(game.getStatus().winner, null)
+    assertEquals(game.isGameOver(), false)
+    assertEquals(game.isCheck(), false)
+    assertEquals(game.isMate(), false)
+    assertEquals(game.isDraw(), false)
 
     console.log(game.getMoveNavigator().serialize())
 
@@ -241,12 +250,20 @@ Deno.test('it handles resignation', () => {
     assertEquals(game.getStatus().terminationType, 'normal')
     assertEquals(game.getStatus().winner, 'black')
     assertEquals(game.getStatus().drawType, null)
+    assertEquals(game.isGameOver(), true)
+    assertEquals(game.isCheck(), false)
+    assertEquals(game.isMate(), false)
+    assertEquals(game.isDraw(), false)
 
     game = new Game()
     game.setResigns('black')
     assertEquals(game.getStatus().terminationType, 'normal')
     assertEquals(game.getStatus().winner, 'white')
     assertEquals(game.getStatus().drawType, null)
+    assertEquals(game.isGameOver(), true)
+    assertEquals(game.isCheck(), false)
+    assertEquals(game.isMate(), false)
+    assertEquals(game.isDraw(), false)
 
     // cannot make a move after game is over
     assertThrows(() => {game.makeMove('e4')})
@@ -258,6 +275,10 @@ Deno.test('it handles draw by agreement', () => {
     assertEquals(game.getStatus().terminationType, 'normal')
     assertEquals(game.getStatus().winner, null)
     assertEquals(game.getStatus().drawType, 'agreement')
+    assertEquals(game.isGameOver(), true)
+    assertEquals(game.isCheck(), false)
+    assertEquals(game.isMate(), false)
+    assertEquals(game.isDraw(), true)
 
     // cannot make a move after game is over
     assertThrows(() => {game.makeMove('e4')})
@@ -270,6 +291,10 @@ Deno.test('it handles stalemate with no legal moves', () => {
     assertEquals(game.getStatus().terminationType, 'normal')
     assertEquals(game.getStatus().winner, null)
     assertEquals(game.getStatus().drawType, 'stalemate')
+    assertEquals(game.isGameOver(), true)
+    assertEquals(game.isCheck(), false)
+    assertEquals(game.isMate(), false)
+    assertEquals(game.isDraw(), true)
 })
 
 Deno.test('it handles draw by insufficient material', () => {
@@ -279,6 +304,10 @@ Deno.test('it handles draw by insufficient material', () => {
     assertEquals(game.getStatus().terminationType, 'normal')
     assertEquals(game.getStatus().winner, null)
     assertEquals(game.getStatus().drawType, 'insufficient-material')
+    assertEquals(game.isGameOver(), true)
+    assertEquals(game.isCheck(), false)
+    assertEquals(game.isMate(), false)
+    assertEquals(game.isDraw(), true)
 })
 
 Deno.test('it handles draw by fifty move rule', () => {
@@ -288,6 +317,10 @@ Deno.test('it handles draw by fifty move rule', () => {
     assertEquals(game.getStatus().terminationType, 'normal')
     assertEquals(game.getStatus().winner, null)
     assertEquals(game.getStatus().drawType, 'fifty-move-rule')
+    assertEquals(game.isGameOver(), true)
+    assertEquals(game.isCheck(), false)
+    assertEquals(game.isMate(), false)
+    assertEquals(game.isDraw(), true)
 })
 
 Deno.test('it handles draw by three fold repetition', () => {
@@ -302,8 +335,40 @@ Deno.test('it handles draw by three fold repetition', () => {
     game.makeMove('Ke8')
     game.makeMove('Ke2')
     game.makeMove('Ke7')  // third
-    game.getStatus()
     assertEquals(game.getStatus().terminationType, 'normal')
     assertEquals(game.getStatus().winner, null)
     assertEquals(game.getStatus().drawType, 'three-fold-repetition')
+    assertEquals(game.isGameOver(), true)
+    assertEquals(game.isCheck(), false)
+    assertEquals(game.isMate(), false)
+    assertEquals(game.isDraw(), true)
+})
+
+Deno.test('it handles draw by three fold repetition after switching to new line', () => {
+    const game = new Game('rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2')
+    game.makeMove('Ke2')
+    game.makeMove('Ke7') // first - repetition starts here because castle rights have finished changing
+    game.makeMove('Ke1')
+    game.makeMove('Ke8')
+    const prev = game.makeMove('Ke2')
+
+    // start variation
+    game.makeMove('Nc6')
+    game.makeMove('Nc3')
+
+    // back into our main line
+    game.gotoMove(prev.getId())
+    game.makeMove('Ke7') // second
+
+    game.makeMove('Ke1')
+    game.makeMove('Ke8')
+    game.makeMove('Ke2')
+    game.makeMove('Ke7')  // third
+    assertEquals(game.getStatus().terminationType, 'normal')
+    assertEquals(game.getStatus().winner, null)
+    assertEquals(game.getStatus().drawType, 'three-fold-repetition')
+    assertEquals(game.isGameOver(), true)
+    assertEquals(game.isCheck(), false)
+    assertEquals(game.isMate(), false)
+    assertEquals(game.isDraw(), true)
 })

@@ -180,13 +180,14 @@ game.isGameOver()
 // is the king in check
 game.isCheck()
 // is there a checkmate on the board?
-game.isCheckMate()
+game.isMate()
 // what about a stalemate?
-game.isStaleMate()
-// do we have 3-fold repetition?
-game.is3FoldRepetitionDraw()
-// what about 50-move rule
-game.is50MoveRuleDraw()
+game.isDraw()
+
+// you can get more detail from the GameStatus object
+/** @see GameStatus */
+const status = game.getStatus()
+
 ```
 
 ## Resigns or Draw by Agreement

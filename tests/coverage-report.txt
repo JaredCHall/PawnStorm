@@ -5,7 +5,7 @@ File                                        | Branch % | Line % |
  [0m[32mBoard/BoardState.ts                       [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mBoard/Piece.ts                            [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mBoard/Square.ts                           [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mGame/Game.ts                              [0m | [0m[32m    94.3[0m | [0m[32m  89.7[0m |
+ [0m[32mGame/Game.ts                              [0m | [0m[32m    95.0[0m | [0m[32m  90.5[0m |
  [0m[32mGame/GameStatus.ts                        [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mGame/Move.ts                              [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mGame/MoveNavigator.ts                     [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |

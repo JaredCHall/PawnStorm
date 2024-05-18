@@ -146,6 +146,26 @@ export class Game {
         return squares
     }
 
+    isGameOver(): boolean
+    {
+        return this.getStatus().terminationType != 'unterminated'
+    }
+
+    isCheck(): boolean
+    {
+        return this.moveNavigator.getLast()?.bitMove.isCheck ?? false
+    }
+
+    isMate(): boolean
+    {
+        return this.moveNavigator.getLast()?.bitMove.isMate ?? false
+    }
+
+    isDraw(): boolean
+    {
+        return this.isGameOver() && this.getStatus().winner === null
+    }
+
     setDrawByAgreement(): void {
         this.gameStatus = new GameStatus('normal', null, 'agreement')
     }
