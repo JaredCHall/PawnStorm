@@ -10,6 +10,10 @@ export class RecordedMove extends Move {
 
     private next: RecordedMove|null = null
 
+    private annotation: number|null = null
+
+    private comment: string|null = null
+
     readonly bitMove: BitMove
 
     constructor(

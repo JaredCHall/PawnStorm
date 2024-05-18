@@ -17,6 +17,17 @@ export class PgnFile {
         return file
     }
 
+    // throws
+    toGame(): Game
+    {
+        const game = new Game(this.gameTags['FEN'] ?? null)
+
+        // TODO: morph this into a game with all moves recorded and set to the initial position
+
+        
+        return game
+    }
+
     serialize(): string{
         let serialized = ''
 
@@ -32,8 +43,39 @@ export class PgnFile {
         return serialized
     }
 
-    parse(fileContent: string): PgnFile {
-        return new PgnFile()
+    parseTag(line: string): [string, string] {
+        const parts = line.match(/^\[([a-zA-Z0-9]+)\s["']([^"']+)["']]$/)
+        if(parts === null){
+            throw new Error("Could not parse header line: "+line)
+        }
+        const key = parts[1] ?? null
+        const value = parts[2] ?? null
+
+        this.gameTags[key] = value
+
+        return [key, value]
+    }
+
+    static parse(fileContent: string): PgnFile {
+
+        const lines = fileContent.replace('\r\n','\n').split('\n')
+
+        const file = new PgnFile()
+
+        let foundLastHeader = false
+        lines.forEach((line: string) => {
+            if(line.charAt(0) === '['){
+               file.parseTag(line)
+            }
+            if(!foundLastHeader && line === ''){
+                foundLastHeader = true
+            }
+            if(foundLastHeader && line !== ''){
+                file.moveText += line + " "
+            }
+        })
+
+        return file
     }
 
     static formatDateTag(date: Date): string
