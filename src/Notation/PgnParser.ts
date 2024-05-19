@@ -119,10 +119,10 @@ export class PgnParser {
             if(char === '{'){
                 const commentText = seekToCommentEnd()
                 if(!lastMove){
-                    error('Cannot add comment without a move')
-                    return
+                    game.getMoveNavigator().initialComment = commentText
+                }else{
+                    lastMove.comment = commentText
                 }
-                lastMove.comment = commentText
                 continue
             }
             if(char === '('){
@@ -200,9 +200,18 @@ export class PgnParser {
             const tagValue = tags[tagName].replace('"','')
             serialized += `[${tagName} "${tagValue}"]\n`
         }
-
         serialized += '\n'
-        serialized += this.serializeMoves(game.getMoveNavigator().getMove(0))
+
+        const navigator = game.getMoveNavigator()
+        if(navigator.initialComment.length > 0){
+            serialized += `{ ${navigator.initialComment} }\n`
+        }
+
+        const firstMove = navigator.getFirstMove()
+        if(firstMove){
+            serialized += this.serializeMoves(firstMove)
+        }
+
         serialized += ' ' + game.getTag('Result') ?? PgnTagFormatter.formatResult(game.getStatus())
         serialized += '\n'
 

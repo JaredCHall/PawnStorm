@@ -59,7 +59,7 @@ Deno.test('it parses and re-serializes an opening study', () => {
 })
 
 
-Deno.test('it parses and re-serializes a game starting from an alternative initial position', () => {
+Deno.test('it handles game with alternative initial position', () => {
 
     const parser = new PgnParser()
 
@@ -102,6 +102,47 @@ Deno.test('it parses and re-serializes a game starting from an alternative initi
     )
 
 })
+
+
+Deno.test('it handles puzzle with initial comment and no moves', () => {
+
+    const parser = new PgnParser()
+
+    const inputString
+        = `[Event "Various Puzzles: Queen + Bishop 26"]
+[Result "*"]
+[FEN "3r4/1p2RQ1p/p5p1/2q5/3r2kP/6P1/PP3P2/5BK1 w - - 0 36"]
+
+{ Can you find the mate-in-2? }
+ *`
+    const game = parser.parse(inputString)
+
+    assertEquals(game.getMoveNavigator().getLast(), null, 'It sets game to start position')
+
+    assertEquals(game.getTag('Event'), 'Various Puzzles: Queen + Bishop 26', 'Sets Site tag')
+    assertEquals(game.getTag('Result'), '*', 'Sets Result tag')
+    assertEquals(game.getTag('FEN'), '3r4/1p2RQ1p/p5p1/2q5/3r2kP/6P1/PP3P2/5BK1 w - - 0 36', 'Sets FEN tag')
+
+    console.log(parser.serialize(game))
+
+    assertEquals(
+        parser.serialize(game),
+        `[Event "Various Puzzles: Queen + Bishop 26"]
+[Site "?"]
+[Round "1"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[FEN "3r4/1p2RQ1p/p5p1/2q5/3r2kP/6P1/PP3P2/5BK1 w - - 0 36"]
+
+{  Can you find the mate-in-2?  }
+ *
+`,
+        'serializes game as expected PGN file'
+    )
+
+})
+
 
 // chessgames.com formats moves without a space between the move count token and the move notation and additionally
 // restricts total line size by adding line returns, making it a good variation to test

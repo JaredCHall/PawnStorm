@@ -13,12 +13,21 @@ import {RecordedMove} from "./RecordedMove.ts";
  *
  */
 export class MoveNavigator {
+    get initialComment(): string {
+        return this._initialComment;
+    }
+
+    set initialComment(value: string) {
+        this._initialComment = value;
+    }
 
     readonly moves: RecordedMove[] = []; // the mainline moves
 
     private idMap: (RecordedMove|null)[] = []; // all moves indexed by id
 
     private cursor: number = -1 // id of the currently selected move
+
+    private _initialComment: string = '' // a PGN-style comment on the initial position
 
     constructor(readonly startFen: string) {}
 
@@ -48,6 +57,12 @@ export class MoveNavigator {
             this.moves.push(move)
         }
     }
+
+    getFirstMove(): RecordedMove|null
+    {
+        return this.idMap[0] ?? null
+    }
+
 
     getLast(): RecordedMove|null {
         return this.idMap[this.cursor] ?? null
