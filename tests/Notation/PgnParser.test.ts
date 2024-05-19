@@ -103,7 +103,6 @@ Deno.test('it handles game with alternative initial position', () => {
 
 })
 
-
 Deno.test('it handles puzzle with initial comment and no moves', () => {
 
     const parser = new PgnParser()
@@ -140,7 +139,43 @@ Deno.test('it handles puzzle with initial comment and no moves', () => {
 `,
         'serializes game as expected PGN file'
     )
+})
 
+Deno.test('it handles puzzle with uncommon NAG values', () => {
+
+    const parser = new PgnParser()
+
+    const inputString
+        = `[Event "Various Puzzles: Queen + Bishop 26"]
+[Result "*"]
+[FEN "3r4/1p2RQ1p/p5p1/2q5/3r2kP/6P1/PP3P2/5BK1 w - - 0 36"]
+
+36. Qf3+ $40 Kxf3 $7 37. Be2# *
+`
+    const game = parser.parse(inputString)
+
+    assertEquals(game.getMoveNavigator().getLast(), null, 'It sets game to start position')
+
+    assertEquals(game.getTag('Event'), 'Various Puzzles: Queen + Bishop 26', 'Sets Site tag')
+    assertEquals(game.getTag('Result'), '*', 'Sets Result tag')
+    assertEquals(game.getTag('FEN'), '3r4/1p2RQ1p/p5p1/2q5/3r2kP/6P1/PP3P2/5BK1 w - - 0 36', 'Sets FEN tag')
+
+    console.log(parser.serialize(game))
+
+    assertEquals(
+        parser.serialize(game),
+        `[Event "Various Puzzles: Queen + Bishop 26"]
+[Site "?"]
+[Round "1"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[FEN "3r4/1p2RQ1p/p5p1/2q5/3r2kP/6P1/PP3P2/5BK1 w - - 0 36"]
+
+36. Qf3+ $40 Kxf3 $7 37. Be2# *
+`,
+        'serializes game as expected PGN file'
+    )
 })
 
 

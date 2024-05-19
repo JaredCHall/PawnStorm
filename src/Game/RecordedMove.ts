@@ -1,16 +1,17 @@
 import {Move} from "./Move.ts";
 import {BitMove} from "../MoveGen/BitMove.ts";
 import {FenNumber} from "../Notation/FenNumber.ts";
+import {AnnotationGlyph} from "../Notation/AnnotationGlyph.ts";
 
 export type MoveAnnotation = '!'|'?'|'!!'|'!?'|'?!'|'??'
 
 export class RecordedMove extends Move {
-    get annotation(): MoveAnnotation|null {
+    get annotation(): AnnotationGlyph {
         return this._annotation;
     }
 
-    set annotation(value: MoveAnnotation|null) {
-        this._annotation = value;
+    set annotation(glyph: AnnotationGlyph|null) {
+        this._annotation = glyph ?? new AnnotationGlyph( 0);
     }
 
     get comment(): string|null {
@@ -27,7 +28,7 @@ export class RecordedMove extends Move {
 
     private next: RecordedMove|null = null
 
-    private _annotation: MoveAnnotation|null = null
+    private _annotation: AnnotationGlyph = new AnnotationGlyph(0) // null annotation
 
     private _comment: string|null = null
 
@@ -99,7 +100,7 @@ export class RecordedMove extends Move {
             serialized = this.moveCounter.toString()
                 + (this.getColor() == 'white' ? '.' : '...') + ' '
         }
-        return serialized + this.notation + (this.annotation ?? '')
+        return serialized + this.notation + this.annotation.serialize()
     }
 
 }

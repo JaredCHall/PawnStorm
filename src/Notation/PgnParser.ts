@@ -1,6 +1,7 @@
 import {Game} from "../Game/Game.ts";
 import {RecordedMove} from "../Game/RecordedMove.ts";
 import {PgnTagFormatter} from "./PgnTagFormatter.ts";
+import {AnnotationGlyph} from "./AnnotationGlyph.ts";
 
 export class PgnParser {
 
@@ -159,6 +160,17 @@ export class PgnParser {
                     token += char
                 }
 
+                // annotation glyph
+                if(token.charAt(0) == '$'){
+                    if(!lastMove){
+                        error('NAG value cannot appear before first move')
+                        return
+                    }
+                    lastMove.annotation = AnnotationGlyph.fromString(token)
+                    token = ''
+                    continue
+                }
+
                 const parts = token.match(/^([0-9]+\.+)?([^?!]+)([?!]{1,2})?$/)
 
                 if(!parts){
@@ -170,18 +182,19 @@ export class PgnParser {
                 const annotation = parts[3] ?? null
 
                 try{
-                    //console.log(moveNotation)
                     lastMove = game.makeMove(notation)
-                    // @ts-ignore - regex ensures type compliance
-                    lastMove.annotation = annotation
                 }catch (e){
-                    //console.log(new PgnParser().serializeMoves(game.getMoveNavigator().getMove(0)))
                     let msg = 'Unknown Error'
                     if(e instanceof Error){
                         msg = e.message
                     }
                     error(msg)
                 }
+
+                if(lastMove && annotation != null){
+                    lastMove.annotation = AnnotationGlyph.fromString(annotation)
+                }
+
 
                 token = ''
                 continue
