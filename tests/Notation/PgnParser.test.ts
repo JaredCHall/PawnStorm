@@ -34,6 +34,8 @@ Deno.test('it parses and re-serializes an opening study', () => {
     assertEquals(game.getTag('UTCTime'), '23:24:07', 'Sets UTCTime tag')
 
 
+    console.log(parser.serialize(game))
+
     assertEquals(
         parser.serialize(game),
         `[Event "Repertoire as White: Scandinavian Defense"]
@@ -51,6 +53,51 @@ Deno.test('it parses and re-serializes an opening study', () => {
 [Date "2024.05.19"]
 
 1. e4 d5 2. exd5 Qxd5 (2... Nf6!? 3. Be2 Nxd5 4. d4) (2... c6?! { Scandinavian Gambit. It's kind of like the Danish Gambit, but for Black. } 3. dxc6 Nxc6 4. Bc4 e5 5. d3 Nf6 6. Ne2 Bg4 7. Nbc3 Bc5 8. h3 Bh5 9. O-O) 3. Nf3 Bg4! { Played by masters. Black pins our knight to the queen. We will break the pin with the bishop then immediately go h3 to push the bishop back and prevent Qh5. } (3... e5?? 4. Nc3 Qa5 (4... Qe6 5. Bb5+ Nc6 6. O-O) 5. Bc4) (3... c5? 4. Nc3 Qd8 5. d4) (3... Nc6!? 4. Nc3 Qa5 5. d4) (3... Nf6! { Played by masters. } 4. d4 c6 5. c4) (3... Qe6+?? 4. Be2 Qg6 5. d4 Qxg2 6. Rg1) 4. Be2 Nc6 5. h3 Bh5 6. d4 O-O-O 7. c4 Qf5 8. g4
+`,
+        'serializes game as expected PGN file'
+    )
+
+})
+
+
+Deno.test('it parses and re-serializes a game starting from an alternative initial position', () => {
+
+    const parser = new PgnParser()
+
+    const inputString = `[Event "Mating Patterns #1: Balestra #4"]
+[Site "?"]
+[Date "????.??.??"]
+[White "Example 4"]
+[Result "*"]
+[FEN "1r1k1b1r/1bqn2p1/p3Q2p/1p2P3/8/4B1PP/PPP3P1/3RRBK1 w - - 0 21"]
+
+21. Rxd7+ (21. Bb6 Bc5+ 22. Bxc5 Qxc5+ 23. Kh2 Qe7) 21... Qxd7 22. Rd1 (22. Bb6+ Kc8) 22... Qxd1 23. Bb6# { 1-0 White wins by checkmate. } *
+
+`
+    const game = parser.parse(inputString)
+
+    assertEquals(game.getMoveNavigator().getLast(), null, 'It sets game to start position')
+
+    assertEquals(game.getTag('Site'), '?', 'Sets Site tag')
+    assertEquals(game.getTag('Date'), '????.??.??', 'Sets Result tag')
+    assertEquals(game.getTag('Result'), '1-0', 'Corrects Result tag')
+    assertEquals(game.getTag('White'), 'Example 4', 'Sets White tag')
+    assertEquals(game.getTag('FEN'), '1r1k1b1r/1bqn2p1/p3Q2p/1p2P3/8/4B1PP/PPP3P1/3RRBK1 w - - 0 21', 'Sets FEN tag')
+
+    console.log(parser.serialize(game))
+
+    assertEquals(
+        parser.serialize(game),
+        `[Event "Mating Patterns #1: Balestra #4"]
+[Site "?"]
+[Round "1"]
+[White "Example 4"]
+[Black "?"]
+[Date "????.??.??"]
+[Result "1-0"]
+[FEN "1r1k1b1r/1bqn2p1/p3Q2p/1p2P3/8/4B1PP/PPP3P1/3RRBK1 w - - 0 21"]
+
+21. Rxd7+ (21. Bb6 Bc5+ 22. Bxc5 Qxc5+ 23. Kh2 Qe7) 21... Qxd7 22. Rd1 (22. Bb6+ Kc8) 22... Qxd1 23. Bb6# { 1-0 White wins by checkmate. }
 `,
         'serializes game as expected PGN file'
     )

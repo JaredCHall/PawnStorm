@@ -12,6 +12,7 @@ import {GameStatus} from "./GameStatus.ts";
 import {FenNumber} from "../Notation/FenNumber.ts";
 import {RepetitionTracker} from "./RepetitionTracker.ts";
 import {PgnTagFormatter} from "../Notation/PgnTagFormatter.ts";
+import {dumpBin} from "../Utils.ts";
 
 export class Game {
 
@@ -27,7 +28,7 @@ export class Game {
 
     private readonly moveFactory = new MoveFactory();
 
-    private readonly moveNavigator: MoveNavigator
+    private moveNavigator: MoveNavigator
 
     private notationParser: ParserInterface = new AlgebraicNotationParser(this.moveFactory)
 
@@ -41,6 +42,7 @@ export class Game {
 
     setBoard(fenString: string): void {
         this.moveFactory.setFromFenNumber(fenString)
+        this.moveNavigator = new MoveNavigator(fenString)
     }
 
     getFenNotation(): FenNumber {
@@ -58,7 +60,7 @@ export class Game {
     gotoMove(moveId: number): void {
 
         if(moveId == -1){
-            this.moveNavigator.goto(moveId)
+            this.moveNavigator.goto(-1)
             this.moveFactory.setFromFenNumber(this.moveNavigator.startFen)
             this.repetitionTracker.buildFromMove(null)
             return
@@ -136,12 +138,8 @@ export class Game {
     getSquares(): (string|null)[] {
         const squares: (string|null)[] = []
         for(let i=0;i<64;i++){
-            const piece = this.moveFactory.squareList[this.moveFactory.square64Indexes[i]]
-            if(piece != 0){
-                squares[i] = null
-            }else{
-                squares[i] = FenPieceMap.fenByBitType[piece]
-            }
+            const piece = this.moveFactory.squareList[this.moveFactory.square120Indexes[i]]
+            squares[i] = piece == 0 ? null : FenPieceMap.fenByBitType[piece]
         }
         return squares
     }
