@@ -18,7 +18,7 @@ export class RecordedMove extends Move {
     }
 
     set comment(value: string|null) {
-        this._comment = value?.replace(/[}]/g,'') ?? null;
+        this._comment = value
     }
 
     private id: number = -1 // a sentinel value of sorts
