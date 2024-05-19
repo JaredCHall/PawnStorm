@@ -28,7 +28,7 @@ export class AlgebraicNotationParser implements ParserInterface{
             throw new Error(`"${notation}" is not valid algebraic notation.`)
         }
         const pieceType =  parts[1] ? FenPieceMap.bitTypeByFen[parts[1]] >> 1 : (sideToMove ? PieceType.BPawn : PieceType.Pawn)
-        const startFile = SquareNameMap.fileIndexes[parts[2]] || null
+        const startFile = SquareNameMap.fileIndexes[parts[2]] ?? null
         const startRank = parts[3] ? parseInt(parts[3]) - 1 : null
         const toSquare = SquareNameMap.indexByName[parts[5]]
         const promotionType = parts[7] ? parts[7].replace(/=/,'') : null

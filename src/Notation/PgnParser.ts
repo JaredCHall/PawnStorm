@@ -1,11 +1,14 @@
 import {Game} from "../Game/Game.ts";
 import {RecordedMove} from "../Game/RecordedMove.ts";
+import {PgnTagFormatter} from "./PgnTagFormatter.ts";
 
 export class PgnParser {
 
     parse(input: string): Game {
         const game = new Game()
         const lines = input.replace(/\r\n/g,'\n').split('\n')
+
+        let originalResultTag = null
 
         // parse game tags
         let foundLastHeader = false
@@ -16,6 +19,9 @@ export class PgnParser {
                 game.setTag(tagName, tagValue)
                 if(tagName == 'FEN'){
                     game.setBoard(tagValue)
+                }
+                if(tagName == 'Result'){
+                    originalResultTag = tagValue
                 }
             }
             if(!foundLastHeader && line === ''){
@@ -28,6 +34,9 @@ export class PgnParser {
 
         this.#parseMoveText(game, moveText)
         game.gotoMove(-1)
+
+        const result = originalResultTag ?? PgnTagFormatter.formatResult(game.getStatus())
+        game.setTag('Result', result)
 
         return game
     }
@@ -43,8 +52,7 @@ export class PgnParser {
         return [key, value]
     }
 
-    #parseMoveText(game: Game, moveText: string, depth: number = 0): void
-    {
+    #parseMoveText(game: Game, moveText: string, depth: number = 0): void {
         let lastMove: RecordedMove|null = game.getMoveNavigator().getLast()
         let content = moveText
         let contentRemaining = moveText
@@ -106,8 +114,7 @@ export class PgnParser {
         let token = ''
 
         do {
-            //console.log(`r: ${depth}, position: ${position}, remaining: ${contentRemaining}`)
-
+            //console.log(`r: ${depth}, position: ${position}, token: ${token} remaining: ${contentRemaining}`)
             char = seek(1)
             if(char === '{'){
                 const commentText = seekToCommentEnd()
@@ -138,11 +145,12 @@ export class PgnParser {
 
                 // end on result type tokens
                 if(token === '*' || token === '1-0' || token === '0-1' || token === '1/2-1/2'){
+                    game.setTag('Result', token)
                     break;
                 }
 
                 // filter out move counters, ex: '1.' '12...'
-                if(token.match(/[0-9]+\./)){
+                if(token.match(/^[0-9]+\.+$/)){
                     token = ''
                     continue;
                 }
@@ -151,16 +159,15 @@ export class PgnParser {
                     token += char
                 }
 
-                const parts = token.match(/^([^?!]+)([?!]{1,2})?$/)
+                const parts = token.match(/^([0-9]+\.+)?([^?!]+)([?!]{1,2})?$/)
 
                 if(!parts){
                     error(`Unrecognized token: ` + token)
                     return
                 }
 
-                const notation = parts[1]
-                const annotation = parts[2] ?? null
-
+                const notation = parts[2]
+                const annotation = parts[3] ?? null
 
                 try{
                     //console.log(moveNotation)
@@ -168,14 +175,13 @@ export class PgnParser {
                     // @ts-ignore - regex ensures type compliance
                     lastMove.annotation = annotation
                 }catch (e){
-                    console.log(new PgnParser().serializeMoves(game.getMoveNavigator().getMove(0)))
+                    //console.log(new PgnParser().serializeMoves(game.getMoveNavigator().getMove(0)))
                     let msg = 'Unknown Error'
                     if(e instanceof Error){
                         msg = e.message
                     }
                     error(msg)
                 }
-
 
                 token = ''
                 continue
@@ -197,14 +203,13 @@ export class PgnParser {
 
         serialized += '\n'
         serialized += this.serializeMoves(game.getMoveNavigator().getMove(0))
+        serialized += ' ' + game.getTag('Result') ?? PgnTagFormatter.formatResult(game.getStatus())
         serialized += '\n'
 
         return serialized
     }
 
-
-    serializeMoves(firstMove: RecordedMove): string
-    {
+    serializeMoves(firstMove: RecordedMove): string {
         const renderLine = (move: RecordedMove|null): string => {
             let outLine = ''
             let isFirst = true

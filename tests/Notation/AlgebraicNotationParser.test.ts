@@ -75,9 +75,12 @@ Deno.test('it handles invalid moves', () => {
 })
 
 Deno.test('it handles ambiguous moves', () => {
-    const parser = getParser('R7/8/6N1/2B1B3/8/8/4N1N1/R7 w - - 0 1')
+    let parser: AlgebraicNotationParser
     let move
 
+
+
+    parser = getParser('R7/8/6N1/2B1B3/8/8/4N1N1/R7 w - - 0 1')
     // errors when knight move is ambiguous
     assertThrows(
         () => {parser.parse('Ra5')},
@@ -104,7 +107,7 @@ Deno.test('it handles ambiguous moves', () => {
     move = parser.parse('Bed4')
     assertEquals(move, new BitMove(Square.e5,Square.d4, Piece.WhiteBishop, 0,0))
 
-    // errors when knight mvoe is ambiguous
+    // errors when knight move is ambiguous
     assertThrows(
         () => {parser.parse('Nf4')},
         Error,'"Nf4" is ambiguous.',
@@ -120,6 +123,11 @@ Deno.test('it handles ambiguous moves', () => {
     // correct knight move
     move = parser.parse('Ng2f4')
     assertEquals(move, new BitMove(Square.g2,Square.f4, Piece.WhiteKnight, 0,0))
+
+    // edge-case revealed in testing
+    parser  = getParser('r2qrbk1/1pp2ppp/2n5/p2bp3/Q7/P2PBNP1/1PR1PPBP/R5K1 w - - 5 15')
+    move = parser.parse('Rac1')
+    assertEquals(move, new BitMove(Square.a1,Square.c1, Piece.WhiteRook, 0,0))
 
 })
 

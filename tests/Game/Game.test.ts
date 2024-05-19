@@ -140,7 +140,7 @@ Deno.test('it plays the opera game', () => {
 [Date "1900.??.??"]
 [Result "1-0"]
 
-1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8#
+1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8# 1-0
 `)
 
     console.log(serialized)
@@ -361,4 +361,29 @@ Deno.test('it handles draw by three fold repetition after switching to new line'
     assertEquals(game.isCheck(), false)
     assertEquals(game.isMate(), false)
     assertEquals(game.isDraw(), true)
+})
+
+Deno.test('it loads new game from Pgn File Content', () => {
+    const game = Game.load(`[Event "Monte Carlo"]
+[Site "Monte Carlo MNC"]
+[Date "1968.04.10"]
+[EventDate "1968.04.03"]
+[Round "7"]
+[Result "1-0"]
+[White "Mikhail Botvinnik"]
+[Black "Lajos Portisch"]
+[ECO "A22"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "51"]
+
+1.c4 e5 2.Nc3 Nf6 3.g3 d5 4.cxd5 Nxd5 5.Bg2 Be6 6.Nf3 Nc6
+7.O-O Nb6 8.d3 Be7 9.a3 a5 10.Be3 O-O 11.Na4 Nxa4 12.Qxa4 Bd5
+13.Rfc1 Re8 14.Rc2 Bf8 15.Rac1 Nb8 16.Rxc7 Bc6 17.R1xc6 bxc6
+18.Rxf7 h6 19.Rb7 Qc8 20.Qc4+ Kh8 21.Nh4 Qxb7 22.Ng6+ Kh7
+23.Be4 Bd6 24.Nxe5 g6 25.Bxg6+ Kg7 26.Bxh6+ 1-0`)
+
+    game.gotoMove(50)
+    game.render()
+
 })

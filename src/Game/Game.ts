@@ -13,6 +13,7 @@ import {FenNumber} from "../Notation/FenNumber.ts";
 import {RepetitionTracker} from "./RepetitionTracker.ts";
 import {PgnTagFormatter} from "../Notation/PgnTagFormatter.ts";
 import {dumpBin} from "../Utils.ts";
+import {PgnParser} from "../Notation/PgnParser.ts";
 
 export class Game {
 
@@ -38,6 +39,11 @@ export class Game {
         fen ??= 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
         this.setBoard(fen)
         this.moveNavigator = new MoveNavigator(fen)
+    }
+
+    static load(pgnFileContent: string): Game
+    {
+        return new PgnParser().parse(pgnFileContent)
     }
 
     setBoard(fenString: string): void {
