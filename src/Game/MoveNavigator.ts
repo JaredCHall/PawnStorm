@@ -1,4 +1,5 @@
 import {RecordedMove} from "./RecordedMove.ts";
+import {PgnParser} from "../Notation/PgnParser.ts";
 
 /**
  *  MoveNavigator
@@ -107,25 +108,7 @@ export class MoveNavigator {
         if(this.moves.length == 0){
             return ''
         }
-
-        const renderLine = (move: RecordedMove|null): string => {
-            let outLine = ''
-            let isFirst = true
-            let prevHadChild = false
-            while(move != null){
-                const includeMoveCounter = isFirst || prevHadChild || move.color == 'white'
-                isFirst = false
-                prevHadChild = false
-                outLine += move.serialize(includeMoveCounter) + ' '
-                move.getChildren().forEach((move: RecordedMove) => {
-                    prevHadChild = true
-                    outLine += '(' + renderLine(move) + ') '
-                })
-                move = move.getNext()
-            }
-            return outLine.trimEnd()
-        }
-        return renderLine(this.getMove(0))
+        return (new PgnParser()).serializeMoves(this)
     }
 
     #removeMainLineMove(move: RecordedMove): void {

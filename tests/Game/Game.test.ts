@@ -5,7 +5,7 @@ import {BitMove} from "../../src/MoveGen/BitMove.ts";
 import {Square} from "../../src/Board/Square.ts";
 import { Piece } from "BitChess/Board/Piece.ts";
 import {assertThrows} from "https://deno.land/std@0.219.0/assert/assert_throws.ts";
-import {PgnFile} from "../../src/Notation/PgnFile.ts";
+import {PgnParser} from "../../src/Notation/PgnParser.ts";
 
 Deno.test('it starts a new game', () => {
 
@@ -134,8 +134,8 @@ Deno.test('it plays the opera game', () => {
     assertEquals(game.isDraw(), false)
 
 
-    const file = PgnFile.fromGame(game)
-    assertEquals(file.serialize(), `[Event "Casual Game"]
+    const serialized = (new PgnParser).serialize(game)
+    assertEquals(serialized, `[Event "Casual Game"]
 [Site "Opera House"]
 [Round "1"]
 [White "Morphy, Paul"]
@@ -146,7 +146,7 @@ Deno.test('it plays the opera game', () => {
 1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8#
 `)
 
-    console.log(file.serialize())
+    console.log(serialized)
 
 })
 
