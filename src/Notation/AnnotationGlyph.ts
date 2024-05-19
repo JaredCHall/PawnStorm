@@ -1,7 +1,7 @@
 export class AnnotationGlyph {
 
 
-    constructor(public readonly value: number = 0) {
+    constructor(public readonly value: number) {
     }
 
     static fromString(input: string): AnnotationGlyph {
