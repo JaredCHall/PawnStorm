@@ -9,7 +9,7 @@ File                                        | Branch % | Line % |
  [0m[32mGame/GameStatus.ts                        [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mGame/Move.ts                              [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mGame/MoveNavigator.ts                     [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mGame/RecordedMove.ts                      [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
+ [0m[32mGame/RecordedMove.ts                      [0m | [0m[32m   100.0[0m | [0m[32m  92.3[0m |
  [0m[32mGame/RepetitionTracker.ts                 [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mMoveGen/BitMove.ts                        [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mMoveGen/CastlingMove.ts                   [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
@@ -18,11 +18,11 @@ File                                        | Branch % | Line % |
  [0m[32mNotation/FenNumber.ts                     [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mNotation/Moves/AlgebraicNotationParser.ts [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mNotation/Moves/CoordinateNotationParser.ts[0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mNotation/PgnFile.ts                       [0m | [0m[32m   100.0[0m | [0m[32m  93.8[0m |
+ [0m[33mNotation/PgnParser.ts                     [0m | [0m[32m    90.9[0m | [0m[33m  62.6[0m |
  [0m[32mPerft/PerftCounter.ts                     [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mPerft/PerftPosition.ts                    [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mPerft/PerftRunner.ts                      [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[33mUtils.ts                                  [0m | [0m[32m   100.0[0m | [0m[33m  50.0[0m |
 -----------------------------------------------------------------
- [0m[32mAll files                                 [0m | [0m[32m    99.1[0m | [0m[32m  98.3[0m |
+ [0m[32mAll files                                 [0m | [0m[32m    98.9[0m | [0m[32m  96.2[0m |
 -----------------------------------------------------------------
