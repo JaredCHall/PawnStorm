@@ -11,7 +11,7 @@ import {CoordinateNotationParser} from "../Notation/Moves/CoordinateNotationPars
 import {GameStatus} from "./GameStatus.ts";
 import {FenNumber} from "../Notation/FenNumber.ts";
 import {RepetitionTracker} from "./RepetitionTracker.ts";
-import {PgnParser} from "../Notation/PgnParser.ts";
+import {PgnTagFormatter} from "../Notation/PgnTagFormatter.ts";
 
 export class Game {
 
@@ -101,7 +101,7 @@ export class Game {
         // game officially starts on first move
         if(moveCounter == 1 && this.getSideToMove() == 'white'){
             if(!this.getTag('Date')){
-                this.setTag('Date', PgnParser.formatDateTag(new Date()))
+                this.setTag('Date', PgnTagFormatter.formatDate(new Date()))
             }
         }
 
@@ -116,7 +116,7 @@ export class Game {
         this.moveNavigator.addMove(recordedMove)
         this.repetitionTracker.addMove(recordedMove)
         this.#updateGameTermination(recordedMove)
-        this.setTag('Result', PgnParser.formatResultTag(this.gameStatus))
+        this.setTag('Result', PgnTagFormatter.formatResult(this.gameStatus))
 
         return recordedMove
     }

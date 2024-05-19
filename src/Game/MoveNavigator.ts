@@ -1,5 +1,4 @@
 import {RecordedMove} from "./RecordedMove.ts";
-import {PgnParser} from "../Notation/PgnParser.ts";
 
 /**
  *  MoveNavigator

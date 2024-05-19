@@ -1,17 +1,11 @@
 import {Game} from "../Game/Game.ts";
-import {GameStatus} from "../Game/GameStatus.ts";
 import {RecordedMove} from "../Game/RecordedMove.ts";
-import {MoveNavigator} from "../Game/MoveNavigator.ts";
-import {Move} from "../Game/Move.ts";
 
 export class PgnParser {
 
-
     parse(input: string): Game {
-        const lines = input.replace(/\r\n/g,'\n').split('\n')
-
         const game = new Game()
-
+        const lines = input.replace(/\r\n/g,'\n').split('\n')
 
         // parse game tags
         let foundLastHeader = false
@@ -233,31 +227,4 @@ export class PgnParser {
         }
         return renderLine(firstMove)
     }
-
-    static formatDateTag(date: Date): string {
-        const pad2 = (val: number) => {
-            return val.toString().padStart(2, '0')
-        }
-
-        const yyyy = date.getUTCFullYear()
-        // increment month since index starts at zero for january
-        const mm = pad2(date.getUTCMonth() + 1)
-        const dd = pad2(date.getUTCDate())
-
-        return `${yyyy}.${mm}.${dd}`
-    }
-
-    static formatResultTag(status: GameStatus): string {
-        if(status.winner == 'white'){
-            return '1-0'
-        }
-        if(status.winner == 'black'){
-            return '0-1'
-        }
-        if(status.terminationType != 'unterminated'){
-            return '1/2-1/2'
-        }
-        return '*'
-    }
-
 }
