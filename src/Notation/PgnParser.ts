@@ -7,7 +7,7 @@ export class PgnParser {
 
 
     parse(input: string): Game {
-        const lines = input.replace('\r\n','\n').split('\n')
+        const lines = input.replace(/\r\n/g,'\n').split('\n')
 
         const game = new Game()
         let foundLastHeader = false
@@ -33,6 +33,16 @@ export class PgnParser {
 
     }
 
+    parseTag(line: string): [string, string] {
+        const parts = line.match(/^\[([a-zA-Z0-9]+)\s["']([^"']+)["']]$/)
+        if(parts === null){
+            throw new Error("Could not parse header line: "+line)
+        }
+        const key = parts[1] ?? null
+        const value = parts[2] ?? null
+
+        return [key, value]
+    }
 
     serialize(game: Game): string {
 
@@ -45,14 +55,14 @@ export class PgnParser {
         }
 
         serialized += '\n'
-        serialized += this.serializeMoves(game.getMoveNavigator())
+        serialized += this.serializeMoves(game.getMoveNavigator().getMove(0))
         serialized += '\n'
 
         return serialized
     }
 
 
-    serializeMoves(moveNavigator: MoveNavigator): string
+    serializeMoves(firstMove: RecordedMove): string
     {
         const renderLine = (move: RecordedMove|null): string => {
             let outLine = ''
@@ -63,6 +73,9 @@ export class PgnParser {
                 isFirst = false
                 prevHadChild = false
                 outLine += move.serialize(includeMoveCounter) + ' '
+                if(move.comment){
+                    outLine += '{' + move.comment + '}'
+                }
                 move.getChildren().forEach((move: RecordedMove) => {
                     prevHadChild = true
                     outLine += '(' + renderLine(move) + ') '
@@ -71,20 +84,11 @@ export class PgnParser {
             }
             return outLine.trimEnd()
         }
-        return renderLine(moveNavigator.getMove(0))
+        return renderLine(firstMove)
     }
 
 
-    parseTag(line: string): [string, string] {
-        const parts = line.match(/^\[([a-zA-Z0-9]+)\s["']([^"']+)["']]$/)
-        if(parts === null){
-            throw new Error("Could not parse header line: "+line)
-        }
-        const key = parts[1] ?? null
-        const value = parts[2] ?? null
 
-        return [key, value]
-    }
 
     static formatDateTag(date: Date): string {
         const pad2 = (val: number) => {

@@ -2,7 +2,24 @@ import {Move} from "./Move.ts";
 import {BitMove} from "../MoveGen/BitMove.ts";
 import {FenNumber} from "../Notation/FenNumber.ts";
 
+export type MoveAnnotation = '!'|'?'|'!!'|'!?'|'?!'|'??'
+
 export class RecordedMove extends Move {
+    get annotation(): MoveAnnotation|null {
+        return this._annotation;
+    }
+
+    set annotation(value: MoveAnnotation|null) {
+        this._annotation = value;
+    }
+
+    get comment(): string|null {
+        return this._comment;
+    }
+
+    set comment(value: string|null) {
+        this._comment = value?.replace(/[}]/g,'') ?? null;
+    }
 
     private id: number = -1 // a sentinel value of sorts
 
@@ -10,9 +27,9 @@ export class RecordedMove extends Move {
 
     private next: RecordedMove|null = null
 
-    private annotation: number|null = null
+    private _annotation: MoveAnnotation|null = null
 
-    private comment: string|null = null
+    private _comment: string|null = null
 
     readonly bitMove: BitMove
 
@@ -82,7 +99,7 @@ export class RecordedMove extends Move {
             serialized = this.moveCounter.toString()
                 + (this.getColor() == 'white' ? '.' : '...') + ' '
         }
-        return serialized + this.notation
+        return serialized + this.notation + (this.annotation ?? '')
     }
 
 }

@@ -7,6 +7,11 @@ import { Piece } from "BitChess/Board/Piece.ts";
 import {assertThrows} from "https://deno.land/std@0.219.0/assert/assert_throws.ts";
 import {PgnParser} from "../../src/Notation/PgnParser.ts";
 
+const assertSerializesMovesAs = (game: Game, expected: string): void =>  {
+    assertEquals((new PgnParser()).serializeMoves(game.getMoveNavigator().getMove(0)), expected)
+}
+
+
 Deno.test('it starts a new game', () => {
 
     const game = new Game()
@@ -42,20 +47,15 @@ Deno.test('it goes to previous move and makes a variation', () => {
     game.makeMove('Nf3') // much better
     game.makeMove('d5')
 
-    assertEquals(
-        game.getMoveNavigator().serialize(),
-        '1. e4 e5 2. Ke2 (2. Nf3 d5) 2... Ke7'
-    )
+    assertSerializesMovesAs(game, '1. e4 e5 2. Ke2 (2. Nf3 d5) 2... Ke7')
 
     // what if we tried d4 instead?
     game.gotoMove(-1)
     game.makeMove('d4')
-    assertEquals(game.getMoveNavigator().serialize(), '1. e4 (1. d4) 1... e5 2. Ke2 (2. Nf3 d5) 2... Ke7')
+    assertSerializesMovesAs(game, '1. e4 (1. d4) 1... e5 2. Ke2 (2. Nf3 d5) 2... Ke7')
 
-
-    // test a couple throws
+    // test invalid move
     assertThrows(() => {game.gotoMove(99)},Error, 'Could not find','throws on invalid move id')
-
 
 })
 
@@ -120,10 +120,7 @@ Deno.test('it plays the opera game', () => {
 
     game.render()
 
-    assertEquals(
-        game.getMoveNavigator().serialize(),
-        '1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8#'
-    )
+    assertSerializesMovesAs(game, '1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8#')
 
     // sets game termination?
     assertEquals(game.getStatus().terminationType, 'normal')
@@ -169,10 +166,7 @@ Deno.test('it plays the opera game in coordinate notation', () => {
 
     game.render()
 
-    assertEquals(
-        game.getMoveNavigator().serialize(),
-        '1. e2e4 e7e5 2. g1f3 d7d6 3. d2d4 c8g4'
-    )
+    assertSerializesMovesAs(game, '1. e2e4 e7e5 2. g1f3 d7d6 3. d2d4 c8g4')
 
     assertEquals(game.getStatus().terminationType, 'unterminated')
     assertEquals(game.getStatus().winner, null)
@@ -180,9 +174,6 @@ Deno.test('it plays the opera game in coordinate notation', () => {
     assertEquals(game.isCheck(), false)
     assertEquals(game.isMate(), false)
     assertEquals(game.isDraw(), false)
-
-    console.log(game.getMoveNavigator().serialize())
-
 })
 
 Deno.test('it gets candidate moves', () => {
@@ -238,7 +229,6 @@ Deno.test('it handles undo moves', () => {
         game.getFenNotation().serialize(),
         'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2'
     )
-
 })
 
 Deno.test('it handles resignation', () => {

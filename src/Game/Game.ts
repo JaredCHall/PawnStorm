@@ -58,14 +58,14 @@ export class Game {
     gotoMove(moveId: number): void {
 
         if(moveId == -1){
-            this.moveNavigator.setCursor(moveId)
+            this.moveNavigator.goto(moveId)
             this.moveFactory.setFromFenNumber(this.moveNavigator.startFen)
             this.repetitionTracker.buildFromMove(null)
             return
         }
 
         const move = this.moveNavigator.getMove(moveId)
-        this.moveNavigator.setCursor(moveId)
+        this.moveNavigator.goto(moveId)
         this.repetitionTracker.buildFromMove(move)
         this.moveFactory.setFromFenNumber(move.fen.serialize())
     }

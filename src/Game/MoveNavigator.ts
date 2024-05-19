@@ -57,6 +57,7 @@ export class MoveNavigator {
     deleteFrom(id: number): void {
         const move = this.getMove(id)
         const parent = move.getParent()
+        const prev = move.getPrev()
 
         const getDescendantIds = (startMove: RecordedMove): number[] => {
             let current: RecordedMove | null = startMove;
@@ -82,11 +83,16 @@ export class MoveNavigator {
             parent.removeChild(move)
             return
         }else{
-            move.getPrev()?.setNext(null)
+            prev?.setNext(null)
+        }
+
+        // if cursor is part of the deleted line, set it to something else
+        if(!this.idMap[this.cursor]){
+            this.cursor = prev?.getId() ?? -1
         }
     }
 
-    setCursor(id: number): void {
+    goto(id: number): void {
         if(id == -1){
             this.cursor = -1
             return
@@ -102,13 +108,6 @@ export class MoveNavigator {
             throw new Error(`Could not find move with id ${id}. Move does not exist.`)
         }
         return move
-    }
-
-    serialize(): string {
-        if(this.moves.length == 0){
-            return ''
-        }
-        return (new PgnParser()).serializeMoves(this)
     }
 
     #removeMainLineMove(move: RecordedMove): void {
