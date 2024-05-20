@@ -7,33 +7,40 @@ export class PgnParser {
 
     parse(input: string): Game {
         const game = new Game()
-        const lines = input.replace(/\r\n/g,'\n').split('\n')
+        const lines = input.replace(/\r\n/g,'\n').trim().split('\n')
 
         let originalResultTag = null
 
         // parse game tags
-        let foundLastHeader = false
+        let foundLastHeader = lines[0].charAt(0) != '['
         let moveText = ''
         lines.forEach((line: string) => {
-            if(line.charAt(0) === '['){
-                const [tagName,tagValue] = this.#parseTag(line)
-                game.setTag(tagName, tagValue)
-                if(tagName == 'FEN'){
-                    game.setBoard(tagValue)
+
+            if(foundLastHeader){
+                if(line !== ''){
+                    moveText += line + " "
                 }
-                if(tagName == 'Result'){
-                    originalResultTag = tagValue
-                }
-            }
-            if(!foundLastHeader && line === ''){
+                return
+            }else if(line === ''){
                 foundLastHeader = true
+                return
             }
-            if(foundLastHeader && line !== ''){
-                moveText += line + " "
+
+            if(line.charAt(0) != '['){
+                throw new Error(`Game tag line must start with the "[" character. Could not parse: ${line} `)
+            }
+
+            const [tagName,tagValue] = this.#parseTag(line)
+            game.setTag(tagName, tagValue)
+            if(tagName == 'FEN'){
+                game.setBoard(tagValue)
+            }
+            if(tagName == 'Result'){
+                originalResultTag = tagValue
             }
         })
 
-        this.#parseMoveText(game, moveText)
+        this.#parseMoveText(game, moveText.trim())
         game.gotoMove(-1)
 
         const result = originalResultTag ?? PgnTagFormatter.formatResult(game.getStatus())
@@ -45,7 +52,7 @@ export class PgnParser {
     #parseTag(line: string): [string, string] {
         const parts = line.match(/^\[([a-zA-Z0-9]+)\s["']([^"']+)["']]$/)
         if(parts === null){
-            throw new Error("Could not parse header line: "+line)
+            throw new Error("Could not parse game tag: "+line)
         }
         const key = parts[1] ?? null
         const value = parts[2] ?? null
@@ -65,10 +72,6 @@ export class PgnParser {
         }
 
         const seek = (len: number): string => {
-            if(contentRemaining.length < len){
-                error('reached EOF. Cannot seek.')
-            }
-
             content = contentRemaining.substring(0, len)
             contentRemaining = contentRemaining.substring(len)
             position += len
@@ -115,7 +118,7 @@ export class PgnParser {
         let token = ''
 
         do {
-            //console.log(`r: ${depth}, position: ${position}, token: ${token} remaining: ${contentRemaining}`)
+           // console.log(`r: ${depth}, position: ${position}, token: ${token} remaining: ${contentRemaining}`)
             char = seek(1)
             if(char === '{'){
                 const commentText = seekToCommentEnd()
@@ -144,6 +147,10 @@ export class PgnParser {
                     continue
                 }
 
+                if(contentRemaining.length === 0){
+                    token += char
+                }
+
                 // end on result type tokens
                 if(token === '*' || token === '1-0' || token === '0-1' || token === '1/2-1/2'){
                     game.setTag('Result', token)
@@ -154,10 +161,6 @@ export class PgnParser {
                 if(token.match(/^[0-9]+\.+$/)){
                     token = ''
                     continue;
-                }
-
-                if(contentRemaining.length === 0){
-                    token += char
                 }
 
                 // annotation glyph
@@ -181,20 +184,11 @@ export class PgnParser {
                 const notation = parts[2]
                 const annotation = parts[3] ?? null
 
-                try{
-                    lastMove = game.makeMove(notation)
-                }catch (e){
-                    let msg = 'Unknown Error'
-                    if(e instanceof Error){
-                        msg = e.message
-                    }
-                    error(msg)
-                }
+                lastMove = game.makeMove(notation)
 
                 if(lastMove && annotation != null){
                     lastMove.annotation = AnnotationGlyph.fromString(annotation)
                 }
-
 
                 token = ''
                 continue
