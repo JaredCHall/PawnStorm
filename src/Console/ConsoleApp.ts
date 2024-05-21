@@ -16,10 +16,10 @@ export class ConsoleApp {
             return this.#sayGoodbye()
         }
 
-        const continues = this.#selectNotationType()
-        if(!continues){
-            return this.#sayGoodbye()
-        }
+        // const continues = this.#selectNotationType()
+        // if(!continues){
+        //     return this.#sayGoodbye()
+        // }
 
         console.log(`Good luck!`)
 
