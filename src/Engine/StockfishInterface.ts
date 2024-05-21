@@ -17,9 +17,9 @@ export class StockfishInterface implements EngineInterface{
 
     async close()
     {
+        await this.writeCommand('quit')
         await this.process.stdin.close()
         await this.process.stdout.cancel()
-        this.process.kill()
         await this.process.status
     }
 
