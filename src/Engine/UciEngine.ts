@@ -46,7 +46,7 @@ export class UciEngine
         await writer.write(new TextEncoder().encode(command + '\n'))
         writer.releaseLock()
     }
-    async readResponse(expected: string): Promise<string> {
+    async readResponse(regex: RegExp, firstMatchOnly: boolean = false): Promise<string> {
 
         let decoded = ''
         let output
@@ -54,6 +54,9 @@ export class UciEngine
         const reader = this.process.stdout.getReader()
         const decoder = new TextDecoder();
 
+        const lines: Array<string> = []
+
+        readLoop:
         while(true){
             output = await this.timeoutPromise(reader.read(), 500)
             if(output.done){
@@ -61,27 +64,27 @@ export class UciEngine
             }
             const chunk = decoder.decode(output.value);
             decoded += chunk
-            if(decoded.includes(expected)) break;
-        }
 
+            const decodedLines = decoded.trim().split('\n')
+            for(const i in decodedLines){
+                lines.push(decodedLines[i]);
+                if(decodedLines[i].match(regex) !== null){
+                    break readLoop;
+                }
+
+            }
+        }
         reader.releaseLock()
+
+        if(firstMatchOnly){
+            const parts = lines.pop()?.match(regex)
+            if(!parts){
+                throw new UciUnexpectedOutputError(decoded, regex)
+            }
+
+            return parts[1]
+        }
 
         return decoded
     }
-
-    async readValueFromExpectedLine(expected: string, regex: RegExp): Promise<string> {
-        const response = await this.readResponse(expected)
-        const lastLine = response.trim().split('\n').pop()
-        if(!lastLine){
-            throw new UciUnexpectedOutputError(response, regex)
-        }
-
-        const parts = lastLine.match(regex)
-        if(!parts){
-            throw new UciUnexpectedOutputError(response, regex)
-        }
-
-        return parts[1]
-    }
-
 }

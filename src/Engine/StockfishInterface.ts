@@ -9,10 +9,8 @@ export class StockfishInterface extends UciEngine implements EngineInterface {
 
     async isReady(): Promise<boolean> {
         await this.writeCommand('isready')
-
-        const response = await this.readResponse('readyok')
-
-        return response.includes('readyok')
+        await this.readResponse(/^(readyok)/, true)
+        return true
     }
 
     async setFen(fen: string): Promise<void> {
@@ -22,19 +20,16 @@ export class StockfishInterface extends UciEngine implements EngineInterface {
 
     async getBestMove(): Promise<string> {
         await this.writeCommand('go depth 6')
-
-        return await this.readValueFromExpectedLine('bestmove ', /^bestmove\s+([a-h0-8=NBRQ]+)/)
+        return await this.readResponse(/^bestmove\s+([a-h0-8=NBRQ]+)/, true)
     }
 
     async getEval(): Promise<number> {
         await this.writeCommand('eval')
-        const evalValue = await this.readValueFromExpectedLine('Final evaluation', /^Final evaluation\s+([-+][0-9.]+)/)
-        return parseFloat(evalValue)
+        return parseFloat(await this.readResponse(/^Final evaluation\s+([-+][0-9.]+)/, true))
     }
 
     async perft(depth: number): Promise<number> {
         await this.writeCommand('go perft ' + depth)
-        const response = await this.readValueFromExpectedLine('Nodes searched: ',/^Nodes searched:\s+([0-9]+)/)
-        return parseInt(response)
+        return parseInt(await this.readResponse(/^Nodes searched:\s+([0-9]+)/, true))
     }
 }

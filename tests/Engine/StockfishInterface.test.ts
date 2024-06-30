@@ -28,10 +28,6 @@ Deno.test('it runs perft for a position', async () => {
 
     assertEquals(await stockfish.isReady(), true)
     const perftNodes = await stockfish.perft(5)
-
-    assertEquals(perftNodes, 4865909, 'Calculates perft5 correct')
-
-    console.log(perftNodes)
-
+    assertEquals(perftNodes, 4865609, 'Calculates perft5 correct')
     await stockfish.close()
 })
