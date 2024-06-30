@@ -1,38 +1,70 @@
 import {MoveFactory} from "../MoveGen/MoveFactory.ts";
-import {PerftCounter} from "./PerftCounter.ts";
+import {DetailedCounter} from "./Counters/DetailedCounter.ts";
 import {BitMove} from "../MoveGen/BitMove.ts";
+import {CounterInterface} from "./Counters/CounterInterface.ts";
+import {NodeCounter} from "./Counters/NodeCounter.ts";
 export class PerftRunner {
 
     factory: MoveFactory
-    counter: PerftCounter
+    counter: CounterInterface
     runTime: number = 0// milliseconds
+    rootCounters: Record<string, CounterInterface> = {}
+    readonly startFen: string
+    readonly nodesOnly: boolean
 
-    constructor(startFen: string) {
+    constructor(startFen: string, nodesOnly: boolean = false) {
+        this.startFen = startFen
+        this.nodesOnly = nodesOnly
         this.factory = new MoveFactory()
         this.factory.setFromFenNumber(startFen)
-        this.counter = new PerftCounter()
+        this.counter = this.newCounter()
     }
 
-    run(depth: number=0): PerftCounter
+    getRootNodeCounts(): Record<string, number> {
+        const mappedCounters: Record<string, number> = {}
+        for(const i in this.rootCounters) {
+            mappedCounters[i] = this.rootCounters[i].nodes
+        }
+        return mappedCounters
+    }
+
+    newCounter(): CounterInterface {
+        return this.nodesOnly ? new NodeCounter() : new DetailedCounter()
+    }
+
+    run(depth: number=0): CounterInterface
     {
         const start = (new Date()).getTime()
-        this.perft(depth)
+
+        const n_moves = this.factory.getLegalMoves()
+        n_moves.forEach((move: BitMove) => {
+            const rootCounter = this.newCounter()
+            this.rootCounters[move.serialize()] = rootCounter
+            this.factory.makeMove(move)
+            this.perft(depth - 1, rootCounter, move)
+            this.factory.unmakeMove(move)
+        })
         this.runTime = new Date().getTime() - start
 
-        return this.counter
+        let counter: CounterInterface = this.newCounter()
+        for(const i in this.rootCounters) {
+            counter = counter.merge(this.rootCounters[i])
+        }
+        this.counter = counter
+
+        return counter
     }
 
-    perft(depth: number = 0, lastMove: null|BitMove = null): void
+    perft(depth: number = 0, counter: CounterInterface, lastMove: null|BitMove = null): void
     {
         if(depth == 0 && lastMove){
-            this.counter.update(lastMove)
+            counter.update(lastMove)
             return
         }
         const n_moves = this.factory.getLegalMoves()
-
         n_moves.forEach((move: BitMove) => {
             this.factory.makeMove(move)
-            this.perft(depth -1, move)
+            this.perft(depth -1, counter, move)
             this.factory.unmakeMove(move)
         })
 

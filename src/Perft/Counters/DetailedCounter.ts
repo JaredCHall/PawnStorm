@@ -1,6 +1,7 @@
-import {BitMove, MoveFlag} from "../MoveGen/BitMove.ts";
+import {BitMove, MoveFlag} from "../../MoveGen/BitMove.ts";
+import {CounterInterface} from "./CounterInterface.ts";
 
-export class PerftCounter {
+export class DetailedCounter implements CounterInterface{
     nodes: number
     captures: number
     passants: number
@@ -50,5 +51,17 @@ export class PerftCounter {
                 this.checkMates++
             }
         }
+    }
+
+    merge(counter: DetailedCounter): DetailedCounter {
+        const newCounter = new DetailedCounter()
+        newCounter.nodes = this.nodes + counter.nodes
+        newCounter.captures = this.captures + counter.captures
+        newCounter.passants = this.passants + counter.passants
+        newCounter.castles = this.castles + counter.castles
+        newCounter.promotions = this.promotions + counter.promotions
+        newCounter.checks = this.checks + counter.checks
+        newCounter.checkMates = this.checkMates + counter.checkMates
+        return newCounter
     }
 }
