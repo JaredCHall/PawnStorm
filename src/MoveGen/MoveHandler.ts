@@ -193,7 +193,9 @@ export class MoveHandler extends Board
             this.#revokeCastleRightsOnRookCapture(movingColor, move.captured, move.to)
         }else{
             this.squareList[move.to] = move.moving
-            this.squareList[this.state.enPassantTarget] = 0
+            if(this.state.enPassantTarget != 0){
+                this.squareList[this.state.enPassantTarget] = 0
+            }
             this.state.enPassantTarget = 0
         }
     }

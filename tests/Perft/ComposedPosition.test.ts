@@ -4,8 +4,7 @@ import {PerftPosition} from "../../src/Perft/PerftPosition.ts";
 
 const position = PerftPosition.composedPosition()
 
-// TODO: over counting nodes at depth 5, should debug with a smarter engine
-const maxDepth = 4
+const maxDepth = 5
 for(let depth=1;depth <= maxDepth; depth++){
     Deno.test(`it passes composed position: ${depth}`, () => {
         const runner = new PerftRunner(position.fen)

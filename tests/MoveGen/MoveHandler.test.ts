@@ -150,6 +150,8 @@ Deno.test('it makes quiet moves for pawn', () => {
     assertSquareEquals(Square.f3, 0)
     assertSquareEquals(Square.f4, Piece.WhitePawn)
     assertBoardStatePushed(new BoardState(1,0,0,0))
+    // regression test. originally handler always updated square list based on en-passant even when the target was 0
+    assertEquals(board.squareList[0], 255, 'Does not incorrectly mark index 0 after pawn moves')
 
     // unmake
     board.unmakeMove(move)
