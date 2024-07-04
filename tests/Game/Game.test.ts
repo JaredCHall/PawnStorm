@@ -152,15 +152,13 @@ Deno.test('it plays the opera game in coordinate notation', () => {
 
     const game = new Game()
 
-    game.setNotation('coordinate')
+    game.makeMove('e2e4', 'coordinate')
+    game.makeMove('e7e5', 'coordinate')
+    game.makeMove('g1f3', 'coordinate')
+    game.makeMove('d7d6', 'coordinate')
 
-    game.makeMove('e2e4')
-    game.makeMove('e7e5')
-    game.makeMove('g1f3')
-    game.makeMove('d7d6')
-
-    game.makeMove('d2d4')
-    game.makeMove('c8g4')
+    game.makeMove('d2d4', 'coordinate')
+    game.makeMove('c8g4', 'coordinate')
 
     // well some of the opera game
 

@@ -31,7 +31,9 @@ export class Game {
 
     private moveNavigator: MoveNavigator
 
-    private notationParser: ParserInterface = new AlgebraicNotationParser(this.moveFactory)
+    private coordinateParser: CoordinateNotationParser = new CoordinateNotationParser(this.moveFactory)
+
+    private algebraicNotationParser: AlgebraicNotationParser = new AlgebraicNotationParser(this.moveFactory)
 
     private repetitionTracker: RepetitionTracker = new RepetitionTracker();
 
@@ -78,33 +80,19 @@ export class Game {
         this.moveFactory.setFromFenNumber(move.fen.serialize())
     }
 
-    setNotation(type: 'algebraic'|'coordinate') {
-        if(type == this.notationParser.getType()){
-            return
-        }
-
-        switch(type){
-            case 'algebraic':
-                this.notationParser = new AlgebraicNotationParser(this.moveFactory)
-                break
-            case 'coordinate':
-                this.notationParser = new CoordinateNotationParser(this.moveFactory)
-                break
-        }
-    }
-
-    makeMove(notation: string): RecordedMove {
+    makeMove(notation: string, notationType: 'coordinate'|'algebraic' = 'algebraic'): RecordedMove {
 
         if(this.gameStatus.terminationType != 'unterminated'){
             throw new Error('Cannot make move. Game is already terminated.')
         }
 
-        const move = this.notationParser.parse(notation)
+        const parser = notationType == 'algebraic' ? this.algebraicNotationParser : this.coordinateParser
+        const move = parser.parse(notation)
 
         // serialize the notation before the move is made as it is necessary for disambiguation
         // in algebraic notation. We could unmake/make again, but that is less efficient
         const moveCounter = (Math.floor(this.moveFactory.ply / 2) + 1)
-        const serialized = this.notationParser.serialize(move)
+        const serialized = parser.serialize(move)
 
         // game officially starts on first move
         if(moveCounter == 1 && this.getSideToMove() == 'white'){
@@ -118,7 +106,7 @@ export class Game {
         const recordedMove = new RecordedMove(
             move,
             this.getFenNotation(),
-            serialized + this.notationParser.getCheckOrMateIndicator(move),
+            serialized + parser.getCheckOrMateIndicator(move),
             moveCounter
         )
         this.moveNavigator.addMove(recordedMove)
