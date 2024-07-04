@@ -7,6 +7,11 @@ export class StockfishInterface extends UciEngine implements EngineInterface {
         super('stockfish')
     }
 
+    async setSkillLevel(elo: number): Promise<void> {
+        await this.writeCommand('setoption name UCI_LimitStrength value true')
+        await this.writeCommand(`setoption name UCI_Elo value ${elo}`)
+    }
+
     async isReady(): Promise<boolean> {
         await this.writeCommand('isready')
         await this.readResponse(/^(readyok)/, true)
@@ -19,7 +24,7 @@ export class StockfishInterface extends UciEngine implements EngineInterface {
     }
 
     async getBestMove(): Promise<string> {
-        await this.writeCommand('go depth 6')
+        await this.writeCommand('go depth 10')
         return await this.readResponse(/^bestmove\s+([a-h0-8=NBRQ]+)/, true)
     }
 
