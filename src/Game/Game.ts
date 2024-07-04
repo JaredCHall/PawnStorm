@@ -5,14 +5,12 @@ import {BitMove} from "../MoveGen/BitMove.ts";
 import {Color, FenPieceMap} from "../Board/Piece.ts";
 import {MoveNavigator} from "./MoveNavigator.ts";
 import {RecordedMove} from "./RecordedMove.ts";
-import {ParserInterface} from "../Notation/Moves/ParserInterface.ts";
 import {AlgebraicNotationParser} from "../Notation/Moves/AlgebraicNotationParser.ts";
 import {CoordinateNotationParser} from "../Notation/Moves/CoordinateNotationParser.ts";
 import {GameStatus} from "./GameStatus.ts";
 import {FenNumber} from "../Notation/FenNumber.ts";
 import {RepetitionTracker} from "./RepetitionTracker.ts";
 import {PgnTagFormatter} from "../Notation/PgnTagFormatter.ts";
-import {dumpBin} from "../Utils.ts";
 import {PgnParser} from "../Notation/PgnParser.ts";
 
 export class Game {
@@ -92,7 +90,7 @@ export class Game {
         // serialize the notation before the move is made as it is necessary for disambiguation
         // in algebraic notation. We could unmake/make again, but that is less efficient
         const moveCounter = (Math.floor(this.moveFactory.ply / 2) + 1)
-        const serialized = parser.serialize(move)
+        const serialized = this.algebraicNotationParser.serialize(move)
 
         // game officially starts on first move
         if(moveCounter == 1 && this.getSideToMove() == 'white'){
@@ -106,7 +104,7 @@ export class Game {
         const recordedMove = new RecordedMove(
             move,
             this.getFenNotation(),
-            serialized + parser.getCheckOrMateIndicator(move),
+            serialized + this.algebraicNotationParser.getCheckOrMateIndicator(move),
             moveCounter
         )
         this.moveNavigator.addMove(recordedMove)
@@ -194,7 +192,6 @@ export class Game {
         }
 
     }
-
 
     undoMove(): void {
         const recordedMove = this.moveNavigator.getLast()

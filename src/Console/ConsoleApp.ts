@@ -1,6 +1,7 @@
 import {Game} from "../Game/Game.ts";
 import {EngineInterface} from "../Engine/EngineInterface.ts";
 import {StockfishInterface} from "../Engine/StockfishInterface.ts";
+import {PgnParser} from "../Notation/PgnParser.ts";
 
 export class ConsoleApp {
 
@@ -23,7 +24,8 @@ export class ConsoleApp {
         console.log(`
 ${this.name} Menu
 
-A console chess app. To play against your favorite engine in the console.
+A console chess app. To play against your favorite engine in the console. This app hides the board by default,
+allowing you to work on visualization.
 
 Usage:
 
@@ -33,6 +35,8 @@ game will progress, or input one of the following menu options.
 
 Options:
     menu            Display this menu
+    show            Display the board
+    list            Display the full move list
     new [fen]       Start a new game and optionally set with fen string
     level [level]   Set the engine's skill level (1 - 9)
     switch          Switch sides and play as the other color
@@ -48,21 +52,31 @@ Options:
 
         while(true){
 
-            console.log(`${this.playerSide} to move`)
-            this.game.render()
-
             const input = prompt(`> `)
 
             switch (input) {
-                case 'menu': this.printMenu(); break;
-                case 'quit': return Deno.exit(0)
+                case 'menu':
+                    this.printMenu()
+                    continue
+                case 'quit':
+                    console.log('Goodbye!')
+                    return Deno.exit(0)
+                case 'show':
+                    this.game.render()
+                    continue
+                case 'list':
+                    this.#displayMoveList()
+                    continue
+                case 'new':
+                    await this.newGame(null);
+                    continue
                 case 'undo':
                     this.game.undoMove() // undo engine's last move
                     this.game.undoMove() // undo player's last move
                     continue
                 case 'switch':
-                    this.switchSides()
-                    this.engineMove()
+                    this.#switchSides()
+                    await this.engineMove()
                     continue
                 case 'resign':
                     this.game.setResigns(this.playerSide)
@@ -77,23 +91,22 @@ Options:
 
             const newFenInput = input.match(/^new\s(.*)$/)
             if(newFenInput !== null){
-                this.game = new Game(newFenInput[1])
-                if(this.playerSide == 'black'){
-                    this.engineMove()
-                }
+                await this.newGame(newFenInput[1])
                 continue;
             }
 
             const newLevelInput = input.match(/^level\s([0-9]+)/)
             if(newLevelInput){
                 await this.engine.setSkillLevel(parseInt(newLevelInput[1]))
+                console.log(`Engine skill level changed to ~${newLevelInput[1]} ELO`)
                 continue
             }
 
             // input is move notation
 
             try {
-                this.game.makeMove(input)
+                const move = this.game.makeMove(input)
+                console.log(move.serialize(true))
             }catch(err){
                 console.log(err.message)
                 continue
@@ -104,7 +117,7 @@ Options:
                 this.game.render()
                 console.log('Game over')
                 console.log(`${status.winner} wins`)
-                break
+                continue
             }
 
             await this.engineMove()
@@ -113,67 +126,36 @@ Options:
                 this.game.render()
                 console.log('Game over')
                 console.log(`${status.winner} wins`)
-                break
             }
-
-
         }
     }
 
-    switchSides(): void {
+    #switchSides(): void {
         this.playerSide = this.playerSide == 'white' ? 'black' : 'white'
     }
 
     async engineMove(): Promise<void> {
         await this.engine.setFen(this.game.getFenNotation().serialize())
-        this.game.makeMove(await this.engine.getBestMove(), 'coordinate')
+        const move = this.game.makeMove(await this.engine.getBestMove(), 'coordinate')
 
-        console.log(`Engine move`)
+        console.log(`${move.serialize(true)}`)
+    }
+
+    async newGame(fen: string|null): Promise<void>
+    {
+        this.game = new Game(fen)
+        console.log(`New game with FEN: ${this.game.getFenNotation().serialize()}`)
         this.game.render()
-
-    }
-
-    #isExitInput(input: string|null)
-    {
-        if(!input){
-            return false
+        if(this.playerSide == 'black'){
+            await this.engineMove()
         }
-
-        return ['quit','exit'].indexOf(input.toLowerCase()) !== -1
     }
 
-    #getUserMoveInput(): string|false
+    #displayMoveList(): void
     {
-        const input = prompt(`> `)
-
-        if(!input || this.#isExitInput(input)){
-            return false
+        const firstMove = this.game.getMoveNavigator().getFirstMove()
+        if(firstMove){
+            console.log(new PgnParser().serializeMoves(firstMove))
         }
-
-        return input
     }
-
-
-
-    #makeNextUserMove(): boolean
-    {
-        let input
-        do{
-            input = this.#getUserMoveInput()
-            if(input === false){
-                return false
-            }
-
-            try {
-                this.game.makeMove(input)
-            }catch(err){
-                console.log(err.message)
-                input = null
-            }
-
-        }while(!input);
-
-        return true
-    }
-
 }
