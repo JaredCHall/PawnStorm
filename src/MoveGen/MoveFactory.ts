@@ -1,17 +1,22 @@
 import {MoveHandler} from "./MoveHandler.ts";
-import {Piece, Color, PieceType, FenPieceMap} from "../Board/Piece.ts";
+import {Piece, Color, PieceType} from "../Board/Piece.ts";
 import {Square, SquareNameMap} from "../Board/Square.ts";
 import {BitMove, MoveType} from "./BitMove.ts";
 import {CastlingMoveMap} from "./CastlingMove.ts";
-import { dumpBin } from "BitChess/Utils.ts";
 
 
 export class MoveFactory extends MoveHandler
 {
+
+    evaluateCheckAndMate: boolean = true
+
     makeMove(move: BitMove) {
         super.makeMove(move);
 
         // evaluate checks and mates
+        if(!this.evaluateCheckAndMate){
+            return
+        }
         const movingColor = move.moving & 1
         const enemyColor = movingColor ? 0 : 1
         move.isCheck = this.isSquareThreatened(this.kingSquares[enemyColor], movingColor)

@@ -1,6 +1,6 @@
 import {parseArgs} from "https://deno.land/std@0.219.0/cli/parse_args.ts";
 import {format} from "https://deno.land/std@0.220.1/fmt/duration.ts";
-import {green} from "https://deno.land/std@0.219.1/fmt/colors.ts";
+import {brightRed, green} from "https://deno.land/std@0.219.1/fmt/colors.ts";
 import { PerftRunner } from "./src/Perft/PerftRunner.ts";
 import {PerftPosition} from "./src/Perft/PerftPosition.ts";
 
@@ -26,27 +26,31 @@ Examples:
 }
 
 const depth = parseInt(args.depth ?? '1')
-const fen = args.fen ?? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+const fen = args.fen ?? null
 const position = args.position ?? null
 
+let expectedNodes: number|null = null // for named positions, we have a list of expectations
+
 const getRunner = (): PerftRunner => {
-    if(!position){
-        return new PerftRunner(fen, true)
+    if(fen){
+        return new PerftRunner(fen)
     }
-    switch(position){
-        case 'initial': return new PerftRunner(PerftPosition.initialPosition().fen, true)
-        case 'kiwipete': return new PerftRunner(PerftPosition.kiwiPete().fen, true)
-        case 'endgame': return new PerftRunner(PerftPosition.endgamePosition().fen, true)
-        case 'composed': return new PerftRunner(PerftPosition.composedPosition().fen, true)
-        case 'composed-mirror': return new PerftRunner(PerftPosition.composedPositionMirrored().fen, true)
-        default: throw new Error(`Unknown perft position: ${position}`)
+
+    const namedPosition = PerftPosition.namedPositions[position ?? 'initial'] ?? null
+    if(!namedPosition){
+        throw new Error(`Unknown named position: ${position}`)
     }
+    expectedNodes = namedPosition.nodesByDepth[depth] ?? null
+    return new PerftRunner(namedPosition.fen)
 }
 
 const runner = getRunner()
-const counters = runner.run(depth)
-const elapsed = format(runner.runTime, {ignoreZero: true})
+const totalNodes = runner.run(depth)
+const elapsed = format(runner.getRunTime(), {ignoreZero: true})
 
-console.table(runner.getRootNodeCounts())
-console.log(`Total Nodes: ${counters.nodes}`)
+console.table(runner.getRootNodeCounts()) // print a table of node counts by root moves, useful for debugging
+console.log(`Total Nodes: ${totalNodes}`)
+if(expectedNodes){
+    console.log(expectedNodes == totalNodes ? green(`Matches expectation`) : brightRed(`Does not match expectation`))
+}
 console.log(green(`RunTime: ${elapsed}`))
