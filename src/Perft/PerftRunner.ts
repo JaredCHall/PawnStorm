@@ -5,7 +5,7 @@ export class PerftRunner {
     readonly factory: MoveFactory
     readonly startFen: string
 
-    private rootCounters: Record<string, number> = {}
+    private rootNodes: Record<string, number> = {}
     private runTime: number = 0// milliseconds
 
     constructor(startFen: string) {
@@ -15,15 +15,15 @@ export class PerftRunner {
         this.factory.evaluateCheckAndMate = false
     }
 
-    getRootNodeCounts(): Record<string, number> {
-        return this.rootCounters
+    getRootNodes(): Record<string, number> {
+        return this.rootNodes
     }
 
     getTotalNodes(): number
     {
         let total = 0
-        for(const i in this.rootCounters){
-            total += this.rootCounters[i]
+        for(const i in this.rootNodes){
+            total += this.rootNodes[i]
         }
         return total
     }
@@ -40,7 +40,7 @@ export class PerftRunner {
         const n_moves = this.factory.getLegalMoves()
         n_moves.forEach((rootMove: BitMove) => {
             const notation = rootMove.serialize()
-            this.rootCounters[notation] = 0
+            this.rootNodes[notation] = 0
             this.factory.makeMove(rootMove)
             this.perft(depth - 1, notation)
             this.factory.unmakeMove(rootMove)
@@ -50,19 +50,17 @@ export class PerftRunner {
         return this.getTotalNodes()
     }
 
-    perft(depth: number = 0, rootMoveNotation: string): void
+    perft(depth: number = 0, rootNodeMoveNotation: string): void
     {
         if(depth == 0){
-            this.rootCounters[rootMoveNotation]++
+            this.rootNodes[rootNodeMoveNotation]++
             return
         }
         const n_moves = this.factory.getLegalMoves()
         n_moves.forEach((move: BitMove) => {
             this.factory.makeMove(move)
-            this.perft(depth -1, rootMoveNotation)
+            this.perft(depth -1, rootNodeMoveNotation)
             this.factory.unmakeMove(move)
         })
-
-        return
     }
 }

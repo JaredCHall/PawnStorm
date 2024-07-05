@@ -48,7 +48,7 @@ const runner = getRunner()
 const totalNodes = runner.run(depth)
 const elapsed = format(runner.getRunTime(), {ignoreZero: true})
 
-console.table(runner.getRootNodeCounts()) // print a table of node counts by root moves, useful for debugging
+console.table(runner.getRootNodes()) // print a table of node counts by root moves, useful for debugging
 console.log(`Total Nodes: ${totalNodes}`)
 if(expectedNodes){
     console.log(expectedNodes == totalNodes ? green(`Matches expectation`) : brightRed(`Does not match expectation`))
