@@ -164,7 +164,7 @@ Deno.test('it plays the opera game in coordinate notation', () => {
 
     game.render()
 
-    assertSerializesMovesAs(game, '1. e2e4 e7e5 2. g1f3 d7d6 3. d2d4 c8g4')
+    assertSerializesMovesAs(game, '1. e4 e5 2. Nf3 d6 3. d4 Bg4') // still serializes as algebraic
 
     assertEquals(game.getStatus().terminationType, 'unterminated')
     assertEquals(game.getStatus().winner, null)

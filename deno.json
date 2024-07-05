@@ -3,6 +3,8 @@
     "BitChess/": "./src/"
   },
   "tasks": {
+    "play": "deno run --allow-run bitchess.ts",
+    "test": "deno test --allow-run",
     "test-coverage": "mkdir -p cov_profile && deno test -q --coverage=cov_profile --allow-run && deno coverage cov_profile | tee tests/coverage-report.txt",
     "test-coverage-html": "deno task test-coverage && deno coverage cov_profile --html && xdg-open cov_profile/html/index.html"
   }
