@@ -98,9 +98,10 @@ export class PerftRunner {
         }
 
         for(const i in n_moves){
-            this.factory.makeMove(n_moves[i])
+            const move = n_moves[i]
+            this.factory.makeMove(move)
             currentCount = this.perft(depth -1, currentCount)
-            this.factory.unmakeMove(n_moves[i])
+            this.factory.unmakeMove(move)
         }
 
         return currentCount
