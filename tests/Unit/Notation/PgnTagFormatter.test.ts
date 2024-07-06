@@ -1,6 +1,6 @@
+import {assertEquals} from "std/assert/assert_equals.ts";
 import {PgnTagFormatter} from "../../../src/Notation/PgnTagFormatter.ts";
 import {GameStatus} from "../../../src/Game/GameStatus.ts";
-import { assertEquals } from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 
 Deno.test('it formats result tag', () => {
     let status

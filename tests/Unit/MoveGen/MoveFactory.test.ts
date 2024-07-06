@@ -1,7 +1,7 @@
+import {assertArrayIncludes} from "std/assert/assert_array_includes.ts";
+import {assertEquals} from "std/assert/assert_equals.ts";
 import {MoveFactory} from "../../../src/MoveGen/MoveFactory.ts";
 import {BitMove, MoveType} from "../../../src/MoveGen/BitMove.ts";
-import {assertArrayIncludes} from "https://deno.land/std@0.219.0/assert/assert_array_includes.ts";
-import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 import {Square} from "../../../src/Board/Square.ts";
 import {Piece, Color} from "../../../src/Board/Piece.ts";
 

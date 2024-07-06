@@ -1,6 +1,6 @@
-import {parseArgs} from "https://deno.land/std@0.219.0/cli/parse_args.ts";
-import {format} from "https://deno.land/std@0.220.1/fmt/duration.ts";
-import {green} from "https://deno.land/std@0.219.1/fmt/colors.ts";
+import {parseArgs} from "std/cli/parse_args.ts";
+import {format} from "std/fmt/duration.ts";
+import {green} from "std/fmt/colors.ts";
 import { PerftRunner } from "./src/Perft/PerftRunner.ts";
 
 const args = parseArgs(Deno.args, {

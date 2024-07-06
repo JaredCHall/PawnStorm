@@ -1,16 +1,15 @@
-import {Game} from "BitChess/Game/Game.ts";
-import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
+import {assertEquals} from "std/assert/assert_equals.ts";
+import {assertThrows} from "std/assert/assert_throws.ts";
+import {Game} from "../../../src/Game/Game.ts";
 import {Move} from "../../../src/Game/Move.ts";
 import {BitMove} from "../../../src/MoveGen/BitMove.ts";
 import {Square} from "../../../src/Board/Square.ts";
-import { Piece } from "BitChess/Board/Piece.ts";
-import {assertThrows} from "https://deno.land/std@0.219.0/assert/assert_throws.ts";
+import {Piece} from "../../../src/Board/Piece.ts";
 import {PgnParser} from "../../../src/Notation/PgnParser.ts";
 
 const assertSerializesMovesAs = (game: Game, expected: string): void =>  {
     assertEquals((new PgnParser()).serializeMoves(game.getMoveNavigator().getMove(0)), expected)
 }
-
 
 Deno.test('it starts a new game', () => {
 

@@ -1,5 +1,5 @@
-import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
-import {assertThrows} from "https://deno.land/std@0.219.0/assert/assert_throws.ts";
+import {assertEquals} from "std/assert/assert_equals.ts";
+import {assertThrows} from "std/assert/assert_throws.ts";
 import {RecordedMove} from "../../../src/Game/RecordedMove.ts";
 import { BitMove } from "BitChess/MoveGen/BitMove.ts";
 import {Square} from "../../../src/Board/Square.ts";

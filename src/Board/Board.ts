@@ -5,7 +5,7 @@ import {
     black,
     bold,
     white
-} from "https://deno.land/std@0.219.1/fmt/colors.ts";
+} from "std/fmt/colors.ts";
 import { Square } from "./Square.ts";
 import {Piece, PieceType, FenPieceMap} from "./Piece.ts";
 
