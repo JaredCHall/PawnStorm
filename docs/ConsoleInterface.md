@@ -4,15 +4,5 @@ You can play a game or view positions from the command line directly. The comman
 
 ### Playing a Game
 ```shell
-deno run bitchess.ts
+deno task play
 ```
-
-```shell
-deno run bitchess.ts --fen=
-```
-
-```shell
-deno run bitchess.ts --pgnFile=
-```
-
-
