@@ -4,6 +4,7 @@ import {Board} from "../../../src/Board/Board.ts";
 import {Square} from "../../../src/Board/Square.ts";
 import {binToString} from "../../../src/Utils.ts";
 import {Piece, Color} from "../../../src/Board/Piece.ts";
+import {Renderer} from "../../../src/Board/Renderer.ts";
 
 const board = new Board()
 
@@ -161,10 +162,10 @@ Deno.test('it errors on invalid piece places', () => {
 })
 
 Deno.test('it renders board with highlights', () => {
-    board.render([Square.e1, Square.e8])
+    new Renderer().render(board,[Square.e1, Square.e8])
 })
 
 Deno.test('it serializes as FEN piece placements', () => {
-    board.render()
+    new Renderer().render(board)
     assertEquals(board.serialize(), 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')
 })

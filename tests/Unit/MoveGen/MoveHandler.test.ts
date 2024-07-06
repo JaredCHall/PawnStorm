@@ -6,9 +6,13 @@ import {Square} from "../../../src/Board/Square.ts";
 import {binToString} from "../../../src/Utils.ts";
 import { BoardState } from "../../../src/Board/BoardState.ts";
 import { CastlingRight } from "../../../src/MoveGen/CastlingMove.ts";
+import {Renderer} from "../../../src/Board/Renderer.ts";
 
+const renderer = new Renderer()
 let board = new MoveHandler()
 let lastBoardState = new BoardState()
+
+
 
 const setBoard = (piecePositions: string, state: BoardState = new BoardState()) => {
     board = new MoveHandler()
@@ -104,7 +108,7 @@ Deno.test('it makes quiet moves for piece', () => {
 
     // make move
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f3, 0)
     assertSquareEquals(Square.e5, Piece.WhiteKnight)
     assertBoardStatePushed(new BoardState(1,0,0,1))
@@ -112,7 +116,7 @@ Deno.test('it makes quiet moves for piece', () => {
 
     // unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f3, Piece.WhiteKnight)
     assertSquareEquals(Square.e5, 0)
     assertBoardStatePopped()
@@ -126,14 +130,14 @@ Deno.test('it makes capture moves for piece', () => {
 
     // make move
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f3, 0)
     assertSquareEquals(Square.g5, Piece.WhiteKnight)
     assertBoardStatePushed(new BoardState(1,0,0,0))
 
     // unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f3, Piece.WhiteKnight)
     assertSquareEquals(Square.g5, Piece.BlackRook)
     assertBoardStatePopped()
@@ -146,7 +150,7 @@ Deno.test('it makes quiet moves for pawn', () => {
 
     // make move
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f3, 0)
     assertSquareEquals(Square.f4, Piece.WhitePawn)
     assertBoardStatePushed(new BoardState(1,0,0,0))
@@ -155,7 +159,7 @@ Deno.test('it makes quiet moves for pawn', () => {
 
     // unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f3, Piece.WhitePawn)
     assertSquareEquals(Square.f4, 0)
     assertBoardStatePopped()
@@ -167,13 +171,13 @@ Deno.test('it makes quiet knight promotions for pawn', () => {
 
 
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f7, 0)
     assertSquareEquals(Square.f8, Piece.WhiteKnight)
     assertBoardStatePushed(new BoardState(1,0,0,0))
 
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f7, Piece.WhitePawn)
     assertSquareEquals(Square.f8, 0)
     assertBoardStatePopped()
@@ -185,13 +189,13 @@ Deno.test('it makes quiet bishop promotions for pawn', () => {
 
 
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f7, 0)
     assertSquareEquals(Square.f8, Piece.WhiteBishop)
     assertBoardStatePushed(new BoardState(1,0,0,0))
 
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f7, Piece.WhitePawn)
     assertSquareEquals(Square.f8, 0)
     assertBoardStatePopped()
@@ -203,13 +207,13 @@ Deno.test('it makes quiet rook promotions for pawn', () => {
 
 
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f7, 0)
     assertSquareEquals(Square.f8, Piece.WhiteRook)
     assertBoardStatePushed(new BoardState(1,0,0,0))
 
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f7, Piece.WhitePawn)
     assertSquareEquals(Square.f8, 0)
     assertBoardStatePopped()
@@ -220,13 +224,13 @@ Deno.test('it makes quiet queen promotions for pawn', () => {
     const move = new BitMove(Square.f7, Square.f8, Piece.WhitePawn, 0, MoveType.QueenPromote)
 
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f7, 0)
     assertSquareEquals(Square.f8, Piece.WhiteQueen)
     assertBoardStatePushed(new BoardState(1,0,0,0))
 
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.f7, Piece.WhitePawn)
     assertSquareEquals(Square.f8, 0)
     assertBoardStatePopped()
@@ -237,14 +241,14 @@ Deno.test('it makes double pawn push for white', () => {
     const move = new BitMove(Square.a2, Square.a4, Piece.WhitePawn,0, MoveType.DoublePawnPush)
 
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.a2, 0)
     assertSquareEquals(Square.a4, Piece.WhitePawn)
     // sets en-passant target
     assertBoardStatePushed(new BoardState(1,0,Square.a3))
 
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.a2, Piece.WhitePawn)
     assertSquareEquals(Square.a4, 0)
     assertBoardStatePopped()
@@ -255,14 +259,14 @@ Deno.test('it makes double pawn push for black', () => {
     const move = new BitMove(Square.a7, Square.a5, Piece.BlackPawn,0, MoveType.DoublePawnPush)
 
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.a7, 0)
     assertSquareEquals(Square.a5, Piece.BlackPawn)
     // sets en-passant target
     assertBoardStatePushed(new BoardState(1,0,Square.a6))
 
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.a7, Piece.BlackPawn)
     assertSquareEquals(Square.a5, 0)
     assertBoardStatePopped()
@@ -275,14 +279,14 @@ Deno.test('it makes capture moves for pawn', () => {
 
     // make move
     board.makeMove(move) // greatest day in the b-pawn's life
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.b2, 0)
     assertSquareEquals(Square.c3, Piece.WhitePawn)
     assertBoardStatePushed(new BoardState(1,0,0,0))
 
     // unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.b2, Piece.WhitePawn)
     assertSquareEquals(Square.c3, Piece.BlackQueen)
     assertBoardStatePopped()
@@ -293,13 +297,13 @@ Deno.test('it makes capture knight promotions for pawn', () => {
     const move = new BitMove(Square.e2, Square.d1, Piece.BlackPawn, Piece.WhiteRook, MoveType.KnightPromote | MoveFlag.Capture)
 
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e2, 0)
     assertSquareEquals(Square.d1, Piece.BlackKnight)
     assertBoardStatePushed(new BoardState(0,0,0,0))
 
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e2, Piece.BlackPawn)
     assertSquareEquals(Square.d1, Piece.WhiteRook)
     assertBoardStatePopped()
@@ -310,13 +314,13 @@ Deno.test('it makes capture bishop promotions for pawn', () => {
     const move = new BitMove(Square.e2, Square.d1, Piece.BlackPawn, Piece.WhiteRook, MoveType.BishopPromote | MoveFlag.Capture)
 
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e2, 0)
     assertSquareEquals(Square.d1, Piece.BlackBishop)
     assertBoardStatePushed(new BoardState(0,0,0,0))
 
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e2, Piece.BlackPawn)
     assertSquareEquals(Square.d1, Piece.WhiteRook)
     assertBoardStatePopped()
@@ -327,13 +331,13 @@ Deno.test('it makes capture rook promotions for pawn', () => {
     const move = new BitMove(Square.e2, Square.d1, Piece.BlackPawn, Piece.WhiteRook, MoveType.RookPromote | MoveFlag.Capture)
 
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e2, 0)
     assertSquareEquals(Square.d1, Piece.BlackRook)
     assertBoardStatePushed(new BoardState(0,0,0,0))
 
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e2, Piece.BlackPawn)
     assertSquareEquals(Square.d1, Piece.WhiteRook)
     assertBoardStatePopped()
@@ -344,13 +348,13 @@ Deno.test('it makes capture queen promotions for pawn', () => {
     const move = new BitMove(Square.e2, Square.d1, Piece.BlackPawn, Piece.WhiteRook, MoveType.QueenPromote | MoveFlag.Capture)
 
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e2, 0)
     assertSquareEquals(Square.d1, Piece.BlackQueen)
     assertBoardStatePushed(new BoardState(0,0,0,0))
 
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e2, Piece.BlackPawn)
     assertSquareEquals(Square.d1, Piece.WhiteRook)
     assertBoardStatePopped()
@@ -361,14 +365,14 @@ Deno.test('it makes en-passant capture as white', () => {
     const move = new BitMove(Square.e5, Square.f6, Piece.WhitePawn, Piece.BlackPawn, MoveType.EnPassant)
 
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e5, 0)
     assertSquareEquals(Square.f6, Piece.WhitePawn)
     assertSquareEquals(Square.f5, 0)
     assertBoardStatePushed(new BoardState(1,0,0,0))
 
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e5, Piece.WhitePawn)
     assertSquareEquals(Square.f6, 0)
     assertSquareEquals(Square.f5, Piece.BlackPawn)
@@ -380,14 +384,14 @@ Deno.test('it makes en-passant capture as black', () => {
     const move = new BitMove(Square.h4, Square.g3, Piece.BlackPawn, Piece.WhitePawn, MoveType.EnPassant)
 
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.h4, 0)
     assertSquareEquals(Square.g3, Piece.BlackPawn)
     assertSquareEquals(Square.g4, 0)
     assertBoardStatePushed(new BoardState(0,0,0,0))
 
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.h4, Piece.BlackPawn)
     assertSquareEquals(Square.g3, 0)
     assertSquareEquals(Square.g4, Piece.WhitePawn)
@@ -402,14 +406,14 @@ Deno.test('it revokes long castles for white when a1 rook moves', () => {
 
     // make
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.a1, 0)
     assertSquareEquals(Square.a8, Piece.WhiteRook)
     assertBoardStatePushed(new BoardState(1,CastlingRight.K,0,1))
 
     // unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.a1, Piece.WhiteRook)
     assertSquareEquals(Square.a8, 0)
     assertBoardStatePopped()
@@ -422,14 +426,14 @@ Deno.test('it revokes short castles for white when h1 rook moves', () => {
 
     // make
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.h1, 0)
     assertSquareEquals(Square.h8, Piece.WhiteRook)
     assertBoardStatePushed(new BoardState(1,CastlingRight.Q,0,1))
 
     // unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.h1, Piece.WhiteRook)
     assertSquareEquals(Square.h8, 0)
     assertBoardStatePopped()
@@ -443,14 +447,14 @@ Deno.test('it revokes long castles for black when a8 rook moves', () => {
 
     // make
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.a8, 0)
     assertSquareEquals(Square.a1, Piece.BlackRook)
     assertBoardStatePushed(new BoardState(1,CastlingRight.k,0,1))
 
     // unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.a8, Piece.BlackRook)
     assertSquareEquals(Square.a1, 0)
     assertBoardStatePopped()
@@ -463,14 +467,14 @@ Deno.test('it revokes short castles for black when h8 rook moves', () => {
 
     // make
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.h8, 0)
     assertSquareEquals(Square.h1, Piece.BlackRook)
     assertBoardStatePushed(new BoardState(1,CastlingRight.q,0,1))
 
     // unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.h8, Piece.BlackRook)
     assertSquareEquals(Square.h1, 0)
     assertBoardStatePopped()
@@ -483,14 +487,14 @@ Deno.test('it updates king square when white king moves', () => {
 
     //make
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.d5, Piece.WhiteKing)
     assertSquareEquals(Square.e5, 0)
     assertEquals(board.kingSquares[0], Square.d5)
 
     //unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.d5, 0)
     assertSquareEquals(Square.e5,  Piece.WhiteKing)
     assertEquals(board.kingSquares[0], Square.e5)
@@ -503,12 +507,12 @@ Deno.test('it revokes castle rights when white king moves', () => {
 
     //make
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertBoardStatePushed(new BoardState(1,0,0,1))
 
     //unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertBoardStatePopped()
 })
 
@@ -518,14 +522,14 @@ Deno.test('it updates king square when black king moves', () => {
 
     //make
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.d5, Piece.BlackKing)
     assertSquareEquals(Square.e5, 0)
     assertEquals(board.kingSquares[1], Square.d5)
 
     //unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.d5, 0)
     assertSquareEquals(Square.e5,  Piece.BlackKing)
     assertEquals(board.kingSquares[1], Square.e5)
@@ -537,12 +541,12 @@ Deno.test('it revokes castle rights when black king moves', () => {
 
     //make
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertBoardStatePushed(new BoardState(1,0,0,1))
 
     //unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertBoardStatePopped()
 })
 
@@ -551,7 +555,7 @@ Deno.test('it revokes short castles for black when h8 rook is captured', () => {
 
     const move = new BitMove(Square.f7, Square.h8, Piece.WhiteKnight, Piece.BlackRook, MoveType.Capture)
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertBoardStatePushed(new BoardState(1,0b0011))
     board.unmakeMove(move)
     assertBoardStatePopped()
@@ -562,7 +566,7 @@ Deno.test('it revokes long castles for black when a8 rook is captured', () => {
 
     const move = new BitMove(Square.b6, Square.a8, Piece.WhiteKnight, Piece.BlackRook, MoveType.Capture)
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertBoardStatePushed(new BoardState(1,0b0101))
     board.unmakeMove(move)
     assertBoardStatePopped()
@@ -573,7 +577,7 @@ Deno.test('it revokes short castles for white when h1 rook is captured', () => {
 
     const move = new BitMove(Square.g3, Square.h1, Piece.BlackKnight, Piece.WhiteRook, MoveType.Capture)
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertBoardStatePushed(new BoardState(0,0b0110))
     board.unmakeMove(move)
     assertBoardStatePopped()
@@ -584,7 +588,7 @@ Deno.test('it revokes long castles for white when a1 rook is captured', () => {
 
     const move = new BitMove(Square.b3, Square.a1, Piece.BlackKnight, Piece.WhiteRook, MoveType.Capture)
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertBoardStatePushed(new BoardState(0,0b0101))
     board.unmakeMove(move)
     assertBoardStatePopped()
@@ -595,7 +599,7 @@ Deno.test('it revokes short castles for black when h8 rook is captured by pawn',
 
     const move = new BitMove(Square.g7, Square.h8, Piece.WhitePawn, Piece.BlackRook, MoveType.KnightPromote | MoveFlag.Capture)
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertBoardStatePushed(new BoardState(1,0b0011))
     board.unmakeMove(move)
     assertBoardStatePopped()
@@ -606,7 +610,7 @@ Deno.test('it revokes long castles for black when a8 rook is captured by pawn', 
 
     const move = new BitMove(Square.b7, Square.a8, Piece.WhitePawn, Piece.BlackRook, MoveType.KnightPromote | MoveFlag.Capture)
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertBoardStatePushed(new BoardState(1,0b0101))
     board.unmakeMove(move)
     assertBoardStatePopped()
@@ -617,7 +621,7 @@ Deno.test('it revokes short castles for white when h1 rook is captured by pawn',
 
     const move = new BitMove(Square.g2, Square.h1, Piece.BlackPawn, Piece.WhiteRook, MoveType.KnightPromote | MoveFlag.Capture)
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertBoardStatePushed(new BoardState(0,0b0110))
     board.unmakeMove(move)
     assertBoardStatePopped()
@@ -628,7 +632,7 @@ Deno.test('it revokes long castles for white when a1 rook is captured by pawn', 
 
     const move = new BitMove(Square.b2, Square.a1, Piece.BlackPawn, Piece.WhiteRook,MoveType.KnightPromote | MoveFlag.Capture)
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertBoardStatePushed(new BoardState(0,0b0101))
     board.unmakeMove(move)
     assertBoardStatePopped()
@@ -642,7 +646,7 @@ Deno.test('it castles short as white', () => {
 
     //make
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e1, 0)
     assertSquareEquals(Square.g1, Piece.WhiteKing)
     assertSquareEquals(Square.h1, 0)
@@ -651,7 +655,7 @@ Deno.test('it castles short as white', () => {
 
     //unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e1, Piece.WhiteKing)
     assertSquareEquals(Square.g1, 0)
     assertSquareEquals(Square.h1,  Piece.WhiteRook)
@@ -666,7 +670,7 @@ Deno.test('it castles long as white', () => {
 
     //make
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e1, 0)
     assertSquareEquals(Square.c1, Piece.WhiteKing)
     assertSquareEquals(Square.a1, 0)
@@ -675,7 +679,7 @@ Deno.test('it castles long as white', () => {
 
     //unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e1, Piece.WhiteKing)
     assertSquareEquals(Square.c1, 0)
     assertSquareEquals(Square.a1,  Piece.WhiteRook)
@@ -690,7 +694,7 @@ Deno.test('it castles short as black', () => {
 
     //make
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e8, 0)
     assertSquareEquals(Square.g8, Piece.BlackKing)
     assertSquareEquals(Square.h8, 0)
@@ -699,7 +703,7 @@ Deno.test('it castles short as black', () => {
 
     //unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e8, Piece.BlackKing)
     assertSquareEquals(Square.g8, 0)
     assertSquareEquals(Square.h8,  Piece.BlackRook)
@@ -714,7 +718,7 @@ Deno.test('it castles long as black', () => {
 
     //make
     board.makeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e8, 0)
     assertSquareEquals(Square.c8, Piece.BlackKing)
     assertSquareEquals(Square.a8, 0)
@@ -723,7 +727,7 @@ Deno.test('it castles long as black', () => {
 
     //unmake
     board.unmakeMove(move)
-    board.render()
+    renderer.render(board)
     assertSquareEquals(Square.e8, Piece.BlackKing)
     assertSquareEquals(Square.c8, 0)
     assertSquareEquals(Square.a8,  Piece.BlackRook)

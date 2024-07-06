@@ -2,6 +2,7 @@ import {Game} from "../Game/Game.ts";
 import {EngineInterface} from "../Engine/EngineInterface.ts";
 import {StockfishInterface} from "../Engine/StockfishInterface.ts";
 import {PgnParser} from "../Notation/PgnParser.ts";
+import {Renderer} from "../Board/Renderer.ts";
 
 export class ConsoleApp {
 
@@ -12,11 +13,14 @@ export class ConsoleApp {
 
     game: Game
 
+    renderer: Renderer
+
     engine: EngineInterface
 
     constructor() {
         this.game = new Game()
         this.engine = new StockfishInterface()
+        this.renderer = new Renderer()
     }
 
     printMenu(): void
@@ -46,6 +50,10 @@ Options:
 `)
     }
 
+    renderGame(): void {
+        this.renderer.render(this.game)
+    }
+
     async run() {
 
         this.printMenu()
@@ -62,7 +70,7 @@ Options:
                     console.log('Goodbye!')
                     return Deno.exit(0)
                 case 'show':
-                    this.game.render()
+                    this.renderGame()
                     continue
                 case 'list':
                     this.#displayMoveList()
@@ -114,7 +122,7 @@ Options:
 
             const status = this.game.getStatus()
             if(status.terminationType !== 'unterminated'){
-                this.game.render()
+                this.renderGame()
                 console.log('Game over')
                 console.log(`${status.winner} wins`)
                 continue
@@ -123,7 +131,7 @@ Options:
             await this.engineMove()
 
             if(status.terminationType !== 'unterminated'){
-                this.game.render()
+                this.renderGame()
                 console.log('Game over')
                 console.log(`${status.winner} wins`)
             }
@@ -145,7 +153,7 @@ Options:
     {
         this.game = new Game(fen)
         console.log(`New game with FEN: ${this.game.getFenNotation().serialize()}`)
-        this.game.render()
+        this.renderGame()
         if(this.playerSide == 'black'){
             await this.engineMove()
         }

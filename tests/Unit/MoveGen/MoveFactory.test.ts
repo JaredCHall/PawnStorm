@@ -4,20 +4,22 @@ import {MoveFactory} from "../../../src/MoveGen/MoveFactory.ts";
 import {BitMove, MoveType} from "../../../src/MoveGen/BitMove.ts";
 import {Square} from "../../../src/Board/Square.ts";
 import {Piece, Color} from "../../../src/Board/Piece.ts";
+import {Renderer} from "../../../src/Board/Renderer.ts";
 
 const board = new MoveFactory()
+const renderer = new Renderer()
 
 const genMoves = (fen: string, from: Square): BitMove[] => {
     board.setFromFenNumber(fen)
     const moves = board.getMovesFromSquare(from, board.squareList[from])
-    board.render(moves.map((move) => move.to))
+    renderer.render(board, moves.map((move) => move.to))
     return moves
 }
 
 const genLegalMoves = (fen: string, from: Square): BitMove[] => {
     board.setFromFenNumber(fen)
     const moves = board.getLegalMovesFromSquare(from, board.squareList[from])
-    board.render(moves.map((move) => move.to))
+    renderer.render(board, moves.map((move) => move.to))
     return moves
 }
 
@@ -31,14 +33,14 @@ const assertMatchesSquareList = (actual: BitMove[], expected: Square[], message=
 const assertSquareThreatened = (piecePositions: string, square: Square, color: number, message: string = 'Square threatened') => {
     board.setPieces(piecePositions)
     const isThreatened = board.isSquareThreatened(square, color)
-    board.render(isThreatened ? [square] : [])
+    renderer.render( board, isThreatened ? [square] : [])
     assertEquals(isThreatened, true, message)
 }
 
 const assertNotSquareThreatened = (piecePositions: string, square: Square, color: number, message: string = 'Square not threatened') => {
     board.setPieces(piecePositions)
     const isThreatened = board.isSquareThreatened(square, color)
-    board.render(isThreatened ? [square] : [])
+    renderer.render( board, isThreatened ? [square] : [])
     assertEquals(isThreatened, false, message)
 }
 
@@ -410,7 +412,7 @@ Deno.test('it generates all moves in a position', () => {
     const factory = new MoveFactory()
     factory.setFromFenNumber('2b1rr2/6kp/1R6/1p6/4n3/2N4P/PPP1B1P1/2K4R w - - 0 24')
     let moves = factory.getLegalMoves(Color.White)
-    factory.render(moves.map((move) => move.to))
+    renderer.render(board,moves.map((move) => move.to))
     assertMatchesSquareList(moves,[
         Square.b8,Square.b7,Square.a6,Square.c6,Square.d6,Square.e6,Square.f6,Square.g6,Square.h6,
         Square.b5,Square.d5,Square.h5,Square.a4,Square.b4,Square.c4,Square.e4,Square.g4,Square.h4,
@@ -420,12 +422,11 @@ Deno.test('it generates all moves in a position', () => {
 
     factory.setFromFenNumber('2b1rr2/6kp/1R6/1p6/4n3/2N4P/PPP1B1P1/2K4R b - - 0 24')
     moves = factory.getLegalMoves(Color.Black)
-    factory.render(moves.map((move) => move.to))
+    renderer.render(board,moves.map((move) => move.to))
 
     assertMatchesSquareList(moves, [
         Square.a6, Square.d8,Square.b7,Square.b4,Square.c5,Square.c3,Square.d2,Square.d6,Square.d7,Square.d8,
         Square.e7,Square.e6,Square.e5,Square.f7,Square.f6,Square.f5,Square.f4,Square.f3,Square.f2,Square.f1,
         Square.g8,Square.h8,Square.g5,Square.g4,Square.g3,Square.h6,Square.h5,Square.h3
     ])
-    
 })

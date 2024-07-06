@@ -12,6 +12,7 @@ import {FenNumber} from "../Notation/FenNumber.ts";
 import {RepetitionTracker} from "./RepetitionTracker.ts";
 import {PgnTagFormatter} from "../Notation/PgnTagFormatter.ts";
 import {PgnParser} from "../Notation/PgnParser.ts";
+import {Board} from "../Board/Board.ts";
 
 export class Game {
 
@@ -49,6 +50,11 @@ export class Game {
     setBoard(fenString: string): void {
         this.moveFactory.setFromFenNumber(fenString)
         this.moveNavigator = new MoveNavigator(fenString)
+    }
+
+    getBoard(): Board
+    {
+        return this.moveFactory
     }
 
     getFenNotation(): FenNumber {
@@ -229,10 +235,4 @@ export class Game {
 
         return moves.map((move) => new Move(move))
     }
-
-    render(highlights: Square[] = [])
-    {
-        this.moveFactory.render(highlights)
-    }
-
 }

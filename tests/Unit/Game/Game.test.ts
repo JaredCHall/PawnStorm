@@ -6,7 +6,9 @@ import {BitMove} from "../../../src/MoveGen/BitMove.ts";
 import {Square} from "../../../src/Board/Square.ts";
 import {Piece} from "../../../src/Board/Piece.ts";
 import {PgnParser} from "../../../src/Notation/PgnParser.ts";
+import {Renderer} from "../../../src/Board/Renderer.ts";
 
+const renderer = new Renderer()
 const assertSerializesMovesAs = (game: Game, expected: string): void =>  {
     assertEquals((new PgnParser()).serializeMoves(game.getMoveNavigator().getMove(0)), expected)
 }
@@ -117,7 +119,7 @@ Deno.test('it plays the opera game', () => {
 
     game.makeMove('Rd8')
 
-    game.render()
+    renderer.render(game)
 
     assertSerializesMovesAs(game, '1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8#')
 
@@ -161,7 +163,7 @@ Deno.test('it plays the opera game in coordinate notation', () => {
 
     // well some of the opera game
 
-    game.render()
+    renderer.render(game)
 
     assertSerializesMovesAs(game, '1. e4 e5 2. Nf3 d6 3. d4 Bg4') // still serializes as algebraic
 
@@ -177,7 +179,7 @@ Deno.test('it gets candidate moves', () => {
 
     const game = new Game('8/8/4p3/pb1p4/8/2P1k3/2K5/7q b - - 0 51')
 
-    game.render()
+    renderer.render(game)
     let moves
 
     // throws on invalid square
@@ -220,7 +222,7 @@ Deno.test('it handles undo moves', () => {
     game.undoMove()
     game.makeMove('c5') // wait no, sicilian
 
-    game.render()
+    renderer.render(game)
 
     assertEquals(
         game.getFenNotation().serialize(),
@@ -381,6 +383,6 @@ Deno.test('it loads new game from Pgn File Content', () => {
 23.Be4 Bd6 24.Nxe5 g6 25.Bxg6+ Kg7 26.Bxh6+ 1-0`)
 
     game.gotoMove(50)
-    game.render()
+    renderer.render(game)
 
 })
