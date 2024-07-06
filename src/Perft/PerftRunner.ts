@@ -93,12 +93,11 @@ export class PerftRunner {
     perft(depth: number = 0, currentCount: number = 0): number
     {
         const n_moves = this.factory.getLegalMoves()
-        for(const i in n_moves){
+        if(depth == 1){
+            return currentCount + n_moves.length
+        }
 
-            if(depth == 1){
-                currentCount++
-                continue
-            }
+        for(const i in n_moves){
             this.factory.makeMove(n_moves[i])
             currentCount = this.perft(depth -1, currentCount)
             this.factory.unmakeMove(n_moves[i])
