@@ -1,0 +1,22 @@
+#!/bin/sh
+# Run unit tests
+deno task test-unit
+
+# Check the exit status of the test command
+if [ $? -ne 0 ]; then
+  echo "Unit tests failed. Aborting commit."
+  exit 1
+fi
+
+# Run test coverage
+deno task test-coverage
+if [ $? -ne 0 ]; then
+  echo "Test coverage generation failed. Aborting commit."
+  exit 1
+fi
+
+# Stage the test coverage file for commit
+git add tests/coverage-report.txt
+
+# If both tasks pass, allow the commit
+exit 0
