@@ -2,12 +2,6 @@
 # Run unit tests
 deno task test-unit
 
-# Check the exit status of the test command
-if [ $? -ne 0 ]; then
-  echo "Unit tests failed. Aborting commit."
-  exit 1
-fi
-
 # Run test coverage
 deno task test-coverage
 if [ $? -ne 0 ]; then
@@ -15,8 +9,8 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Stage the test coverage file for commit
+# Stage the coverage report file for commit
 git add tests/coverage-report.txt
 
-# If both tasks pass, allow the commit
+# allow the commit
 exit 0
