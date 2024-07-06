@@ -1,6 +1,6 @@
 #!/bin/sh
 # Run unit tests
-deno task unit-test
+deno task test-unit
 
 # Check the exit status of the test command
 if [ $? -ne 0 ]; then

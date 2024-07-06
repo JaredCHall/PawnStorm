@@ -5,6 +5,7 @@
   "tasks": {
     "play": "deno run --allow-run bitchess.ts",
     "perft": "deno run --allow-read perft.ts",
+    "install-ci": "cp ci/git-hooks/* .git/hooks",
     "test": "deno test --allow-run --allow-read",
     "test-unit": "deno task test -q tests/Unit",
     "test-coverage": "mkdir -p cov_profile && deno task test-unit --coverage=cov_profile && deno coverage cov_profile | tee tests/coverage-report.txt",
