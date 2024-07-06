@@ -1,7 +1,10 @@
 import {PerftRunner} from "./PerftRunner.ts";
 
-self.onmessage = (event: MessageEvent) => {
+//@ts-ignore - this is actually a worker
+const worker: Worker = self
+
+worker.onmessage = (event: MessageEvent) => {
     const { fen, depth } = event.data
     const count = new PerftRunner(fen).run(depth, false)
-    self.postMessage( {fen, count})
+    worker.postMessage( {fen, count})
 }
