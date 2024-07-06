@@ -5,8 +5,8 @@ import { PerftRunner } from "./src/Perft/PerftRunner.ts";
 import {PerftPosition} from "./src/Perft/PerftPosition.ts";
 
 const args = parseArgs(Deno.args, {
-    string: ['depth','fen','position'],
-    boolean: ['help', 'parallel']
+    string: ['depth','fen','parallel'],
+    boolean: ['help']
 })
 
 if (args.help) {
@@ -16,8 +16,7 @@ Usage: perft [options]
 Options:
   --depth <number>       Set the depth for the perft run (default: 1)
   --fen <string>         Specify the FEN string for the starting position
-  --position <name>      Specify a named position (initial, kiwipete, endgame, composed, composed-mirror)
-  --parallel             Run in parallel threads
+  --parallel <count>     Run in parallel threads. <count> (optional) sets the maximum concurrency
 
 Examples:
   perft --depth 3 --fen "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -28,31 +27,13 @@ Examples:
 
 const depth = parseInt(args.depth ?? '1')
 const fen = args.fen ?? null
-const position = args.position ?? null
-const parallelize = args.parallel ?? false
+const parallel: boolean = args.parallel !== undefined
+const maxThreads: number|null = typeof args.parallel == 'string' ? parseInt(args.parallel) : null
 
-let expectedNodes: number|null = null // for named positions, we have a list of expectations
-
-const getRunner = (): PerftRunner => {
-    if(fen){
-        return new PerftRunner(fen)
-    }
-
-    const namedPosition = PerftPosition.namedPositions[position ?? 'initial'] ?? null
-    if(!namedPosition){
-        throw new Error(`Unknown named position: ${position}`)
-    }
-    expectedNodes = namedPosition.nodesByDepth[depth] ?? null
-    return new PerftRunner(namedPosition.fen)
-}
-
-const runner = getRunner()
-const totalNodes = parallelize ? await runner.runAsync(depth) : runner.run(depth)
+const runner = new PerftRunner(fen ?? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+const totalNodes = parallel ? await runner.runAsync(depth, maxThreads) : runner.run(depth)
 const elapsed = format(runner.getRunTime(), {ignoreZero: true})
 
 console.table(runner.getRootNodes()) // print a table of node counts by root moves, useful for debugging
 console.log(`Total Nodes: ${totalNodes}`)
-if(expectedNodes){
-    console.log(expectedNodes == totalNodes ? green(`Matches expectation`) : brightRed(`Does not match expectation`))
-}
 console.log(green(`RunTime: ${elapsed}`))

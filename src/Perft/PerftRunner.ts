@@ -1,10 +1,12 @@
 import {MoveFactory} from "../MoveGen/MoveFactory.ts";
+import {WorkerPool} from "./WorkerPool.ts";
 export class PerftRunner {
 
     readonly factory: MoveFactory
 
     private rootNodes: Record<string, number> = {}
     private runTime: number = 0// milliseconds
+    private workerPool: WorkerPool|null = null
 
     constructor(
         readonly startFen: string,
@@ -30,21 +32,30 @@ export class PerftRunner {
         return this.runTime
     }
 
-    async runAsync(depth: number=0): Promise<number> {
+    async runAsync(depth: number=0, maxThreads: number|null = null): Promise<number> {
 
-        console.log('running root nodes in parallel')
+        maxThreads ??= navigator.hardwareConcurrency ?? 4
+
 
         const start = (new Date()).getTime();
         const n_moves = this.factory.getLegalMoves();
+
+        if(n_moves.length < maxThreads){
+            console.warn(`available moves: ${n_moves.length} is less than than requested threads: ${maxThreads}. Using ${n_moves.length}.`)
+            maxThreads = n_moves.length
+        }
+
+        this.workerPool = new WorkerPool(maxThreads)
 
         const promises = n_moves.map((move) => {
             this.factory.makeMove(move)
             const fen = this.factory.getFenNumber().serialize()
             this.factory.unmakeMove(move)
-            return this.spawnPerftWorker(fen, depth - 1)
+            return this.workerPool!.runTask(fen, depth - 1)
         });
 
         const results = await Promise.all(promises);
+        this.workerPool.terminate()
 
         results.forEach( (count, i) => {
             const notation = n_moves[i].serialize();
@@ -53,22 +64,6 @@ export class PerftRunner {
 
         this.runTime = new Date().getTime() - start;
         return this.getTotalNodes();
-    }
-
-    async spawnPerftWorker(fen: string, depth: number = 0): Promise<number> {
-        const worker = new Worker(new URL("./perft.worker.ts", import.meta.url).href, { type: "module" });
-
-        return new Promise((resolve, reject) => {
-            worker.onmessage = (event) => {
-                resolve(event.data);
-                worker.terminate();
-            };
-            worker.onerror = (error) => {
-                reject(error);
-                worker.terminate();
-            };
-            worker.postMessage({ fen, depth });
-        });
     }
 
     run(depth: number=0, eachRoot: boolean = true): number {
