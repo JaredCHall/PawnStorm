@@ -1,5 +1,3 @@
-import {BitMove} from "../MoveGen/BitMove.ts";
-
 interface Task {
     fen: string
     depth: number
@@ -26,7 +24,7 @@ export class WorkerPool
     }
 
     private createWorker(): Worker {
-        const worker = new Worker(new URL(this.workerScript, import.meta.url).href, { type: "module" })
+        const worker = new Worker(import.meta.resolve('./worker.ts'), { type: "module" })
 
         worker.onmessage = (event) => {
             const { fen, count } = event.data
