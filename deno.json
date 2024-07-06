@@ -4,8 +4,10 @@
   },
   "tasks": {
     "play": "deno run --allow-run bitchess.ts",
+    "perft": "deno run --allow-read perft.ts",
     "test": "deno test --allow-run --allow-read",
-    "test-coverage": "mkdir -p cov_profile && deno task test -q --coverage=cov_profile && deno coverage cov_profile | tee tests/coverage-report.txt",
+    "test-unit": "deno task test -q tests/Unit",
+    "test-coverage": "mkdir -p cov_profile && deno task test-unit --coverage=cov_profile && deno coverage cov_profile | tee tests/coverage-report.txt",
     "test-coverage-html": "deno task test-coverage && deno coverage cov_profile --html && xdg-open cov_profile/html/index.html"
   }
 }

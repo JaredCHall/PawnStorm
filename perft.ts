@@ -28,7 +28,11 @@ Examples:
 const depth = parseInt(args.depth ?? '1')
 const fen = args.fen ?? null
 const parallel: boolean = args.parallel !== undefined
-const maxThreads: number|null = typeof args.parallel == 'string' ? parseInt(args.parallel) : null
+let maxThreads: number|null = typeof args.parallel == 'string' ? parseInt(args.parallel) : null
+
+if(parallel && !maxThreads){
+    maxThreads = 4
+}
 
 const runner = new PerftRunner(fen ?? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
 const totalNodes = parallel ? await runner.runAsync(depth, maxThreads) : runner.run(depth)

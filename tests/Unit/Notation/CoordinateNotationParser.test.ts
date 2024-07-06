@@ -1,9 +1,9 @@
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
-import {BitMove, MoveType} from "../../src/MoveGen/BitMove.ts";
-import {Square} from "../../src/Board/Square.ts";
-import {Piece} from "../../src/Board/Piece.ts";
-import {MoveFactory} from "../../src/MoveGen/MoveFactory.ts";
-import {CoordinateNotationParser} from "../../src/Notation/Moves/CoordinateNotationParser.ts";
+import {BitMove, MoveType} from "../../../src/MoveGen/BitMove.ts";
+import {Square} from "../../../src/Board/Square.ts";
+import {Piece} from "../../../src/Board/Piece.ts";
+import {MoveFactory} from "../../../src/MoveGen/MoveFactory.ts";
+import {CoordinateNotationParser} from "../../../src/Notation/Moves/CoordinateNotationParser.ts";
 import {assertThrows} from "https://deno.land/std@0.219.0/assert/assert_throws.ts";
 
 const getParser = (fen: string): CoordinateNotationParser => {

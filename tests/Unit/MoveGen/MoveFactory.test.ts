@@ -1,9 +1,9 @@
-import {MoveFactory} from "../../src/MoveGen/MoveFactory.ts";
-import {BitMove, MoveType} from "../../src/MoveGen/BitMove.ts";
+import {MoveFactory} from "../../../src/MoveGen/MoveFactory.ts";
+import {BitMove, MoveType} from "../../../src/MoveGen/BitMove.ts";
 import {assertArrayIncludes} from "https://deno.land/std@0.219.0/assert/assert_array_includes.ts";
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
-import {Square} from "../../src/Board/Square.ts";
-import {Piece, Color} from "../../src/Board/Piece.ts";
+import {Square} from "../../../src/Board/Square.ts";
+import {Piece, Color} from "../../../src/Board/Piece.ts";
 
 const board = new MoveFactory()
 

@@ -1,12 +1,12 @@
 import {assertEquals} from "https://deno.land/std@0.219.0/assert/assert_equals.ts";
 import {assertThrows} from "https://deno.land/std@0.219.0/assert/assert_throws.ts";
-import {RecordedMove} from "../../src/Game/RecordedMove.ts";
+import {RecordedMove} from "../../../src/Game/RecordedMove.ts";
 import { BitMove } from "BitChess/MoveGen/BitMove.ts";
-import {Square} from "../../src/Board/Square.ts";
-import {Piece} from "../../src/Board/Piece.ts";
-import {MoveNavigator} from "../../src/Game/MoveNavigator.ts";
-import { FenNumber } from "../../src/Notation/FenNumber.ts";
-import {PgnParser} from "../../src/Notation/PgnParser.ts";
+import {Square} from "../../../src/Board/Square.ts";
+import {Piece} from "../../../src/Board/Piece.ts";
+import {MoveNavigator} from "../../../src/Game/MoveNavigator.ts";
+import { FenNumber } from "../../../src/Notation/FenNumber.ts";
+import {PgnParser} from "../../../src/Notation/PgnParser.ts";
 
 
 

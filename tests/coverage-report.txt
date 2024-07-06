@@ -17,7 +17,7 @@ File                                        | Branch % | Line % |
  [0m[32mGame/RepetitionTracker.ts                 [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mMoveGen/BitMove.ts                        [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mMoveGen/CastlingMove.ts                   [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mMoveGen/MoveFactory.ts                    [0m | [0m[32m    98.6[0m | [0m[32m  98.6[0m |
+ [0m[32mMoveGen/MoveFactory.ts                    [0m | [0m[32m    97.9[0m | [0m[32m  97.7[0m |
  [0m[32mMoveGen/MoveHandler.ts                    [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mNotation/AnnotationGlyph.ts               [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mNotation/FenNumber.ts                     [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
@@ -25,9 +25,7 @@ File                                        | Branch % | Line % |
  [0m[32mNotation/Moves/CoordinateNotationParser.ts[0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
  [0m[32mNotation/PgnParser.ts                     [0m | [0m[32m    85.9[0m | [0m[32m  86.6[0m |
  [0m[32mNotation/PgnTagFormatter.ts               [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mPerft/PerftPosition.ts                    [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mPerft/PerftRunner.ts                      [0m | [0m[32m   100.0[0m | [0m[32m  87.5[0m |
  [0m[33mUtils.ts                                  [0m | [0m[32m   100.0[0m | [0m[33m  50.0[0m |
 -----------------------------------------------------------------
- [0m[32mAll files                                 [0m | [0m[32m    97.2[0m | [0m[32m  96.2[0m |
+ [0m[32mAll files                                 [0m | [0m[32m    96.9[0m | [0m[32m  96.3[0m |
 -----------------------------------------------------------------
