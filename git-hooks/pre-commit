@@ -13,7 +13,6 @@ fi
 # Stage the coverage report file for commit
 git add tests/coverage-report.txt
 
-
 # Get the current branch name
 current_branch=$(git branch --show-current)
 

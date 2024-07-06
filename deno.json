@@ -8,10 +8,10 @@
     "perft": "deno run --allow-read perft.ts",
     "postinstall": "cp git-hooks/* .git/hooks",
     "benchmark": "deno bench > tests/benchmark-results.txt",
-    "test": "deno test --allow-run --allow-read",
+    "test": "deno test --allow-run --allow-read --allow-net=deno.land", // TODO: figure out why --allow-net option is only necessary for Perft/worker.ts AFTER deno version 1.43.4
     "test-unit": "deno task test -q tests/Unit",
-    "test-integration": "deno task test tests/Integration",
-    "test-coverage": "rm -r cov_profile && mkdir -p cov_profile && deno task test-unit --coverage=cov_profile && deno coverage cov_profile | tee tests/coverage-report.txt",
+    "test-integration": "deno task test -q tests/Integration",
+    "test-coverage": "deno task test-unit --clean --coverage=cov_profile && deno coverage cov_profile | tee tests/coverage-report.txt",
     "test-coverage-html": "deno task test-coverage && deno coverage cov_profile --html && xdg-open cov_profile/html/index.html"
   }
 }
