@@ -1,8 +1,6 @@
 #!/bin/sh
-# Run unit tests
-deno task test-unit
 
-# Run test coverage
+# Run unit tests with coverage report
 deno task test-coverage
 if [ $? -ne 0 ]; then
   echo "Test coverage generation failed. Aborting commit."
