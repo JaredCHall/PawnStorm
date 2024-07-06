@@ -8,7 +8,7 @@ Features:
 - Interfaces with popular chess engines:
   - Stockfish
   - Leela (pending)
-  - Etheral (pending)
+  - Ethereal (pending)
   - Rustic Chess (pending)
 - Support for FEN numbers and PGN files
 - Local position database powered by sqlite (pending)
