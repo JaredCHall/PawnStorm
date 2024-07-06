@@ -6,7 +6,7 @@ import {PerftPosition} from "./src/Perft/PerftPosition.ts";
 
 const args = parseArgs(Deno.args, {
     string: ['depth','fen','position'],
-    boolean: ['help']
+    boolean: ['help', 'parallel']
 })
 
 if (args.help) {
@@ -17,6 +17,7 @@ Options:
   --depth <number>       Set the depth for the perft run (default: 1)
   --fen <string>         Specify the FEN string for the starting position
   --position <name>      Specify a named position (initial, kiwipete, endgame, composed, composed-mirror)
+  --parallel             Run in parallel threads
 
 Examples:
   perft --depth 3 --fen "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -28,6 +29,7 @@ Examples:
 const depth = parseInt(args.depth ?? '1')
 const fen = args.fen ?? null
 const position = args.position ?? null
+const parallelize = args.parallel ?? false
 
 let expectedNodes: number|null = null // for named positions, we have a list of expectations
 
@@ -45,7 +47,7 @@ const getRunner = (): PerftRunner => {
 }
 
 const runner = getRunner()
-const totalNodes = runner.run(depth)
+const totalNodes = parallelize ? await runner.runAsync(depth) : runner.run(depth)
 const elapsed = format(runner.getRunTime(), {ignoreZero: true})
 
 console.table(runner.getRootNodes()) // print a table of node counts by root moves, useful for debugging

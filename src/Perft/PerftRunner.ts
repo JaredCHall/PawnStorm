@@ -1,15 +1,14 @@
 import {MoveFactory} from "../MoveGen/MoveFactory.ts";
-import {BitMove} from "../MoveGen/BitMove.ts";
 export class PerftRunner {
 
     readonly factory: MoveFactory
-    readonly startFen: string
 
     private rootNodes: Record<string, number> = {}
     private runTime: number = 0// milliseconds
 
-    constructor(startFen: string) {
-        this.startFen = startFen
+    constructor(
+        readonly startFen: string,
+    ) {
         this.factory = new MoveFactory()
         this.factory.setFromFenNumber(startFen)
         this.factory.evaluateCheckAndMate = false
@@ -19,8 +18,7 @@ export class PerftRunner {
         return this.rootNodes
     }
 
-    getTotalNodes(): number
-    {
+    getTotalNodes(): number {
         let total = 0
         for(const i in this.rootNodes){
             total += this.rootNodes[i]
@@ -28,39 +26,89 @@ export class PerftRunner {
         return total
     }
 
-    getRunTime(): number
-    {
+    getRunTime(): number {
         return this.runTime
     }
 
-    run(depth: number=0): number
-    {
-        const start = (new Date()).getTime()
+    async runAsync(depth: number=0): Promise<number> {
 
+        console.log('running root nodes in parallel')
+
+        const start = (new Date()).getTime();
+        const n_moves = this.factory.getLegalMoves();
+
+        const promises = n_moves.map((move) => {
+            this.factory.makeMove(move)
+            const fen = this.factory.getFenNumber().serialize()
+            this.factory.unmakeMove(move)
+            return this.spawnPerftWorker(fen, depth - 1)
+        });
+
+        const results = await Promise.all(promises);
+
+        results.forEach( (count, i) => {
+            const notation = n_moves[i].serialize();
+            this.rootNodes[notation] = count;
+        });
+
+        this.runTime = new Date().getTime() - start;
+        return this.getTotalNodes();
+    }
+
+    async spawnPerftWorker(fen: string, depth: number = 0): Promise<number> {
+        const worker = new Worker(new URL("./perft.worker.ts", import.meta.url).href, { type: "module" });
+
+        return new Promise((resolve, reject) => {
+            worker.onmessage = (event) => {
+                resolve(event.data);
+                worker.terminate();
+            };
+            worker.onerror = (error) => {
+                reject(error);
+                worker.terminate();
+            };
+            worker.postMessage({ fen, depth });
+        });
+    }
+
+    run(depth: number=0, eachRoot: boolean = true): number {
+
+        if(depth == 0){
+            return 1
+        }
+
+        if(!eachRoot){
+            return this.perft(depth)
+        }
+
+        const start = (new Date()).getTime()
         const n_moves = this.factory.getLegalMoves()
-        n_moves.forEach((rootMove: BitMove) => {
-            const notation = rootMove.serialize()
-            this.rootNodes[notation] = 0
-            this.factory.makeMove(rootMove)
-            this.perft(depth - 1, notation)
-            this.factory.unmakeMove(rootMove)
-        })
+        for(const i in n_moves){
+            const move = n_moves[i]
+            this.factory.makeMove(move)
+            const runner = new PerftRunner(this.factory.getFenNumber().serialize())
+            this.rootNodes[move.serialize()] = runner.run(depth - 1, false)
+            this.factory.unmakeMove(move)
+        }
         this.runTime = new Date().getTime() - start
 
         return this.getTotalNodes()
     }
 
-    perft(depth: number = 0, rootNodeMoveNotation: string): void
+    perft(depth: number = 0, currentCount: number = 0): number
     {
-        if(depth == 0){
-            this.rootNodes[rootNodeMoveNotation]++
-            return
-        }
         const n_moves = this.factory.getLegalMoves()
-        n_moves.forEach((move: BitMove) => {
-            this.factory.makeMove(move)
-            this.perft(depth -1, rootNodeMoveNotation)
-            this.factory.unmakeMove(move)
-        })
+        for(const i in n_moves){
+
+            if(depth == 1){
+                currentCount++
+                continue
+            }
+            this.factory.makeMove(n_moves[i])
+            currentCount = this.perft(depth -1, currentCount)
+            this.factory.unmakeMove(n_moves[i])
+        }
+
+        return currentCount
     }
 }
