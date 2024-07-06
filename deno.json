@@ -6,6 +6,7 @@
     "play": "deno run --allow-run bitchess.ts",
     "perft": "deno run --allow-read perft.ts",
     "postinstall": "cp git-hooks/* .git/hooks",
+    "benchmark": "deno bench > tests/benchmark-results.txt",
     "test": "deno test --allow-run --allow-read",
     "test-unit": "deno task test -q tests/Unit",
     "test-integration": "deno task test tests/Integration",
