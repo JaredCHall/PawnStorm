@@ -16,7 +16,7 @@ export class WorkerPool
     private processedTasks: Task[] = []
 
     private readonly maxWorkers: number
-    private readonly workerScript = './perft.worker.ts'
+    private readonly workerScript = './worker.ts'
 
     constructor(maxWorkers: number) {
         this.maxWorkers = maxWorkers

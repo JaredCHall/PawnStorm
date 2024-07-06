@@ -1,8 +1,7 @@
 import {parseArgs} from "https://deno.land/std@0.219.0/cli/parse_args.ts";
 import {format} from "https://deno.land/std@0.220.1/fmt/duration.ts";
-import {brightRed, green} from "https://deno.land/std@0.219.1/fmt/colors.ts";
+import {green} from "https://deno.land/std@0.219.1/fmt/colors.ts";
 import { PerftRunner } from "./src/Perft/PerftRunner.ts";
-import {PerftPosition} from "./src/Perft/PerftPosition.ts";
 
 const args = parseArgs(Deno.args, {
     string: ['depth','fen','parallel'],
