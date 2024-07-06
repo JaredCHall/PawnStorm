@@ -10,9 +10,8 @@ const testPosition = (fen: string, depth: number, expectedNodes: number): void =
     })
 }
 
-/** following tests borrowed with thanks from @see https://github.com/AndyGrant/Ethereal/blob/master/src/perft/standard.epd **/
-
-const etherealTests = `
+/** following perft results borrowed with thanks from @see https://github.com/AndyGrant/Ethereal/blob/master/src/perft/standard.epd **/
+const perftResults = `
 rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ;D1 20 ;D2 400 ;D3 8902 ;D4 197281 ;D5 4865609 ;D6 119060324
 r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1 ;D1 48 ;D2 2039 ;D3 97862 ;D4 4085603 ;D5 193690690
 4k3/8/8/8/8/8/8/4K2R w K - 0 1 ;D1 15 ;D2 66 ;D3 1197 ;D4 7059 ;D5 133987 ;D6 764643
@@ -143,16 +142,16 @@ n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1 ;D1 24 ;D2 496 ;D3 9483 ;D4 182838 ;D5 3
 rnbqkb1r/ppppp1pp/7n/4Pp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3 ;D5 11139762
 `
 
-const tests = etherealTests.trim().split('\n')
-for(const i in tests){
-    const testLine = tests[i]
-    const parts = testLine.match(/^([^;]+) (;.*)/)
+const results = perftResults.trim().split('\n')
+for(const i in results){
+    const resultLine = results[i]
+    const parts = resultLine.match(/^([^;]+) (;.*)/)
     if(!parts){
-        throw new Error(`Invalid test string: ${testLine}`)
+        throw new Error(`Invalid result line: ${resultLine}`)
     }
     const depthParts = parts[2].trim().match(/;D(\d) (\d+)$/)
     if(!depthParts){
-        throw new Error(`Invalid test string: ${testLine}`)
+        throw new Error(`Invalid result line: ${resultLine}`)
     }
 
     const fen = parts[1]

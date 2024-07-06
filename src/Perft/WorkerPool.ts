@@ -12,8 +12,8 @@ export class WorkerPool
 {
     private workers: Worker[] = []
     private activeWorkers = new Map<Worker, number>()
-    private tasks: Task[] = []
-    private runningTasks: Task[] = []
+    private queuedTasks: Task[] = []
+    private processedTasks: Task[] = []
 
     private readonly maxWorkers: number
     private readonly workerScript = './perft.worker.ts'
@@ -30,7 +30,7 @@ export class WorkerPool
 
         worker.onmessage = (event) => {
             const { fen, count } = event.data
-            const task = this.runningTasks.find(t => t.fen == fen)
+            const task = this.processedTasks.find(t => t.fen == fen)
 
            // console.log(`task with fen: ${fen} complete. ${count} nodes found.`)
 
@@ -55,15 +55,15 @@ export class WorkerPool
     }
 
     private processQueue() {
-        if (this.tasks.length > 0) {
+        if (this.queuedTasks.length > 0) {
             const availableWorker = this.workers.find(worker => this.activeWorkers.get(worker) === 0)
 
             if (availableWorker) {
-                const task = this.tasks.shift()
+                const task = this.queuedTasks.shift()
                 if(!task){
                     console.error("No task found for worker")
                 }else{
-                    this.runningTasks.push(task)
+                    this.processedTasks.push(task)
                     this.activeWorkers.set(availableWorker, 1) // Set active tasks to 1 when assigning a task
                     availableWorker.postMessage({ fen: task.fen, depth: task.depth })
                    // console.log(`Running worker for fen: ${task.fen} and depth: ${task.depth}`)
@@ -74,7 +74,7 @@ export class WorkerPool
 
     runTask(fen: string, depth: number): Promise<number> {
         return new Promise((resolve , reject) => {
-            this.tasks.push({ fen, depth, resolve , reject })
+            this.queuedTasks.push({ fen, depth, resolve , reject })
             this.processQueue()
         });
     }
