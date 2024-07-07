@@ -2,7 +2,6 @@
   "version": "3",
   "remote": {
     "https://deno.land/std@0.224.0/assert/_constants.ts": "a271e8ef5a573f1df8e822a6eb9d09df064ad66a4390f21b3e31f820a38e0975",
-    "https://deno.land/std@0.224.0/assert/assert.ts": "09d30564c09de846855b7b071e62b5974b001bb72a4b797958fe0660e7849834",
     "https://deno.land/std@0.224.0/assert/assert_almost_equals.ts": "9e416114322012c9a21fa68e187637ce2d7df25bcbdbfd957cd639e65d3cf293",
     "https://deno.land/std@0.224.0/assert/assert_array_includes.ts": "14c5094471bc8e4a7895fc6aa5a184300d8a1879606574cb1cd715ef36a4a3c7",
     "https://deno.land/std@0.224.0/assert/assert_equals.ts": "3bbca947d85b9d374a108687b1a8ba3785a7850436b5a8930d81f34a32cb8c74",
@@ -10,11 +9,27 @@
     "https://deno.land/std@0.224.0/assert/assert_throws.ts": "c6508b2879d465898dab2798009299867e67c570d7d34c90a2d235e4553906eb",
     "https://deno.land/std@0.224.0/assert/assertion_error.ts": "ba8752bd27ebc51f723702fac2f54d3e94447598f54264a6653d6413738a8917",
     "https://deno.land/std@0.224.0/assert/equal.ts": "bddf07bb5fc718e10bb72d5dc2c36c1ce5a8bdd3b647069b6319e07af181ac47",
-    "https://deno.land/std@0.224.0/cli/parse_args.ts": "5250832fb7c544d9111e8a41ad272c016f5a53f975ef84d5a9fe5fcb70566ece",
     "https://deno.land/std@0.224.0/fmt/colors.ts": "508563c0659dd7198ba4bbf87e97f654af3c34eb56ba790260f252ad8012e1c5",
-    "https://deno.land/std@0.224.0/fmt/duration.ts": "606f8c2bbbadd7f7a122868a478c9ad31f2e66b1e19e0a9769655585414fced6",
     "https://deno.land/std@0.224.0/internal/diff.ts": "6234a4b493ebe65dc67a18a0eb97ef683626a1166a1906232ce186ae9f65f4e6",
     "https://deno.land/std@0.224.0/internal/format.ts": "0a98ee226fd3d43450245b1844b47003419d34d210fa989900861c79820d21c2",
-    "https://deno.land/std@0.224.0/internal/mod.ts": "534125398c8e7426183e12dc255bb635d94e06d0f93c60a297723abe69d3b22e"
+    "https://deno.land/std@0.224.0/internal/mod.ts": "534125398c8e7426183e12dc255bb635d94e06d0f93c60a297723abe69d3b22e",
+    "https://deno.land/x/chess@0.6.0/src/core/datatypes/Board.ts": "f1f5dee16e70d5d49488d66280be61b125a8cf26787eeb19998ce8768453d41a",
+    "https://deno.land/x/chess@0.6.0/src/core/datatypes/CastleMap.ts": "c2690ee7f204ba2a2cbc34204a1d9e084b94cae2aedc82bf4853f83a2b057091",
+    "https://deno.land/x/chess@0.6.0/src/core/datatypes/ChessError.ts": "5ccd52613fc862c22e551add04e152824d6bb73d2a58ed49d6a5d6df64c53219",
+    "https://deno.land/x/chess@0.6.0/src/core/datatypes/Color.ts": "735478a6593ba7e10102750c6e67cb2e5f16314ddd030d292bed64cf1a820859",
+    "https://deno.land/x/chess@0.6.0/src/core/datatypes/Coord.ts": "3308a2c5ff6389e463698d7b0cef9cc4d5de0fe7c542e4b4a74ba3b3cddf0d7e",
+    "https://deno.land/x/chess@0.6.0/src/core/datatypes/GameStatus.ts": "7e8db0037fe71d6d2eea107900ab96edc6e457cfe6e3280dbffa63d7b0302a51",
+    "https://deno.land/x/chess@0.6.0/src/core/datatypes/Move.ts": "437585fe5f962ba9b18c18dd8170181e0b6120c07e947455989048ec2788071e",
+    "https://deno.land/x/chess@0.6.0/src/core/datatypes/PieceType.ts": "ee5a2a040fbe48c54bf210cef09364765c2e7cc6385d0649a7a94e0e82ba5bb3",
+    "https://deno.land/x/chess@0.6.0/src/core/datatypes/Space.ts": "f3086d595f3883dae7c51210ebf95e932e301996c23f24017d840b77415a8a15",
+    "https://deno.land/x/chess@0.6.0/src/core/logic/assert.ts": "79490e3141d89d768a939798f8c64dfd808396be30c9739d9619f8743002f70e",
+    "https://deno.land/x/chess@0.6.0/src/core/logic/attackMap.ts": "fa7497b2c0400f7b4d677e1bc8a78e45b2d8a3df668173e2b1c3a2f0ba63a0f7",
+    "https://deno.land/x/chess@0.6.0/src/core/logic/boardLayouts/buildStandardBoard.ts": "49db694fb5748ae020dba01f5c1773d06218b1a6b72e788029e11d73a33a2bad",
+    "https://deno.land/x/chess@0.6.0/src/core/logic/hashBoard.ts": "f2ee59bb5997bffdd01d2a5432ceeb55432768ee476796021ee9389b3f9ba5e7",
+    "https://deno.land/x/chess@0.6.0/src/core/logic/kingInDanger.ts": "03fbe107fa661f0efb7b7f59af912e9c5628dcbe94f1ec015558b8450ae9e32d",
+    "https://deno.land/x/chess@0.6.0/src/core/logic/listValidMoves.ts": "1fd895c8fc9ebefaf46c34b122c3c6f6cfa785e54104a9d20ec0f40d01f03a23",
+    "https://deno.land/x/chess@0.6.0/src/core/logic/performMove.ts": "07977c2cae16db468779fb187785a4d43990106d4deba9a9e3ec3c9ba4b44f7d",
+    "https://deno.land/x/chess@0.6.0/src/core/logic/perft.ts": "23adc1fffe4960fede282e6b3a506b7d42fd6d0db82a197914cfff2addacbeeb",
+    "https://raw.githubusercontent.com/jhlywa/chess.js/52f7579e927fb4bd2d51f3d3f07e7d2200770ddd/src/chess.ts": "83f6f64b3b0a0d99fee5416bf4b9ef3f0c527ab1cdf9c5646a1a387407b215f5"
   }
 }
