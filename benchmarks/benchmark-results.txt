@@ -6,14 +6,14 @@ benchmark             time (avg)        iter/s             (min … max)       p
 ---------------------------------------------------------------------- -----------------------------
 
 [0m[38;5;245mgroup[0m [0m[32mperft5[0m
-App Perft5           [0m[33m460.28 ms[0m/iter           2.2 ([0m[36m455.65 ms[0m … [0m[35m463.07 ms[0m) [0m[35m461.74 ms[0m [0m[35m463.07 ms[0m [0m[35m463.07 ms[0m
-DenoChess Perft5        [0m[33m1.38 s[0m/iter           0.7       ([0m[36m1.37 s[0m … [0m[35m1.42 s[0m) [0m[35m1.39 s[0m [0m[35m1.42 s[0m [0m[35m1.42 s[0m
-ChessJS Perft5          [0m[33m1.99 s[0m/iter           0.5          ([0m[36m1.97 s[0m … [0m[35m2 s[0m) [0m[35m2 s[0m [0m[35m2 s[0m [0m[35m2 s[0m
-Stockfish Perft5      [0m[33m12.99 ms[0m/iter          77.0    ([0m[36m12.8 ms[0m … [0m[35m13.36 ms[0m) [0m[35m13.08 ms[0m [0m[35m13.36 ms[0m [0m[35m13.36 ms[0m
+App Perft5           [0m[33m464.43 ms[0m/iter           2.2 ([0m[36m459.76 ms[0m … [0m[35m467.86 ms[0m) [0m[35m466.88 ms[0m [0m[35m467.86 ms[0m [0m[35m467.86 ms[0m
+DenoChess Perft5        [0m[33m1.39 s[0m/iter           0.7        ([0m[36m1.38 s[0m … [0m[35m1.4 s[0m) [0m[35m1.4 s[0m [0m[35m1.4 s[0m [0m[35m1.4 s[0m
+ChessJS Perft5          [0m[33m2.01 s[0m/iter           0.5       ([0m[36m1.99 s[0m … [0m[35m2.04 s[0m) [0m[35m2.01 s[0m [0m[35m2.04 s[0m [0m[35m2.04 s[0m
+Stockfish Perft5      [0m[33m13.05 ms[0m/iter          76.6   ([0m[36m12.85 ms[0m … [0m[35m13.22 ms[0m) [0m[35m13.12 ms[0m [0m[35m13.22 ms[0m [0m[35m13.22 ms[0m
 
 [0m[38;5;245msummary[0m
   [0m[1m[36mApp Perft5[0m
-   [0m[31m35.44[0mx slower than [0m[1m[36mStockfish Perft5[0m
-   [0m[32m3.01[0mx faster than [0m[1m[36mDenoChess Perft5[0m
+   [0m[31m35.58[0mx slower than [0m[1m[36mStockfish Perft5[0m
+   [0m[32m3[0mx faster than [0m[1m[36mDenoChess Perft5[0m
    [0m[32m4.33[0mx faster than [0m[1m[36mChessJS Perft5[0m
 
