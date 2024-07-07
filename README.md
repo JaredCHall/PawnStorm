@@ -24,9 +24,10 @@ Features:
   - Add engine evaluations to PGN ___*TODO\*___
 
 ## Documentation
- - [Game Api](docs/GameApi.md) - For wiring up a UI
- - [Console Interface](docs/ConsoleInterface.md) - Example Console Implementation
- - [Performance Tests](docs/PerformanceTesting.md) - All about Performance Testing
+ - [Game Engine](docs/GameEngine) - For UI or Game Server
+ - [Engine Interfaces](docs/EngineInterfaces.md) - Communicating with locally compiled engines
+ - [Console Applications](docs/ConsoleApplications) - Included console applications. Can be used for fun or as an example of how to use the API.
+ - [Tests and Benchmarks](docs/TestsAndBenchmarks) - How the engine is tested and benchmarked
 
 ## Usage
 - `deno task battle` - Watch battle between two chess engines
