@@ -1,32 +1,35 @@
 -----------------------------------------------------------------
 File                                        | Branch % | Line % |
 -----------------------------------------------------------------
- [0m[32mBoard/Board.ts                            [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mBoard/BoardState.ts                       [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mBoard/Piece.ts                            [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mBoard/Renderer.ts                         [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mBoard/Square.ts                           [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mEngine/Errors/UciTimeoutError.ts          [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[31mEngine/Errors/UciUnexpectedOutputError.ts [0m | [0m[32m   100.0[0m | [0m[31m  40.0[0m |
- [0m[32mEngine/StockfishInterface.ts              [0m | [0m[32m   100.0[0m | [0m[32m  87.1[0m |
- [0m[32mEngine/UciEngine.ts                       [0m | [0m[33m    57.1[0m | [0m[32m  80.8[0m |
- [0m[32mGame/Game.ts                              [0m | [0m[32m   100.0[0m | [0m[32m  95.7[0m |
- [0m[32mGame/GameStatus.ts                        [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mGame/Move.ts                              [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mGame/MoveNavigator.ts                     [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mGame/RecordedMove.ts                      [0m | [0m[32m    83.3[0m | [0m[32m  98.7[0m |
- [0m[32mGame/RepetitionTracker.ts                 [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mMoveGen/BitMove.ts                        [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mMoveGen/CastlingMove.ts                   [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mMoveGen/MoveFactory.ts                    [0m | [0m[32m    97.9[0m | [0m[32m  97.8[0m |
- [0m[32mMoveGen/MoveHandler.ts                    [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mNotation/AnnotationGlyph.ts               [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mNotation/FenNumber.ts                     [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mNotation/Moves/AlgebraicNotationParser.ts [0m | [0m[32m   100.0[0m | [0m[32m  97.8[0m |
- [0m[32mNotation/Moves/CoordinateNotationParser.ts[0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[32mNotation/PgnParser.ts                     [0m | [0m[32m    85.9[0m | [0m[32m  86.9[0m |
- [0m[32mNotation/PgnTagFormatter.ts               [0m | [0m[32m   100.0[0m | [0m[32m 100.0[0m |
- [0m[33mUtils.ts                                  [0m | [0m[32m   100.0[0m | [0m[33m  50.0[0m |
+ Board/Board.ts                             |    100.0 |  100.0 |
+ Board/BoardState.ts                        |    100.0 |  100.0 |
+ Board/Piece.ts                             |    100.0 |  100.0 |
+ Board/Renderer.ts                          |    100.0 |  100.0 |
+ Board/Square.ts                            |    100.0 |  100.0 |
+ Engine/Errors/UciTimeoutError.ts           |    100.0 |  100.0 |
+ Engine/Errors/UciUnexpectedOutputError.ts  |    100.0 |   40.0 |
+ Engine/StockfishInterface.ts               |    100.0 |   87.1 |
+ Engine/UciEngine.ts                        |     57.1 |   80.8 |
+ Game/Error/GameOverError.ts                |    100.0 |  100.0 |
+ Game/Error/IllegalMoveError.ts             |    100.0 |  100.0 |
+ Game/Error/InvalidMoveError.ts             |    100.0 |  100.0 |
+ Game/Game.ts                               |    100.0 |   95.7 |
+ Game/GameStatus.ts                         |    100.0 |  100.0 |
+ Game/Move.ts                               |    100.0 |  100.0 |
+ Game/MoveNavigator.ts                      |    100.0 |  100.0 |
+ Game/RecordedMove.ts                       |     83.3 |   98.7 |
+ Game/RepetitionTracker.ts                  |    100.0 |  100.0 |
+ MoveGen/BitMove.ts                         |    100.0 |  100.0 |
+ MoveGen/CastlingMove.ts                    |    100.0 |  100.0 |
+ MoveGen/MoveFactory.ts                     |     97.9 |   97.8 |
+ MoveGen/MoveHandler.ts                     |    100.0 |  100.0 |
+ Notation/AnnotationGlyph.ts                |    100.0 |  100.0 |
+ Notation/FenNumber.ts                      |    100.0 |  100.0 |
+ Notation/Moves/AlgebraicNotationParser.ts  |    100.0 |   97.8 |
+ Notation/Moves/CoordinateNotationParser.ts |    100.0 |  100.0 |
+ Notation/PgnParser.ts                      |     85.9 |   86.9 |
+ Notation/PgnTagFormatter.ts                |    100.0 |  100.0 |
+ Utils.ts                                   |    100.0 |   50.0 |
 -----------------------------------------------------------------
- [0m[32mAll files                                 [0m | [0m[32m    97.0[0m | [0m[32m  96.4[0m |
+ All files                                  |     97.0 |   96.4 |
 -----------------------------------------------------------------

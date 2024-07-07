@@ -13,6 +13,7 @@ import {RepetitionTracker} from "./RepetitionTracker.ts";
 import {PgnTagFormatter} from "../Notation/PgnTagFormatter.ts";
 import {PgnParser} from "../Notation/PgnParser.ts";
 import {Board} from "../Board/Board.ts";
+import {GameOverError} from "./Error/GameOverError.ts";
 
 export class Game {
 
@@ -87,7 +88,7 @@ export class Game {
     makeMove(notation: string, notationType: 'coordinate'|'algebraic' = 'algebraic'): RecordedMove {
 
         if(this.gameStatus.terminationType != 'unterminated'){
-            throw new Error('Cannot make move. Game is already terminated.')
+            throw new GameOverError('Cannot make move. Game is already terminated.')
         }
 
         const parser = notationType == 'algebraic' ? this.algebraicNotationParser : this.coordinateParser

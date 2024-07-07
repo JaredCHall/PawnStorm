@@ -9,7 +9,7 @@ import {
 import {Square} from "./Square.ts";
 import {PieceType} from "./Piece.ts";
 import {Board} from "./Board.ts";
-import { Game } from "BitChess/Game/Game.ts";
+import {Game} from "src/Game/Game.ts";
 
 export class Renderer {
     render(board: Board|Game, highlights: Square[] = [])

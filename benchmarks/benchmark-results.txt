@@ -1,19 +1,19 @@
-[0m[38;5;245mcpu: 12th Gen Intel(R) Core(TM) i9-12900K[0m
-[0m[38;5;245mruntime: deno 1.44.4 (x86_64-unknown-linux-gnu)[0m
+cpu: 12th Gen Intel(R) Core(TM) i9-12900K
+runtime: deno 1.44.4 (x86_64-unknown-linux-gnu)
 
-[0m[38;5;245mfile:///home/godzilla/projects/BitChess/benchmarks/perft-compare.bench.ts[0m
+file:///projects/PawnStorm/benchmarks/perft-compare.bench.ts
 benchmark             time (avg)        iter/s             (min … max)       p75       p99      p995
 ---------------------------------------------------------------------- -----------------------------
 
-[0m[38;5;245mgroup[0m [0m[32mperft5[0m
-App Perft5           [0m[33m464.43 ms[0m/iter           2.2 ([0m[36m459.76 ms[0m … [0m[35m467.86 ms[0m) [0m[35m466.88 ms[0m [0m[35m467.86 ms[0m [0m[35m467.86 ms[0m
-DenoChess Perft5        [0m[33m1.39 s[0m/iter           0.7        ([0m[36m1.38 s[0m … [0m[35m1.4 s[0m) [0m[35m1.4 s[0m [0m[35m1.4 s[0m [0m[35m1.4 s[0m
-ChessJS Perft5          [0m[33m2.01 s[0m/iter           0.5       ([0m[36m1.99 s[0m … [0m[35m2.04 s[0m) [0m[35m2.01 s[0m [0m[35m2.04 s[0m [0m[35m2.04 s[0m
-Stockfish Perft5      [0m[33m13.05 ms[0m/iter          76.6   ([0m[36m12.85 ms[0m … [0m[35m13.22 ms[0m) [0m[35m13.12 ms[0m [0m[35m13.22 ms[0m [0m[35m13.22 ms[0m
+group perft5
+App Perft5           427.94 ms/iter           2.3  (424.41 ms … 430.5 ms) 429.37 ms 430.5 ms 430.5 ms
+DenoChess Perft5        1.37 s/iter           0.7       (1.36 s … 1.38 s) 1.38 s 1.38 s 1.38 s
+ChessJS Perft5          2.02 s/iter           0.5       (2.01 s … 2.04 s) 2.03 s 2.04 s 2.04 s
+Stockfish Perft5      13.63 ms/iter          73.4   (13.03 ms … 19.25 ms) 13.34 ms 19.25 ms 19.25 ms
 
-[0m[38;5;245msummary[0m
-  [0m[1m[36mApp Perft5[0m
-   [0m[31m35.58[0mx slower than [0m[1m[36mStockfish Perft5[0m
-   [0m[32m3[0mx faster than [0m[1m[36mDenoChess Perft5[0m
-   [0m[32m4.33[0mx faster than [0m[1m[36mChessJS Perft5[0m
+summary
+  App Perft5
+   31.4x slower than Stockfish Perft5
+   3.2x faster than DenoChess Perft5
+   4.73x faster than ChessJS Perft5
 

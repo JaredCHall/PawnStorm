@@ -1,7 +1,7 @@
 import {assertEquals} from "std/assert/assert_equals.ts";
 import {assertThrows} from "std/assert/assert_throws.ts";
 import {RecordedMove} from "../../../src/Game/RecordedMove.ts";
-import { BitMove } from "BitChess/MoveGen/BitMove.ts";
+import { BitMove } from "src/MoveGen/BitMove.ts";
 import {Square} from "../../../src/Board/Square.ts";
 import {Piece} from "../../../src/Board/Piece.ts";
 import {MoveNavigator} from "../../../src/Game/MoveNavigator.ts";

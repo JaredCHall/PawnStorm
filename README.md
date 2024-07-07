@@ -1,20 +1,27 @@
-# BitChess
-BitChess is a robust, headless chess game engine designed for seamless integration with various user interfaces. Whether you're developing a visually appealing desktop application or a responsive web interface, BitChess provides a solid foundation with its comprehensive game representation and manipulation capabilities.
+# PawnStorm
 
-While the primary goal of BitChess is to offer a dependable backend for chess applications, a significant part of the project's joy comes from its performance optimization. The engine is fine-tuned to excel in performance tests, particularly in calculating perft benchmarks. While it cannot compete with established engines, in this hobbyist's opinion, it is pretty darn fast for Javascript. [Benchmarking](/benchmarks/benchmark-results.txt) shows this app generates legal moves 3x faster than Deno Chess and 4x faster than Chess.js.
+<img alt="Pawns in attack formation buffeted by a blue flame. Like a fiery storm, they leave destruction in their wake." src="./pawn-storm-logo.webp" title="PawnStorm Logo" width="180px" />
+
+PawnStorm is a robust, headless chess game engine designed for seamless integration with user interfaces and game api servers. Whether you're developing a visually appealing desktop application or a responsive web interface, PawnStorm provides a solid foundation with its comprehensive game representation and manipulation capabilities.
+
+While the primary goal of PawnStorm is to offer a dependable backend for chess applications, a significant part of the project's joy comes from its performance optimization. The engine is fine-tuned to excel in performance tests, particularly in calculating perft benchmarks. While it cannot compete with compiled engines, in this hobbyist's opinion, it is pretty darn fast for Javascript. [Benchmarking](/benchmarks/benchmark-results.txt) shows that PawnStorm generates legal moves 3x faster than Deno Chess and 4x faster than Chess.js.
 
 Features:
-- Game Engine which can be wired up to a UI
+- Game Engine
+  - Legal move generation
+  - checkmate and draw detection
+  - FEN/PGN parsing and generation
+  - Variation navigation
+  - Game Clock with Increment and Delay ___*TODO\*___
 - Interfaces with popular chess engines:
   - Stockfish
-  - Leela (pending)
-  - Ethereal (pending)
-  - Rustic Chess (pending)
-- Support for FEN numbers and PGN files
-- Local position database powered by sqlite (pending)
-- Play against an engine in the Console
-- Watch engines battle other engines in the Console  (pending)
-- Accuracy and Performance testing
+  - Leela ___*TODO\*___
+  - Ethereal ___*TODO\*___
+  - Rustic Chess ___*TODO\*___
+- Console Application
+  - Play against your favorite engine
+  - Watch engines battle other engines  ___*TODO\*___
+  - Add engine evaluations to PGN ___*TODO\*___
 
 ## Documentation
  - [Game Api](docs/GameApi.md) - For wiring up a UI
@@ -24,13 +31,14 @@ Features:
 ## Usage
 - `deno task battle` - Watch battle between two chess engines
 - `deno task play` - Play against an AI engine in the console
-- `deno task perft` - Calculate number of possible moves from given position at depth n
+- `deno task perft` - Calculate number of possible moves from given position at depth `n`
 
 
 ## Installation - (Development and Testing)
 
 1. Install Deno
 2. Clone the repo
+3. Run `deno task postinstall`
 
 ## Dev Tasks
 

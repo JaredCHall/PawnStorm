@@ -1,18 +1,18 @@
 {
   "imports": {
     "std/": "https://deno.land/std@0.224.0/",
-    "BitChess/": "./src/"
+    "src/": "./src/"
   },
   "tasks": {
-    "play": "deno run --allow-run bitchess.ts",
+    "play": "deno run --allow-run play.ts",
     "perft": "deno run --allow-read perft.ts",
     "postinstall": "cp git-hooks/* .git/hooks",
-    "benchmark": "deno bench --allow-read --allow-run | tee benchmarks/benchmark-results.txt",
+    "benchmark": "scripts/run_benchmarks.sh",
     "stats": "cat tests/coverage-report.txt benchmarks/benchmark-results.txt",
     "test": "deno test --allow-run --allow-read",
     "test-unit": "deno task test -q tests/Unit",
     "test-integration": "deno task test -q tests/Integration",
-    "test-coverage": "deno task test-unit --clean --coverage=cov_profile && deno coverage cov_profile | tee tests/coverage-report.txt",
+    "test-coverage": "scripts/run_test_coverage.sh",
     "test-coverage-html": "deno task test-coverage && deno coverage cov_profile --html && xdg-open cov_profile/html/index.html"
   }
 }

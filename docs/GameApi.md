@@ -5,7 +5,7 @@ The Game API is where to start if you are wiring a UI. The following documents t
 ## Creating the Game object
 
 ```typescript
-import {Game} from "BitChess/Game/Game.ts"
+import {Game} from "src/Game/Game.ts"
 
 // create a new game with the normal starting position
 let game = new Game()
@@ -32,26 +32,12 @@ Queen.--Fischer} b5 10.Nxb5 cxb5 11.Bxb5+ Nbd7 12.O-O-O Rd8
 game = Game.fromPGN(fileContents)
 ```
 
-## Game Notation
-By default, BitChess will represent moves in algebraic notation, but coordinate notation is also supported.
-
-```typescript
-import {Game} from "BitChess/Game/Game.ts"
-
-const game = new Game()
-// use coordinate notation
-game.setNotation('coordinate')
-// use algebraic notation
-game.setNotation('algebriac')
-
-```
-
 ## Get Candidate Moves
 
 You may need a list legal moves in a position, or from a square. This can be useful for user prompts such as move indicators when selecting a piece to move.
 
 ```typescript
-import {Game} from "BitChess/Game/Game.ts"
+import {Game} from "src/Game/Game.ts"
 
 const game = new Game()
 // get all legal moves for player
@@ -74,22 +60,21 @@ The `piece` property is a fen or algebraic notation character representing both 
 
 ## Making Moves
 ```typescript
-import {Game} from "BitChess/Game/Game.ts"
+import {Game} from "src/Game/Game.ts"
 
 const game = new Game()
 // make moves in algebraic notation (the default)
 game.makeMove('e4')
 game.makeMove('e5')
 
-// or make them in coordinate notation
 game.setNotation('coordinate')
-game.makeMove('e1e2')
-game.makeMove('e8e7')
+game.makeMove('e1e2', 'coordinate')
+game.makeMove('e8e7', 'coordinate')
 ```
 
 ## Undo the Last Move
 ```typescript
-import {Game} from "BitChess/Game/Game.ts"
+import {Game} from "src/Game/Game.ts"
 
 const game = new Game()
 game.makeMove('e4')
@@ -103,7 +88,7 @@ game.undoMove()
 ## Rendering the Board
 ```typescript
 
-import {Game} from "BitChess/Game/Game.ts"
+import {Game} from "src/Game/Game.ts"
 
 const game = new Game()
 game.getSquares().forEach((square) => {
@@ -136,9 +121,9 @@ Moves are stored as a linked list. Useful methods off the `MoveNavigator` includ
 - `.getChild()` - an alternative move that starts a variation line
 
 ```typescript
-import {Game} from "BitChess/Game/Game.ts"
-import {MoveNavigator} from "BitChess/Game/MoveNavigator.ts"
-import {RecordedMove} from "BitChess/Game/RecordedMove.ts"
+import {Game} from "src/Game/Game.ts"
+import {MoveNavigator} from "src/Game/MoveNavigator.ts"
+import {RecordedMove} from "src/Game/RecordedMove.ts"
 
 const navigator = game.getMoveNavigator()
 
@@ -168,9 +153,22 @@ renderLine(navigator.getMove(0))
 
 ```
 
+## Navigating Variations ___*TODO\*___
+
+```typescript
+import {Game} from "src/Game/Game.ts"
+
+// let's import a game like the morphy game used above
+const game = Game.fromPGN(pgnMorphyOperaGame)
+// suppose we want to explore what would happen if Morphy mouse slipped on move 17 and instead of 17. Rd8# played 17. Rd7.
+
+// you can use moveId, but that requires looping through the moveList. Need an easier api to get the mainline moves
+game.gotoMove(16, 'black')
+```
+
 ## Checking Game State
 ```typescript
-import {Game} from "BitChess/Game/Game.ts"
+import {Game} from "src/Game/Game.ts"
 
 const game = new Game()
 // which player's turn is it?
@@ -192,7 +190,7 @@ const status = game.getStatus()
 
 ## Resigns or Draw by Agreement
 ```typescript
-import {Game} from "BitChess/Game/Game.ts"
+import {Game} from "src/Game/Game.ts"
 
 const game = new Game()
 game.setResigns('white')
@@ -203,7 +201,7 @@ game.setDrawByAgreement()
 
 ## Export PGN
 ```typescript
-import {Game} from "BitChess/Game/Game.ts"
+import {Game} from "src/Game/Game.ts"
 
 const game = new Game()
 const pgnFileContents = game.exportPgnFile()
@@ -212,7 +210,7 @@ const pgnFileContents = game.exportPgnFile()
 
 ## Get the FEN string
 ```typescript
-import {Game} from "BitChess/Game/Game.ts"
+import {Game} from "src/Game/Game.ts"
 
 const game = new Game()
 const fenString = game.getFenString()

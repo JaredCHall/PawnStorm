@@ -4,6 +4,8 @@ import {SquareNameMap} from "../../Board/Square.ts";
 import {MoveFactory} from "../../MoveGen/MoveFactory.ts";
 import {Color, FenPieceMap, PieceType} from "../../Board/Piece.ts";
 import {CastlingMoveMap, CastlingRight} from "../../MoveGen/CastlingMove.ts";
+import {InvalidMoveError} from "../../Game/Error/InvalidMoveError.ts";
+import {IllegalMoveError} from "../../Game/Error/IllegalMoveError.ts";
 
 export class AlgebraicNotationParser implements ParserInterface{
 
@@ -25,7 +27,7 @@ export class AlgebraicNotationParser implements ParserInterface{
         // somehow this regex ensures that destination square is always in part 5, even with pawn moves
         parts = notation.match(/^([KQBNR])?([a-h])?([1-8])?(x)?([a-h][1-8])(=)?([QBNR])?([+#])?$/)
         if(parts === null){
-            throw new Error(`"${notation}" is not valid algebraic notation.`)
+            throw new InvalidMoveError(`"${notation}" is not valid algebraic notation.`)
         }
         const pieceType =  parts[1] ? FenPieceMap.bitTypeByFen[parts[1]] >> 1 : (sideToMove ? PieceType.BPawn : PieceType.Pawn)
         const startFile = SquareNameMap.fileIndexes[parts[2]] ?? null
@@ -58,11 +60,11 @@ export class AlgebraicNotationParser implements ParserInterface{
         }
 
         if(moves.length == 0){
-            throw new Error(`"${notation}" is not a legal move.`)
+            throw new IllegalMoveError(`"${notation}" is not a legal move.`)
         }
 
         if(moves.length > 1){
-            throw new Error(`"${notation}" is ambiguous.`)
+            throw new InvalidMoveError(`"${notation}" is ambiguous.`)
         }
 
         return moves[0]

@@ -3,6 +3,8 @@ import {EngineInterface} from "../Engine/EngineInterface.ts";
 import {StockfishInterface} from "../Engine/StockfishInterface.ts";
 import {PgnParser} from "../Notation/PgnParser.ts";
 import {Renderer} from "../Board/Renderer.ts";
+import {GameOverError} from "../Game/Error/GameOverError.ts";
+import {InvalidMoveError} from "../Game/Error/InvalidMoveError.ts";
 
 export class ConsoleApp {
 
@@ -116,7 +118,11 @@ Options:
                 const move = this.game.makeMove(input)
                 console.log(move.serialize(true))
             }catch(err){
-                console.log(err.message)
+                if(err instanceof GameOverError || err instanceof InvalidMoveError){
+                    console.log(`${err.name}: ${err.message}`)
+                }else{
+                    throw err
+                }
                 continue
             }
 

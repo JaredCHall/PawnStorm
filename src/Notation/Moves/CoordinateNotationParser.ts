@@ -2,6 +2,8 @@ import {NotationType, ParserInterface} from "./ParserInterface.ts";
 import {BitMove} from "../../MoveGen/BitMove.ts";
 import {SquareNameMap} from "../../Board/Square.ts";
 import {MoveFactory} from "../../MoveGen/MoveFactory.ts";
+import {InvalidMoveError} from "../../Game/Error/InvalidMoveError.ts";
+import {IllegalMoveError} from "../../Game/Error/IllegalMoveError.ts";
 
 export class CoordinateNotationParser implements ParserInterface{
 
@@ -15,7 +17,7 @@ export class CoordinateNotationParser implements ParserInterface{
     parse(notation: string): BitMove {
         const parts = notation.match(/^([a-h][1-8])(\s)?([a-h][1-8])(\s)?(=)?([QBNR])?$/)
         if(parts === null){
-            throw new Error(`"${notation}" is not valid coordinate notation.`)
+            throw new InvalidMoveError(`"${notation}" is not valid coordinate notation.`)
         }
 
         const fromName = parts[1]
@@ -27,7 +29,7 @@ export class CoordinateNotationParser implements ParserInterface{
         const promoteType = parts[6] || null
         const moving = this.moveFactory.squareList[from]
         if(moving == 0){
-            throw new Error(`"${notation}" is not possible. There is no piece on the ${fromName} square.`)
+            throw new InvalidMoveError(`"${notation}" is not possible. There is no piece on the ${fromName} square.`)
         }
 
         const bitMoves = this.moveFactory.getMovesFromSquare(from, moving)
@@ -36,7 +38,7 @@ export class CoordinateNotationParser implements ParserInterface{
             })
 
         if(bitMoves.length !== 1){
-            throw new Error(`"${notation}" is not a legal move.`)
+            throw new IllegalMoveError(`"${notation}" is not a legal move.`)
         }
         return bitMoves[0]
     }
