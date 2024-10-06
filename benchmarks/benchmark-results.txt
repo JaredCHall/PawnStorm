@@ -1,19 +1,20 @@
-cpu: 12th Gen Intel(R) Core(TM) i9-12900K
-runtime: deno 1.44.4 (x86_64-unknown-linux-gnu)
+    CPU | 12th Gen Intel(R) Core(TM) i9-12900K
+Runtime | Deno 1.46.3 (x86_64-unknown-linux-gnu)
 
 file:///projects/PawnStorm/benchmarks/perft-compare.bench.ts
-benchmark             time (avg)        iter/s             (min … max)       p75       p99      p995
----------------------------------------------------------------------- -----------------------------
+
+benchmark          time/iter (avg)        iter/s      (min … max)           p75      p99     p995
+------------------ ----------------------------- --------------------- --------------------------
 
 group perft5
-App Perft5           427.94 ms/iter           2.3  (424.41 ms … 430.5 ms) 429.37 ms 430.5 ms 430.5 ms
-DenoChess Perft5        1.37 s/iter           0.7       (1.36 s … 1.38 s) 1.38 s 1.38 s 1.38 s
-ChessJS Perft5          2.02 s/iter           0.5       (2.01 s … 2.04 s) 2.03 s 2.04 s 2.04 s
-Stockfish Perft5      13.63 ms/iter          73.4   (13.03 ms … 19.25 ms) 13.34 ms 19.25 ms 19.25 ms
+App Perft5                465.1 ms           2.1 (461.7 ms … 467.1 ms) 466.4 ms 467.1 ms 467.1 ms
+DenoChess Perft5             1.6 s           0.6 (   1.6 s …    1.6 s)    1.6 s    1.6 s    1.6 s
+ChessJS Perft5               2.2 s           0.4 (   2.2 s …    2.3 s)    2.2 s    2.3 s    2.3 s
+Stockfish Perft5           13.3 ms          75.0 ( 12.6 ms …  20.1 ms)  13.0 ms  20.1 ms  20.1 ms
 
 summary
   App Perft5
-   31.4x slower than Stockfish Perft5
-   3.2x faster than DenoChess Perft5
-   4.73x faster than ChessJS Perft5
+    34.86x slower than Stockfish Perft5
+     3.38x faster than DenoChess Perft5
+     4.82x faster than ChessJS Perft5
 
