@@ -1,11 +1,3 @@
-import {
-    bgBrightBlue,
-    bgBrightGreen,
-    bgBrightMagenta,
-    black,
-    bold,
-    white
-} from "std/fmt/colors.ts";
 import {Square} from "./Square.ts";
 import {PieceType} from "./Piece.ts";
 import {Board} from "./Board.ts";
@@ -26,17 +18,25 @@ export class Renderer {
         let i = 20
         for(let rank=7;rank>=0;rank--) {
             let squareType = rank % 2 === 0 ? 1: 0
-            console.log(squaresByRank[rank].map((piece)=> {
+            this.printRank(squaresByRank[rank].map((piece)=> {
                 i++
                 const formatted = this.formatSquare(squareType, piece, highlights.includes(i))
                 squareType ^= 1
                 return formatted
-            }).join(''))
+            }))
             i+= 2
         }
     }
 
-    formatSquare(squareType: number, moving: number, highlight:boolean)
+    printRank(squares: SquareOutput[]): void
+    {
+        console.log(
+            `%c${squares[0].text}%c${squares[1].text}%c${squares[2].text}%c${squares[3].text}%c${squares[4].text}%c${squares[5].text}%c${squares[6].text}%c${squares[7].text}`,
+            squares[0].style,squares[1].style,squares[2].style,squares[3].style,squares[4].style,squares[5].style,squares[6].style,squares[7].style,
+        )
+    }
+
+    formatSquare(squareType: number, moving: number, highlight:boolean): SquareOutput
     {
         const pieceRenderMap: Record<PieceType, string> = {
             [PieceType.Pawn]: '♟',
@@ -48,19 +48,38 @@ export class Renderer {
             [PieceType.BPawn]: '♟',
         }
 
-        //@ts-ignore ok
-        let formatted = (pieceRenderMap[moving >> 1] ?? ' ') + ' '
+        // @ts-ignore - it's fine
+        const text: string = (pieceRenderMap[moving >> 1] ?? ' ') + ' '
+        let style = ''
 
         if(highlight){
-            formatted = bgBrightGreen(formatted)
+            style += 'background-color: green; '
         }else{
-            formatted = squareType === 0 ? bgBrightMagenta(formatted) : bgBrightBlue(formatted)
+            style += squareType === 0 ? 'background-color: magenta; ' : 'background-color: blue; '
+            //formatted = squareType === 0 ? bgBrightMagenta(formatted) : bgBrightBlue(formatted)
         }
 
         if(moving == 0){
-            return formatted
+            return new SquareOutput(text, style)
         }
 
-        return moving & 1 ? bold(black(formatted)) : bold(white(formatted))
+        if(moving & 1){
+            style += 'font-weight: bold; color: black; '
+        }else{
+            style += 'font-weight:bold; color: white; '
+        }
+
+
+        return new SquareOutput(text, style)
+    }
+}
+
+class SquareOutput {
+    text: string
+    style: string
+
+    constructor(text: string, style: string) {
+        this.text = text
+        this.style = style
     }
 }

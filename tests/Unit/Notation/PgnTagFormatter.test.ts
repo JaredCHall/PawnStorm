@@ -1,4 +1,4 @@
-import {assertEquals} from "std/assert/assert_equals.ts";
+import {assertEquals} from "@std/assert";
 import {PgnTagFormatter} from "../../../src/Notation/PgnTagFormatter.ts";
 import {GameStatus} from "../../../src/Game/GameStatus.ts";
 

@@ -1,5 +1,5 @@
-import {assertEquals} from "std/assert/assert_equals.ts";
-import {assertThrows} from "std/assert/assert_throws.ts";
+import {assertEquals} from "@std/assert";
+import {assertThrows} from "@std/assert";
 import {PgnParser} from "../../../src/Notation/PgnParser.ts";
 
 Deno.test('it throws when input cannot be parsed', () => {

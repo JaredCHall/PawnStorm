@@ -1,5 +1,5 @@
-import {assertEquals} from "std/assert/assert_equals.ts";
-import {assertAlmostEquals} from "std/assert/assert_almost_equals.ts";
+import {assertEquals} from "@std/assert";
+import {assertAlmostEquals} from "@std/assert";
 import {StockfishInterface} from "../../../src/Engine/StockfishInterface.ts";
 
 Deno.test('it consults engine on next best move', async () => {

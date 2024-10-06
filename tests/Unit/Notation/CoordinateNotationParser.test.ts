@@ -1,10 +1,10 @@
-import {assertEquals} from "std/assert/assert_equals.ts";
+import {assertEquals} from "@std/assert";
 import {BitMove, MoveType} from "../../../src/MoveGen/BitMove.ts";
 import {Square} from "../../../src/Board/Square.ts";
 import {Piece} from "../../../src/Board/Piece.ts";
 import {MoveFactory} from "../../../src/MoveGen/MoveFactory.ts";
 import {CoordinateNotationParser} from "../../../src/Notation/Moves/CoordinateNotationParser.ts";
-import {assertThrows} from "std/assert/assert_throws.ts";
+import {assertThrows} from "@std/assert";
 
 const getParser = (fen: string): CoordinateNotationParser => {
     const factory = new MoveFactory()

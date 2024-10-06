@@ -1,6 +1,6 @@
-import {assertEquals} from "std/assert/assert_equals.ts";
+import {assertEquals} from "@std/assert";
 import {AnnotationGlyph} from "../../../src/Notation/AnnotationGlyph.ts";
-import {assertThrows} from "std/assert/assert_throws.ts";
+import {assertThrows} from "@std/assert";
 
 Deno.test('it serializes glyphs', () => {
 

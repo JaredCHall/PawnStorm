@@ -1,6 +1,6 @@
-import {assertEquals} from "std/assert/assert_equals.ts";
-import {assertThrows} from "std/assert/assert_throws.ts";
-import {Board} from "../../../src/Board/Board.ts";
+import {assertEquals} from "@std/assert";
+import {assertThrows} from "@std/assert";
+import {Board} from "src/Board/Board.ts";
 import {Square} from "../../../src/Board/Square.ts";
 import {binToString} from "../../../src/Utils.ts";
 import {Piece, Color} from "../../../src/Board/Piece.ts";

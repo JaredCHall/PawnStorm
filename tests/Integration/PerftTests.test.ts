@@ -1,5 +1,5 @@
-import {PerftRunner} from "../../src/Perft/PerftRunner.ts";
-import {assertEquals} from "std/assert/assert_equals.ts";
+import {PerftRunner} from "src/Perft/PerftRunner.ts";
+import {assertEquals} from "@std/assert";
 
 const testPosition = (fen: string, depth: number, expectedNodes: number): void => {
     Deno.test(`it finds ${expectedNodes} nodes in position: "${fen}" position at depth ${depth}`, async () => {

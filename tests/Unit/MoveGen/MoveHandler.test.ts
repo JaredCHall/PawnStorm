@@ -1,4 +1,4 @@
-import {assertEquals} from "std/assert/assert_equals.ts";
+import {assertEquals} from "@std/assert";
 import {MoveHandler} from "../../../src/MoveGen/MoveHandler.ts";
 import {BitMove, MoveFlag, MoveType} from "../../../src/MoveGen/BitMove.ts";
 import {Color, Piece} from "../../../src/Board/Piece.ts";

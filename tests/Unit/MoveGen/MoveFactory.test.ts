@@ -1,5 +1,5 @@
-import {assertArrayIncludes} from "std/assert/assert_array_includes.ts";
-import {assertEquals} from "std/assert/assert_equals.ts";
+import {assertArrayIncludes} from "@std/assert";
+import {assertEquals} from "@std/assert";
 import {MoveFactory} from "../../../src/MoveGen/MoveFactory.ts";
 import {BitMove, MoveType} from "../../../src/MoveGen/BitMove.ts";
 import {Square} from "../../../src/Board/Square.ts";

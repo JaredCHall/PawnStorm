@@ -1,5 +1,5 @@
-import {assertEquals} from "std/assert/assert_equals.ts";
-import {assertThrows} from "std/assert/assert_throws.ts";
+import {assertEquals} from "@std/assert";
+import {assertThrows} from "@std/assert";
 import {RecordedMove} from "../../../src/Game/RecordedMove.ts";
 import { BitMove } from "src/MoveGen/BitMove.ts";
 import {Square} from "../../../src/Board/Square.ts";

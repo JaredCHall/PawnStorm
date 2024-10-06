@@ -1,5 +1,30 @@
 {
   "version": "3",
+  "packages": {
+    "specifiers": {
+      "jsr:@std/assert@^1.0.6": "jsr:@std/assert@1.0.6",
+      "jsr:@std/cli@^1.0.6": "jsr:@std/cli@1.0.6",
+      "jsr:@std/fmt@^1.0.2": "jsr:@std/fmt@1.0.2",
+      "jsr:@std/internal@^1.0.4": "jsr:@std/internal@1.0.4"
+    },
+    "jsr": {
+      "@std/assert@1.0.6": {
+        "integrity": "1904c05806a25d94fe791d6d883b685c9e2dcd60e4f9fc30f4fc5cf010c72207",
+        "dependencies": [
+          "jsr:@std/internal@^1.0.4"
+        ]
+      },
+      "@std/cli@1.0.6": {
+        "integrity": "d22d8b38c66c666d7ad1f2a66c5b122da1704f985d3c47f01129f05abb6c5d3d"
+      },
+      "@std/fmt@1.0.2": {
+        "integrity": "87e9dfcdd3ca7c066e0c3c657c1f987c82888eb8103a3a3baa62684ffeb0f7a7"
+      },
+      "@std/internal@1.0.4": {
+        "integrity": "62e8e4911527e5e4f307741a795c0b0a9e6958d0b3790716ae71ce085f755422"
+      }
+    }
+  },
   "remote": {
     "https://deno.land/std@0.224.0/assert/_constants.ts": "a271e8ef5a573f1df8e822a6eb9d09df064ad66a4390f21b3e31f820a38e0975",
     "https://deno.land/std@0.224.0/assert/assert.ts": "09d30564c09de846855b7b071e62b5974b001bb72a4b797958fe0660e7849834",
@@ -34,5 +59,12 @@
     "https://deno.land/x/chess@0.6.0/src/core/logic/performMove.ts": "07977c2cae16db468779fb187785a4d43990106d4deba9a9e3ec3c9ba4b44f7d",
     "https://deno.land/x/chess@0.6.0/src/core/logic/perft.ts": "23adc1fffe4960fede282e6b3a506b7d42fd6d0db82a197914cfff2addacbeeb",
     "https://raw.githubusercontent.com/jhlywa/chess.js/52f7579e927fb4bd2d51f3d3f07e7d2200770ddd/src/chess.ts": "83f6f64b3b0a0d99fee5416bf4b9ef3f0c527ab1cdf9c5646a1a387407b215f5"
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@std/assert@^1.0.6",
+      "jsr:@std/cli@^1.0.6",
+      "jsr:@std/fmt@^1.0.2"
+    ]
   }
 }
