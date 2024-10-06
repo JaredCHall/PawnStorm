@@ -7,14 +7,16 @@ benchmark          time/iter (avg)        iter/s      (min … max)           p7
 ------------------ ----------------------------- --------------------- --------------------------
 
 group perft5
-App Perft5                465.1 ms           2.1 (461.7 ms … 467.1 ms) 466.4 ms 467.1 ms 467.1 ms
-DenoChess Perft5             1.6 s           0.6 (   1.6 s …    1.6 s)    1.6 s    1.6 s    1.6 s
-ChessJS Perft5               2.2 s           0.4 (   2.2 s …    2.3 s)    2.2 s    2.3 s    2.3 s
-Stockfish Perft5           13.3 ms          75.0 ( 12.6 ms …  20.1 ms)  13.0 ms  20.1 ms  20.1 ms
+PawnStorm Perft5          489.1 ms           2.0 (478.9 ms … 515.7 ms) 489.3 ms 515.7 ms 515.7 ms
+DenoChess Perft5             1.5 s           0.7 (   1.5 s …    1.5 s)    1.5 s    1.5 s    1.5 s
+ChessJS Perft5               2.1 s           0.5 (   2.1 s …    2.2 s)    2.1 s    2.2 s    2.2 s
+Stockfish Perft5           12.9 ms          77.8 ( 12.6 ms …  14.4 ms)  12.9 ms  14.4 ms  14.4 ms
+Ethereal Perft5            95.5 ms          10.5 ( 93.6 ms …  97.1 ms)  95.9 ms  97.1 ms  97.1 ms
 
 summary
-  App Perft5
-    34.86x slower than Stockfish Perft5
-     3.38x faster than DenoChess Perft5
-     4.82x faster than ChessJS Perft5
+  PawnStorm Perft5
+    38.04x slower than Stockfish Perft5
+     5.12x slower than Ethereal Perft5
+     3.03x faster than DenoChess Perft5
+     4.37x faster than ChessJS Perft5
 
