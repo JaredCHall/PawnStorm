@@ -4,7 +4,7 @@ export interface EngineInterface {
 
     setFen(fen: string): Promise<void>
     setSkillLevel(elo: number): Promise<void>
-    getBestMove(): Promise<string>
+    getBestMove(moveTime: number): Promise<string>
     getEval(): Promise<number>
     perft(depth: number): Promise<number>
 

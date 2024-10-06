@@ -46,7 +46,7 @@ export class UciEngine
         await writer.write(new TextEncoder().encode(command + '\n'))
         writer.releaseLock()
     }
-    async readResponse(regex: RegExp, firstMatchOnly: boolean = false): Promise<string> {
+    async readResponse(regex: RegExp, firstMatchOnly: boolean = false, msTimeout: number = 500): Promise<string> {
 
         let decoded = ''
         let output
@@ -58,7 +58,7 @@ export class UciEngine
 
         readLoop:
         while(true){
-            output = await this.timeoutPromise(reader.read(), 500)
+            output = await this.timeoutPromise(reader.read(), msTimeout)
             if(output.done){
                 break
             }
@@ -86,5 +86,22 @@ export class UciEngine
         }
 
         return decoded
+    }
+
+
+    async isReady(): Promise<boolean> {
+        await this.writeCommand('isready')
+        await this.readResponse(/^(readyok)/, true)
+        return true
+    }
+
+    async setFen(fen: string): Promise<void> {
+        await this.writeCommand('ucinewgame')
+        await this.writeCommand('position fen ' + fen)
+    }
+
+    async getBestMove(moveTime:number=500): Promise<string> {
+        await this.writeCommand(`go movetime ${moveTime}`)
+        return await this.readResponse(/^bestmove\s+([a-h0-8=NBRQ]+)/, true, moveTime + 100)
     }
 }

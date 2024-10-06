@@ -16,7 +16,7 @@ Features:
 - Interfaces with popular chess engines:
   - Stockfish
   - Ethereal
-  - Rustic Chess ___*TODO\*___
+  - Rustic Chess
 - Console Application
   - Play against your favorite engine
   - Watch engines battle other engines  ___*TODO\*___

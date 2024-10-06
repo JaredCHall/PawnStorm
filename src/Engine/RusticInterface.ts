@@ -1,10 +1,10 @@
 import {EngineInterface} from "./EngineInterface.ts";
 import { UciEngine } from "./UciEngine.ts";
 
-export class EtherealInterface extends UciEngine implements EngineInterface {
+export class RusticInterface extends UciEngine implements EngineInterface {
 
     constructor() {
-        super('Ethereal')
+        super('rustic')
     }
 
     async setSkillLevel(elo: number): Promise<void> {
@@ -12,11 +12,11 @@ export class EtherealInterface extends UciEngine implements EngineInterface {
     }
 
     async getEval(): Promise<number> {
-        return Promise.reject(new Error('Not supported'))
+        await this.writeCommand('eval')
+        return parseInt(await this.readResponse(/Evaluation:\s+[-]?(\d+)/, true)) / 100
     }
 
     async perft(depth: number): Promise<number> {
-        await this.writeCommand('perft ' + depth)
-        return parseInt(await this.readResponse(/^(\d+)/, true))
+        return Promise.reject(new Error('Not supported in UCI mode'))
     }
 }
