@@ -19,6 +19,9 @@ File                                        | Branch % | Line % |
  Game/MoveNavigator.ts                      |    100.0 |  100.0 |
  Game/RecordedMove.ts                       |     83.3 |   98.7 |
  Game/RepetitionTracker.ts                  |    100.0 |  100.0 |
+ Game/Timer/DelayTimer.ts                   |    100.0 |  100.0 |
+ Game/Timer/IncrementTimer.ts               |    100.0 |  100.0 |
+ Game/Timer/Timer.ts                        |    100.0 |  100.0 |
  MoveGen/BitMove.ts                         |    100.0 |  100.0 |
  MoveGen/CastlingMove.ts                    |    100.0 |  100.0 |
  MoveGen/MoveFactory.ts                     |     97.9 |   97.8 |
@@ -31,5 +34,5 @@ File                                        | Branch % | Line % |
  Notation/PgnTagFormatter.ts                |    100.0 |  100.0 |
  Utils.ts                                   |    100.0 |   50.0 |
 -----------------------------------------------------------------
- All files                                  |     97.0 |   96.4 |
+ All files                                  |     97.0 |   96.6 |
 -----------------------------------------------------------------

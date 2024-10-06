@@ -1,6 +1,6 @@
-import {BasicTimer} from "./BasicTimer.ts";
+import {Timer} from "./Timer.ts";
 
-export class IncrementTimer extends BasicTimer
+export class IncrementTimer extends Timer
 {
     increment: number //seconds
 

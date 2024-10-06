@@ -1,4 +1,4 @@
-export class BasicTimer
+export class Timer
 {
     timeLimit: number // seconds
 
@@ -33,30 +33,29 @@ export class BasicTimer
 
     start()
     {
-        this.turnStartTimestamp = new Date().getTime()
-        this.turnStartTimeRemaining = this.timeRemaining
-        this.intervalId = setInterval(() => {this.decrementTime()}, 1000)
-    }
-
-    decrementTime(): void
-    {
-        if(this.turnStartTimestamp === null){
-            throw new Error("Cannot decrement time when clock is not running.")
+        if(this.timeRemaining <= 0){
+            throw new Error("Cannot start timer. Time expired.")
         }
 
-        const elapsed = this.timeElapsed(this.turnStartTimestamp)
+        this.turnStartTimestamp = new Date().getTime()
+        this.turnStartTimeRemaining = this.timeRemaining
+        this.intervalId = setInterval(() => {this.tick()}, 1000)
+    }
+
+    tick(): void
+    {
+        if(this.turnStartTimestamp === null){
+            throw new Error("Cannot decrement timer. Timer is stopped.")
+        }
+
+        const elapsed = Math.floor(((new Date().getTime()) - this.turnStartTimestamp) / 1000)
         if(elapsed > 0){
-            this.timeRemaining = this.turnStartTimeRemaining - this.timeElapsed(this.turnStartTimestamp)
+            this.timeRemaining = this.turnStartTimeRemaining - elapsed
         }
 
         if(this.timeRemaining <= 0){
             this.outOfTime()
         }
-    }
-
-    timeElapsed(startTime: number): number
-    {
-        return Math.floor(((new Date().getTime()) - startTime) / 1000)
     }
 
     stop(): void

@@ -1,6 +1,6 @@
-import { BasicTimer } from "src/Game/Timer/BasicTimer.ts";
+import { Timer } from "src/Game/Timer/Timer.ts";
 
-export class DelayTimer extends BasicTimer
+export class DelayTimer extends Timer
 {
     delay: number //seconds
 
@@ -14,6 +14,6 @@ export class DelayTimer extends BasicTimer
     {
         this.turnStartTimeRemaining = this.timeRemaining
         this.turnStartTimestamp = new Date().getTime() + this.delay * 1000
-        this.intervalId = setInterval(() => {this.decrementTime()}, 1000)
+        this.intervalId = setInterval(() => {this.tick()}, 1000)
     }
 }
