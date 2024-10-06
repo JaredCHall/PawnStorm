@@ -5,6 +5,8 @@ import {PgnParser} from "../Notation/PgnParser.ts";
 import {Renderer} from "../Board/Renderer.ts";
 import {GameOverError} from "../Game/Error/GameOverError.ts";
 import {InvalidMoveError} from "../Game/Error/InvalidMoveError.ts";
+import {PgnSerializer} from "../Notation/PgnSerializer.ts";
+import {EtherealInterface} from "../Engine/EtherealInterface.ts";
 
 export class ConsoleApp {
 
@@ -21,7 +23,7 @@ export class ConsoleApp {
 
     constructor() {
         this.game = new Game()
-        this.engine = new StockfishInterface()
+        this.engine = new EtherealInterface()
         this.renderer = new Renderer()
     }
 
@@ -169,7 +171,10 @@ Options:
     {
         const firstMove = this.game.getMoveNavigator().getFirstMove()
         if(firstMove){
-            console.log(new PgnParser().serializeMoves(firstMove))
+            const serializer = new PgnSerializer(this.game)
+            serializer.withGameTags = false
+
+            console.log(serializer.serialize().trim())
         }
     }
 }

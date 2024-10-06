@@ -8,6 +8,7 @@ File                                        | Branch % | Line % |
  Board/Square.ts                            |    100.0 |  100.0 |
  Engine/Errors/UciTimeoutError.ts           |    100.0 |  100.0 |
  Engine/Errors/UciUnexpectedOutputError.ts  |    100.0 |   40.0 |
+ Engine/EtherealInterface.ts                |    100.0 |   89.7 |
  Engine/StockfishInterface.ts               |    100.0 |   87.1 |
  Engine/UciEngine.ts                        |     57.1 |   80.8 |
  Game/Error/GameOverError.ts                |    100.0 |  100.0 |
@@ -36,5 +37,5 @@ File                                        | Branch % | Line % |
  Notation/PgnTagFormatter.ts                |    100.0 |  100.0 |
  Utils.ts                                   |    100.0 |   50.0 |
 -----------------------------------------------------------------
- All files                                  |     96.7 |   96.8 |
+ All files                                  |     96.7 |   96.7 |
 -----------------------------------------------------------------

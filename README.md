@@ -12,11 +12,10 @@ Features:
   - checkmate and draw detection
   - FEN/PGN parsing and generation
   - Variation navigation
-  - Game Clock with Increment and Delay ___*TODO\*___
+  - Game Clock with Increment and Delay
 - Interfaces with popular chess engines:
   - Stockfish
-  - Leela ___*TODO\*___
-  - Ethereal ___*TODO\*___
+  - Ethereal
   - Rustic Chess ___*TODO\*___
 - Console Application
   - Play against your favorite engine
