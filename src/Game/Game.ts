@@ -17,7 +17,7 @@ import {GameOverError} from "./Error/GameOverError.ts";
 import { Timer } from "src/Game/Timer/Timer.ts";
 import {DelayTimer} from "./Timer/DelayTimer.ts";
 import {IncrementTimer} from "./Timer/IncrementTimer.ts";
-import {ClockTime} from "./Timer/ClockTime.ts";
+import {ClockTime} from "../Notation/ClockTime.ts";
 
 export class Game {
 

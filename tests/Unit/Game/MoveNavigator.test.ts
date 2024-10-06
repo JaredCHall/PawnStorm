@@ -7,13 +7,16 @@ import {Piece} from "../../../src/Board/Piece.ts";
 import {MoveNavigator} from "../../../src/Game/MoveNavigator.ts";
 import { FenNumber } from "../../../src/Notation/FenNumber.ts";
 import {PgnParser} from "../../../src/Notation/PgnParser.ts";
+import {PgnSerializer} from "../../../src/Notation/PgnSerializer.ts";
+import {Game} from "../../../src/Game/Game.ts";
 
 
 
 const navigator = new MoveNavigator('startFen')
+const serializer = new PgnSerializer(new Game())
 
 const assertSerializesAs = (expected: string, msg: string = 'Serializes as expected string'): void => {
-    assertEquals((new PgnParser()).serializeMoves(navigator.getMove(0)), expected, msg)
+    assertEquals(serializer.serializeMoves(navigator.getMove(0)), expected, msg)
 }
 
 
@@ -155,20 +158,14 @@ Deno.test('it deletes variations and lines', () => {
     assertThrows(() => {navigator.getMove(variation2[2].getId())})
     assertThrows(() => {navigator.getMove(nestedVariation[0].getId())})
 
-    assertEquals(
-        (new PgnParser()).serializeMoves(mainLine[0]),
-        '1. a1 (1. b1 b2) 1... a2 (1... c2) 2. a3 a4'
-    )
+    assertSerializesAs('1. a1 (1. b1 b2) 1... a2 (1... c2) 2. a3 a4')
 
     navigator.deleteFrom(variation1[0].getId())
     assertEquals(navigator.getLast(), variation2[0], 'leaves cursor as it was when not part of the deleted line')
     assertThrows(() => {navigator.getMove(variation1[0].getId())})
     assertThrows(() => {navigator.getMove(variation1[1].getId())})
 
-    assertEquals(
-        (new PgnParser()).serializeMoves(mainLine[0]),
-        '1. a1 a2 (1... c2) 2. a3 a4'
-    )
+    assertSerializesAs('1. a1 a2 (1... c2) 2. a3 a4')
 
     // deletes everything
     navigator.deleteFrom(0)

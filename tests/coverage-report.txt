@@ -13,27 +13,28 @@ File                                        | Branch % | Line % |
  Game/Error/GameOverError.ts                |    100.0 |  100.0 |
  Game/Error/IllegalMoveError.ts             |    100.0 |  100.0 |
  Game/Error/InvalidMoveError.ts             |    100.0 |  100.0 |
- Game/Game.ts                               |     92.5 |   92.7 |
+ Game/Game.ts                               |     92.6 |   92.7 |
  Game/GameStatus.ts                         |    100.0 |  100.0 |
  Game/Move.ts                               |    100.0 |  100.0 |
- Game/MoveNavigator.ts                      |    100.0 |  100.0 |
+ Game/MoveNavigator.ts                      |     95.8 |   98.9 |
  Game/RecordedMove.ts                       |     71.4 |   97.6 |
  Game/RepetitionTracker.ts                  |    100.0 |  100.0 |
- Game/Timer/ClockTime.ts                    |    100.0 |  100.0 |
  Game/Timer/DelayTimer.ts                   |    100.0 |  100.0 |
  Game/Timer/IncrementTimer.ts               |    100.0 |  100.0 |
  Game/Timer/Timer.ts                        |    100.0 |  100.0 |
  MoveGen/BitMove.ts                         |    100.0 |  100.0 |
  MoveGen/CastlingMove.ts                    |    100.0 |  100.0 |
- MoveGen/MoveFactory.ts                     |     97.9 |   97.8 |
+ MoveGen/MoveFactory.ts                     |     98.0 |   97.8 |
  MoveGen/MoveHandler.ts                     |    100.0 |  100.0 |
  Notation/AnnotationGlyph.ts                |    100.0 |  100.0 |
+ Notation/ClockTime.ts                      |    100.0 |  100.0 |
  Notation/FenNumber.ts                      |    100.0 |  100.0 |
  Notation/Moves/AlgebraicNotationParser.ts  |    100.0 |   97.8 |
  Notation/Moves/CoordinateNotationParser.ts |    100.0 |  100.0 |
- Notation/PgnParser.ts                      |     91.5 |   94.2 |
+ Notation/PgnParser.ts                      |     91.9 |   92.6 |
+ Notation/PgnSerializer.ts                  |     75.0 |   94.0 |
  Notation/PgnTagFormatter.ts                |    100.0 |  100.0 |
  Utils.ts                                   |    100.0 |   50.0 |
 -----------------------------------------------------------------
- All files                                  |     96.8 |   96.9 |
+ All files                                  |     96.4 |   96.7 |
 -----------------------------------------------------------------

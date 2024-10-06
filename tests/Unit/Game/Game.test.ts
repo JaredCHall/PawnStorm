@@ -6,12 +6,13 @@ import {Move} from "../../../src/Game/Move.ts";
 import {BitMove} from "../../../src/MoveGen/BitMove.ts";
 import {Square} from "../../../src/Board/Square.ts";
 import {Piece} from "../../../src/Board/Piece.ts";
-import {PgnParser} from "../../../src/Notation/PgnParser.ts";
 import {Renderer} from "../../../src/Board/Renderer.ts";
+import {PgnSerializer} from "../../../src/Notation/PgnSerializer.ts";
 
 const renderer = new Renderer()
 const assertSerializesMovesAs = (game: Game, expected: string): void =>  {
-    assertEquals((new PgnParser()).serializeMoves(game.getMoveNavigator().getMove(0)), expected)
+    const serializer = new PgnSerializer(game)
+    assertEquals(serializer.serializeMoves(game.getMoveNavigator().getMove(0)), expected)
 }
 
 describe("Game", () => {
@@ -133,7 +134,7 @@ describe("Game", () => {
         assertEquals(game.isDraw(), false)
 
 
-        const serialized = (new PgnParser).serialize(game)
+        const serialized = new PgnSerializer(game).serialize()
         assertEquals(serialized, `[Event "Casual Game"]
 [Site "Opera House"]
 [Round "1"]
@@ -187,7 +188,7 @@ describe("Game", () => {
         assertEquals(game.getClockTime('white'),'00:00:53')
         assertEquals(game.getClockTime('black'),'00:00:50')
 
-        const serialized = (new PgnParser).serialize(game)
+        const serialized = new PgnSerializer(game).serialize()
 
         assertEquals(serialized, `[Event "Casual Game"]
 [Site "?"]

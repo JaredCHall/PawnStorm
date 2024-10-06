@@ -1,6 +1,6 @@
 import {describe, it} from "@std/testing/bdd"
 import {assertEquals,assertThrows} from "@std/assert"
-import {ClockTime} from "../../../../src/Game/Timer/ClockTime.ts";
+import {ClockTime} from "../../../src/Notation/ClockTime.ts";
 
 describe("ClockTime", () => {
 
