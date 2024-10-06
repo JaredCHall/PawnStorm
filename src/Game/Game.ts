@@ -1,5 +1,5 @@
 import {MoveFactory} from "../MoveGen/MoveFactory.ts";
-import {Square, SquareNameMap} from "../Board/Square.ts";
+import {SquareNameMap} from "../Board/Square.ts";
 import {Move} from "./Move.ts";
 import {BitMove} from "../MoveGen/BitMove.ts";
 import {Color, FenPieceMap} from "../Board/Piece.ts";
@@ -14,6 +14,10 @@ import {PgnTagFormatter} from "../Notation/PgnTagFormatter.ts";
 import {PgnParser} from "../Notation/PgnParser.ts";
 import {Board} from "../Board/Board.ts";
 import {GameOverError} from "./Error/GameOverError.ts";
+import { Timer } from "src/Game/Timer/Timer.ts";
+import {DelayTimer} from "./Timer/DelayTimer.ts";
+import {IncrementTimer} from "./Timer/IncrementTimer.ts";
+import {ClockTime} from "./Timer/ClockTime.ts";
 
 export class Game {
 
@@ -37,6 +41,11 @@ export class Game {
 
     private repetitionTracker: RepetitionTracker = new RepetitionTracker();
 
+    private clocks: {white: null|Timer, black: null|Timer} = {
+        'white': null,
+        'black': null,
+    }
+
     constructor(fen: string|null = null) {
         fen ??= 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
         this.setBoard(fen)
@@ -46,6 +55,28 @@ export class Game {
     static load(pgnFileContent: string): Game
     {
         return new PgnParser().parse(pgnFileContent)
+    }
+
+    setTimeLimit(
+        timeLimit: number,
+        increment: number|null = null,
+        delay: number|null = null,
+    ): void {
+
+        if(increment != null && delay != null){
+            throw new Error("May only set increment or delay, not both.")
+        }
+
+        if(delay != null) {
+            this.clocks.white = new DelayTimer(timeLimit, delay)
+            this.clocks.black = new DelayTimer(timeLimit, delay)
+        }else if(increment != null){
+            this.clocks.white = new IncrementTimer(timeLimit, increment)
+            this.clocks.black = new IncrementTimer(timeLimit, increment)
+        }else{
+            this.clocks.white = new Timer(timeLimit)
+            this.clocks.black = new Timer(timeLimit)
+        }
     }
 
     setBoard(fenString: string): void {
@@ -107,19 +138,47 @@ export class Game {
         }
 
         this.moveFactory.makeMove(move)
+        this.#toggleClocks()
 
         const recordedMove = new RecordedMove(
             move,
             this.getFenNotation(),
             serialized + this.algebraicNotationParser.getCheckOrMateIndicator(move),
-            moveCounter
+            moveCounter,
+            this.getClockTime(this.getLastSideToMove())
         )
         this.moveNavigator.addMove(recordedMove)
         this.repetitionTracker.addMove(recordedMove)
-        this.#updateGameTermination(recordedMove)
+        this.#terminateIfMatedOrStalemated(recordedMove)
         this.setTag('Result', PgnTagFormatter.formatResult(this.gameStatus))
 
         return recordedMove
+    }
+
+    getClockTime(color: 'white'|'black'): string|null
+    {
+        const timer = this.clocks[color] ?? null
+        if(!timer){
+            return null
+        }
+
+        return new ClockTime(timer.timeRemaining).getTimeString()
+    }
+
+    startClock(): void
+    {
+        this.clocks[this.getSideToMove()]?.start()
+    }
+
+    #toggleClocks(): void {
+        this.clocks[this.getLastSideToMove()]?.stop()
+        this.clocks[this.getSideToMove()]?.start()
+    }
+
+    #stopClocks(): void
+    {
+        this.clocks.white?.stop()
+        this.clocks.black?.stop()
     }
 
     setTag(tagName: string, tagValue: string): void {
@@ -164,38 +223,44 @@ export class Game {
     }
 
     setDrawByAgreement(): void {
-        this.gameStatus = new GameStatus('normal', null, 'agreement')
+        this.terminate(new GameStatus('normal', null, 'agreement'))
     }
 
     setResigns(color: 'white'|'black'): void {
         const winner = color == 'white' ? 'black' : 'white'
 
-        this.gameStatus = new GameStatus('normal', winner, null)
+        this.terminate(new GameStatus('normal', winner, null))
+    }
+
+    terminate(status: GameStatus)
+    {
+        this.#stopClocks()
+        this.gameStatus = status
     }
 
     // determine if last move resulted in end of game
-    #updateGameTermination(move: RecordedMove): void {
+    #terminateIfMatedOrStalemated(move: RecordedMove): void {
         // checkmate
         if(move.bitMove.isMate){
-            this.gameStatus = new GameStatus('normal', move.color)
+            this.terminate(new GameStatus('normal', move.getColor()))
             return
         }
         // stalemates
         if(this.getCandidateMoves(this.getSideToMove()).length == 0){
-            this.gameStatus = new GameStatus('normal', null, 'stalemate')
+            this.terminate(new GameStatus('normal', null, 'stalemate'))
             return
         }
 
         if(!this.moveFactory.hasSufficientMaterialForMate()){
-            this.gameStatus = new GameStatus('normal', null, 'insufficient-material')
+            this.terminate(new GameStatus('normal', null, 'insufficient-material'))
             return
         }
         if(this.moveFactory.state.halfMoveClock >= 50){
-            this.gameStatus = new GameStatus('normal', null, 'fifty-move-rule')
+            this.terminate(new GameStatus('normal', null, 'fifty-move-rule'))
             return
         }
         if(this.repetitionTracker.repetitionCount > 2){
-            this.gameStatus = new GameStatus('normal', null, 'three-fold-repetition')
+            this.terminate(new GameStatus('normal', null, 'three-fold-repetition'))
         }
 
     }
@@ -210,8 +275,12 @@ export class Game {
         this.moveNavigator.deleteFrom(recordedMove.getId())
     }
 
-    getSideToMove(): string {
+    getSideToMove(): "white"|"black" {
         return this.moveFactory.state.sideToMove ? 'black' : 'white'
+    }
+
+    getLastSideToMove(): "white"|"black" {
+        return this.moveFactory.state.sideToMove ? 'white' : 'black'
     }
 
     getCandidateMoves(colorOrSquare: string) {

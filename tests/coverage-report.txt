@@ -13,12 +13,13 @@ File                                        | Branch % | Line % |
  Game/Error/GameOverError.ts                |    100.0 |  100.0 |
  Game/Error/IllegalMoveError.ts             |    100.0 |  100.0 |
  Game/Error/InvalidMoveError.ts             |    100.0 |  100.0 |
- Game/Game.ts                               |    100.0 |   95.7 |
+ Game/Game.ts                               |     92.5 |   92.7 |
  Game/GameStatus.ts                         |    100.0 |  100.0 |
  Game/Move.ts                               |    100.0 |  100.0 |
  Game/MoveNavigator.ts                      |    100.0 |  100.0 |
- Game/RecordedMove.ts                       |     83.3 |   98.7 |
+ Game/RecordedMove.ts                       |     71.4 |   97.6 |
  Game/RepetitionTracker.ts                  |    100.0 |  100.0 |
+ Game/Timer/ClockTime.ts                    |    100.0 |  100.0 |
  Game/Timer/DelayTimer.ts                   |    100.0 |  100.0 |
  Game/Timer/IncrementTimer.ts               |    100.0 |  100.0 |
  Game/Timer/Timer.ts                        |    100.0 |  100.0 |
@@ -30,9 +31,9 @@ File                                        | Branch % | Line % |
  Notation/FenNumber.ts                      |    100.0 |  100.0 |
  Notation/Moves/AlgebraicNotationParser.ts  |    100.0 |   97.8 |
  Notation/Moves/CoordinateNotationParser.ts |    100.0 |  100.0 |
- Notation/PgnParser.ts                      |     85.9 |   86.9 |
+ Notation/PgnParser.ts                      |     91.5 |   94.2 |
  Notation/PgnTagFormatter.ts                |    100.0 |  100.0 |
  Utils.ts                                   |    100.0 |   50.0 |
 -----------------------------------------------------------------
- All files                                  |     97.0 |   96.6 |
+ All files                                  |     96.8 |   96.9 |
 -----------------------------------------------------------------

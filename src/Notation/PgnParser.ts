@@ -121,11 +121,11 @@ export class PgnParser {
            // console.log(`r: ${depth}, position: ${position}, token: ${token} remaining: ${contentRemaining}`)
             char = seek(1)
             if(char === '{'){
-                const commentText = seekToCommentEnd()
+                const commentText = seekToCommentEnd().trim()
                 if(!lastMove){
                     game.getMoveNavigator().initialComment = commentText
                 }else{
-                    lastMove.comment = commentText
+                    lastMove.addComment(commentText)
                 }
                 continue
             }
@@ -198,7 +198,12 @@ export class PgnParser {
         }while(contentRemaining.length > 0)
     }
 
-    serialize(game: Game): string {
+    serialize(game: Game,
+              withVariations: boolean = true,
+              withComments: boolean = true,
+              withClockTime: boolean = true,
+              withAnnotations: boolean = true
+    ): string {
 
         let serialized = ''
         const tags = game.allTags()
@@ -216,7 +221,7 @@ export class PgnParser {
 
         const firstMove = navigator.getFirstMove()
         if(firstMove){
-            serialized += this.serializeMoves(firstMove)
+            serialized += this.serializeMoves(firstMove, withVariations, withComments, withClockTime, withAnnotations)
         }
 
         serialized += ' ' + game.getTag('Result') ?? PgnTagFormatter.formatResult(game.getStatus())
@@ -225,7 +230,13 @@ export class PgnParser {
         return serialized
     }
 
-    serializeMoves(firstMove: RecordedMove): string {
+    serializeMoves(
+        firstMove: RecordedMove,
+        withVariations: boolean = true,
+        withComments: boolean = true,
+        withClockTime: boolean = true,
+        withAnnotation: boolean = true
+    ): string {
         const renderLine = (move: RecordedMove|null): string => {
             let outLine = ''
             let isFirst = true
@@ -234,14 +245,24 @@ export class PgnParser {
                 const includeMoveCounter = isFirst || prevHadChild || move.color == 'white'
                 isFirst = false
                 prevHadChild = false
-                outLine += move.serialize(includeMoveCounter) + ' '
-                if(move.comment){
-                    outLine += '{' + move.comment + '} '
+                outLine += move.serialize(includeMoveCounter, withAnnotation) + ' '
+                if(withComments){
+                    const comments = move.getComments()
+
+                    if(withClockTime && move.clockTime){
+                        comments.unshift(` [%clk ${move.clockTime}] `)
+                    }
+
+                    if(comments.length > 0){
+                        outLine += '{ ' + comments.join(' } { ') + ' } '
+                    }
                 }
-                move.getChildren().forEach((move: RecordedMove) => {
-                    prevHadChild = true
-                    outLine += '(' + renderLine(move) + ') '
-                })
+                if(withVariations){
+                    move.getChildren().forEach((move: RecordedMove) => {
+                        prevHadChild = true
+                        outLine += '(' + renderLine(move) + ') '
+                    })
+                }
                 move = move.getNext()
             }
             return outLine.trimEnd()

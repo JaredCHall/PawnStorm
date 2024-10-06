@@ -14,14 +14,6 @@ export class RecordedMove extends Move {
         this._annotation = glyph ?? new AnnotationGlyph( 0);
     }
 
-    get comment(): string|null {
-        return this._comment;
-    }
-
-    set comment(value: string|null) {
-        this._comment = value
-    }
-
     private id: number = -1 // a sentinel value of sorts
 
     private prev: RecordedMove|null = null
@@ -30,7 +22,7 @@ export class RecordedMove extends Move {
 
     private _annotation: AnnotationGlyph = new AnnotationGlyph(0) // null annotation
 
-    private _comment: string|null = null
+    private comments: string[] = []
 
     readonly bitMove: BitMove
 
@@ -39,6 +31,7 @@ export class RecordedMove extends Move {
         readonly fen: FenNumber,
         readonly notation: string,
         readonly moveCounter: number,
+        readonly clockTime: string|null = null, // remaining clock for player after move
         private parent: RecordedMove|null = null, // moves have a parent move, if they are the first move in a variation
         private children: RecordedMove[] = [], // child variations if they exist
     ) {
@@ -69,6 +62,16 @@ export class RecordedMove extends Move {
         return this.children
     }
 
+    addComment(text: string): void
+    {
+        this.comments.push(text)
+    }
+
+    getComments(): string[]
+    {
+        return this.comments
+    }
+
     addChild(child: RecordedMove): void {
         this.children.push(child)
     }
@@ -93,14 +96,14 @@ export class RecordedMove extends Move {
         return this.bitMove.moving & 1 ? 'black' : 'white'
     }
 
-    serialize(includeMoveCounter: boolean = false): string
+    serialize(includeMoveCounter: boolean = false, includeAnnotation: boolean = true): string
     {
         let serialized = ''
         if(includeMoveCounter){
             serialized = this.moveCounter.toString()
                 + (this.getColor() == 'white' ? '.' : '...') + ' '
         }
-        return serialized + this.notation + this.annotation.serialize()
+        return serialized + this.notation + (includeAnnotation ? this.annotation.serialize() : '')
     }
 
 }
