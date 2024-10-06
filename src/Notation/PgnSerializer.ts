@@ -64,7 +64,7 @@ export class PgnSerializer {
                     const comments = move.getComments()
 
                     if(this.withClock && move.clockTime){
-                        comments.unshift(`[%clk ${move.clockTime}]`)
+                        comments.unshift(`[%clk ${move.clockTime.getTimeString()}]`)
                     }
 
                     if(comments.length > 0){

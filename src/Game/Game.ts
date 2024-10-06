@@ -155,14 +155,14 @@ export class Game {
         return recordedMove
     }
 
-    getClockTime(color: 'white'|'black'): string|null
+    getClockTime(color: 'white'|'black'): ClockTime|null
     {
         const timer = this.clocks[color] ?? null
         if(!timer){
             return null
         }
 
-        return new ClockTime(timer.timeRemaining).getTimeString()
+        return new ClockTime(timer.timeRemaining)
     }
 
     startClock(): void

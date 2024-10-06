@@ -2,6 +2,7 @@ import {Move} from "./Move.ts";
 import {BitMove} from "../MoveGen/BitMove.ts";
 import {FenNumber} from "../Notation/FenNumber.ts";
 import {AnnotationGlyph} from "../Notation/AnnotationGlyph.ts";
+import {ClockTime} from "../Notation/ClockTime.ts";
 
 export type MoveAnnotation = '!'|'?'|'!!'|'!?'|'?!'|'??'
 
@@ -31,7 +32,7 @@ export class RecordedMove extends Move {
         readonly fen: FenNumber,
         readonly notation: string,
         readonly moveCounter: number,
-        readonly clockTime: string|null = null, // remaining clock for player after move
+        readonly clockTime: ClockTime|null = null, // remaining clock for player after move
         private parent: RecordedMove|null = null, // moves have a parent move, if they are the first move in a variation
         private children: RecordedMove[] = [], // child variations if they exist
     ) {

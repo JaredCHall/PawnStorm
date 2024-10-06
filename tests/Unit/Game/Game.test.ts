@@ -8,6 +8,7 @@ import {Square} from "../../../src/Board/Square.ts";
 import {Piece} from "../../../src/Board/Piece.ts";
 import {Renderer} from "../../../src/Board/Renderer.ts";
 import {PgnSerializer} from "../../../src/Notation/PgnSerializer.ts";
+import {ClockTime} from "../../../src/Notation/ClockTime.ts";
 
 const renderer = new Renderer()
 const assertSerializesMovesAs = (game: Game, expected: string): void =>  {
@@ -185,8 +186,8 @@ describe("Game", () => {
         game.setResigns('white')
         clock.tick(2000) // game already terminated
 
-        assertEquals(game.getClockTime('white'),'00:00:53')
-        assertEquals(game.getClockTime('black'),'00:00:50')
+        assertEquals(game.getClockTime('white'),new ClockTime(53))
+        assertEquals(game.getClockTime('black'),new ClockTime(50))
 
         const serialized = new PgnSerializer(game).serialize()
 
