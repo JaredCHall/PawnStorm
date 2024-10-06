@@ -9,15 +9,26 @@ describe("ClockTime", () => {
         assertEquals(time.seconds, 60)
     })
 
+    it('throws if time limit greater than 9:59:59', () => {
+        assertThrows(() => {
+            new ClockTime(86400)
+        })
+    })
+
+    it('throws if time limit < 0', () => {
+        assertThrows(() => {
+            new ClockTime(-1)
+        })
+    })
+
 
     const cases = [
-        [600, "00:10:00"],
-        [3666, "01:01:06"],
-        [7, "00:00:07"],
-        [0, "00:00:00"],
-        [3599, "00:59:59"],
-        [86400,"24:00:00"],
-        [7325, "02:02:05"],
+        [600, "0:10:00"],
+        [3666, "1:01:06"],
+        [7, "0:00:07"],
+        [0, "0:00:00"],
+        [3599, "0:59:59"],
+        [7325, "2:02:05"],
     ]
 
     cases.forEach((args) => {

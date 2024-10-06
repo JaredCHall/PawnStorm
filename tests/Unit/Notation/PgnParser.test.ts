@@ -1,6 +1,7 @@
 import {assertEquals, assertThrows} from "@std/assert";
 import {describe, it} from "@std/testing/bdd"
 import {PgnParser} from "../../../src/Notation/PgnParser.ts";
+import {ClockTime} from "../../../src/Notation/ClockTime.ts";
 
 
 describe("PgnParser", () => {
@@ -55,6 +56,31 @@ describe("PgnParser", () => {
         ])
     })
 
+    it('handles moves with clock times', () => {
+        const parser = new PgnParser()
+        const game = parser.parse(`1. d4 { [%eval 0.17] [%clk 0:05:00] } 1... e6 {[%clk 0:02:00] }`)
+
+        game.gotoMove(0)
+        assertEquals(game.getMoveNavigator().getLast()?.getComments(),[])
+        assertEquals(game.getMoveNavigator().getLast()?.clockTime, new ClockTime(300))
+        game.gotoMove(1)
+        assertEquals(game.getMoveNavigator().getLast()?.getComments(),[])
+        assertEquals(game.getMoveNavigator().getLast()?.clockTime, new ClockTime(120))
+    })
+
+    it('handles moves with evals', () => {
+        const parser = new PgnParser()
+        const game = parser.parse(`1. d4 { [%eval 0.17] [%clk 0:05:00] } 1... e6 { [%eval 0.37]}`)
+
+        game.gotoMove(0)
+        assertEquals(game.getMoveNavigator().getLast()?.getComments(),[])
+        assertEquals(game.getMoveNavigator().getLast()?.evalValue, 0.17)
+        game.gotoMove(1)
+        assertEquals(game.getMoveNavigator().getLast()?.getComments(),[])
+        assertEquals(game.getMoveNavigator().getLast()?.evalValue,0.37)
+
+    })
+
 
     it('handles game with alternative initial position', () => {
 
@@ -102,7 +128,7 @@ describe("PgnParser", () => {
 
     })
 
-    it('handles puzzle with uncommon NAG values', () => {
+    it('handles moves with uncommon NAG values', () => {
 
         const parser = new PgnParser()
 

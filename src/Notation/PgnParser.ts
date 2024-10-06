@@ -2,6 +2,7 @@ import {Game} from "../Game/Game.ts";
 import {RecordedMove} from "../Game/RecordedMove.ts";
 import {PgnTagFormatter} from "./PgnTagFormatter.ts";
 import {AnnotationGlyph} from "./AnnotationGlyph.ts";
+import {ClockTime} from "./ClockTime.ts";
 
 export class PgnParser {
 
@@ -47,6 +48,41 @@ export class PgnParser {
         game.setTag('Result', result)
 
         return game
+    }
+
+    #parseComment(commentText: string): [commentText: string|null, clockTime: ClockTime|null, eval: number|null]
+    {
+        let evalValue: number | null = null;
+        let clockTime: ClockTime | null = null;
+
+        commentText = commentText.trim();
+
+        // Regex to extract the eval value, e.g., [%eval 0.17]
+        const evalMatch = commentText.match(/\[%eval (-?\d+\.\d+)\]/);
+        if (evalMatch) {
+            evalValue = parseFloat(evalMatch[1]);
+            // Remove the eval part from the comment text
+            commentText = commentText.replace(evalMatch[0], '').trim();
+        }
+
+        // Regex to extract the clock time, e.g., [%clk 0:05:00]
+        const clockMatch = commentText.match(/\[%clk (\d+):(\d+):(\d+)\]/);
+        if (clockMatch) {
+            // Convert the clock time to total seconds
+            const hours = parseInt(clockMatch[1], 10);
+            const minutes = parseInt(clockMatch[2], 10);
+            const seconds = parseInt(clockMatch[3], 10);
+            clockTime = new ClockTime(hours * 3600 + minutes * 60 + seconds);
+            // Remove the clock part from the comment text
+            commentText = commentText.replace(clockMatch[0], '').trim();
+        }
+
+        // Return the remaining comment text, clock time, and eval value
+        return [
+            commentText.length > 0 ? commentText : null,
+            clockTime,
+            evalValue
+        ];
     }
 
     #parseTag(line: string): [string, string] {
@@ -121,11 +157,21 @@ export class PgnParser {
            // console.log(`r: ${depth}, position: ${position}, token: ${token} remaining: ${contentRemaining}`)
             char = seek(1)
             if(char === '{'){
-                const commentText = seekToCommentEnd().trim()
+                const [commentText, clockTime, evalValue] = this.#parseComment(seekToCommentEnd())
                 if(!lastMove){
-                    game.getMoveNavigator().initialComment = commentText
+                    if(commentText){
+                        game.getMoveNavigator().initialComment = commentText
+                    }
                 }else{
-                    lastMove.addComment(commentText)
+                    if(commentText){
+                        lastMove.addComment(commentText)
+                    }
+                    if(clockTime){
+                        lastMove.clockTime = clockTime
+                    }
+                    if(evalValue){
+                        lastMove.evalValue = evalValue
+                    }
                 }
                 continue
             }

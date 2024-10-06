@@ -15,6 +15,8 @@ export class RecordedMove extends Move {
         this._annotation = glyph ?? new AnnotationGlyph( 0);
     }
 
+    public evalValue: number|null = null
+
     private id: number = -1 // a sentinel value of sorts
 
     private prev: RecordedMove|null = null
@@ -32,7 +34,7 @@ export class RecordedMove extends Move {
         readonly fen: FenNumber,
         readonly notation: string,
         readonly moveCounter: number,
-        readonly clockTime: ClockTime|null = null, // remaining clock for player after move
+        public clockTime: ClockTime|null = null, // remaining clock for player after move
         private parent: RecordedMove|null = null, // moves have a parent move, if they are the first move in a variation
         private children: RecordedMove[] = [], // child variations if they exist
     ) {

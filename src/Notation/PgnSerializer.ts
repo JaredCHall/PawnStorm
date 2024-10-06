@@ -11,11 +11,9 @@ export class PgnSerializer {
     withComments: boolean = true
     withVariations: boolean = true
 
-
     constructor(
         private readonly game: Game
     ) {}
-
 
     serialize(): string {
 
@@ -61,10 +59,19 @@ export class PgnSerializer {
                 prevHadChild = false
                 outLine += move.serialize(includeMoveCounter, this.withGlyphs) + ' '
                 if(this.withComments){
-                    const comments = move.getComments()
-
+                    const extraMoveTags: string[] = []
+                    if(this.withEval && move.evalValue !== null){
+                        extraMoveTags.push(`[%eval ${move.evalValue.toFixed(2)}]`)
+                    }
                     if(this.withClock && move.clockTime){
-                        comments.unshift(`[%clk ${move.clockTime.getTimeString()}]`)
+                        extraMoveTags.push(`[%clk ${move.clockTime.getTimeString()}]`)
+                    }
+
+                    let comments: string[] = []
+                    comments = comments.concat(move.getComments())
+
+                    if(extraMoveTags.length > 0){
+                        comments.unshift(extraMoveTags.join(' '))
                     }
 
                     if(comments.length > 0){
@@ -83,6 +90,4 @@ export class PgnSerializer {
         }
         return renderLine(firstMove)
     }
-
-
 }
