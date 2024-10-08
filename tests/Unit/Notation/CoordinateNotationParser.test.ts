@@ -35,7 +35,11 @@ Deno.test('it parses notation', () => {
     assertEquals(move, new BitMove(Square.b7,Square.b8, Piece.WhitePawn, 0,MoveType.BishopPromote))
     move = parser.parse('b7b8Q')
     assertEquals(move, new BitMove(Square.b7,Square.b8, Piece.WhitePawn, 0,MoveType.QueenPromote))
-
+    // and lower case
+    move = parser.parse('b7b8=n')
+    assertEquals(move, new BitMove(Square.b7,Square.b8, Piece.WhitePawn, 0,MoveType.KnightPromote))
+    move = parser.parse('b7b8r') // uci-style
+    assertEquals(move, new BitMove(Square.b7,Square.b8, Piece.WhitePawn, 0,MoveType.RookPromote))
 })
 
 

@@ -18,7 +18,7 @@ File                                        | Branch % | Line % |
  Game/Game.ts                               |     92.5 |   92.7 |
  Game/GameStatus.ts                         |    100.0 |  100.0 |
  Game/Move.ts                               |    100.0 |  100.0 |
- Game/MoveNavigator.ts                      |     95.7 |   98.9 |
+ Game/MoveNavigator.ts                      |    100.0 |  100.0 |
  Game/RecordedMove.ts                       |     87.5 |   98.8 |
  Game/RepetitionTracker.ts                  |    100.0 |  100.0 |
  Game/Timer/DelayTimer.ts                   |    100.0 |  100.0 |
@@ -34,9 +34,9 @@ File                                        | Branch % | Line % |
  Notation/Moves/AlgebraicNotationParser.ts  |    100.0 |   97.8 |
  Notation/Moves/CoordinateNotationParser.ts |    100.0 |  100.0 |
  Notation/PgnParser.ts                      |     92.8 |   94.1 |
- Notation/PgnSerializer.ts                  |     86.7 |   94.7 |
+ Notation/PgnSerializer.ts                  |     93.8 |   96.0 |
  Notation/PgnTagFormatter.ts                |    100.0 |  100.0 |
  Utils.ts                                   |    100.0 |   50.0 |
 -----------------------------------------------------------------
- All files                                  |     96.7 |   96.6 |
+ All files                                  |     97.1 |   96.7 |
 -----------------------------------------------------------------

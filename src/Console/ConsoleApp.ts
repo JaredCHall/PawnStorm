@@ -1,19 +1,35 @@
 import {Game} from "../Game/Game.ts";
 import {EngineInterface} from "../Engine/EngineInterface.ts";
-import {StockfishInterface} from "../Engine/StockfishInterface.ts";
-import {PgnParser} from "../Notation/PgnParser.ts";
 import {Renderer} from "../Board/Renderer.ts";
 import {GameOverError} from "../Game/Error/GameOverError.ts";
 import {InvalidMoveError} from "../Game/Error/InvalidMoveError.ts";
 import {PgnSerializer} from "../Notation/PgnSerializer.ts";
 import {EtherealInterface} from "../Engine/EtherealInterface.ts";
+import {EngineRegistry, EngineType} from "../Engine/EngineRegistry.ts";
+
+class ConsoleAppPlayer {
+    type: 'user'|'engine' = 'user'
+    name: string = 'user'
+    engineTimeToMove: number|null = null
+}
+
 
 export class ConsoleApp {
 
 
-    readonly name = 'BitChess Console'
+    readonly name = 'PawnStorm Console'
 
-    playerSide: 'white'|'black' = 'white';
+    showAlways: boolean = true
+
+    players: {
+        white: ConsoleAppPlayer,
+        black: ConsoleAppPlayer,
+    } = {
+        white: new ConsoleAppPlayer(),
+        black: new ConsoleAppPlayer()
+    }
+
+    playerSide: 'white'|'black'|null = 'white';
 
     game: Game
 
@@ -21,10 +37,19 @@ export class ConsoleApp {
 
     engine: EngineInterface
 
+    engineRegistry: EngineRegistry
+
     constructor() {
         this.game = new Game()
         this.engine = new EtherealInterface()
         this.renderer = new Renderer()
+        this.engineRegistry = new EngineRegistry()
+        this.engineRegistry.add('stockfish', EngineType.Stockfish)
+        this.engineRegistry.add('ethereal', EngineType.Ethereal)
+        this.engineRegistry.add('rustic', EngineType.Rustic)
+
+        this.#setPlayer('white','Console User')
+        this.#setEngine('black','stockfish',500)
     }
 
     printMenu(): void
@@ -32,25 +57,24 @@ export class ConsoleApp {
         console.log(`
 ${this.name} Menu
 
-A console chess app. To play against your favorite engine in the console. This app hides the board by default,
-allowing you to work on visualization.
-
-Usage:
-
-You will always have an input prompt available indicated by the '>' character.
+By default you will start as white against stockfish with 500ms to move. While playing,
+you will always have an input prompt available indicated by the '>' character.
 You may either enter your next move in algebraic notation, in which case the
 game will progress, or input one of the following menu options.
 
+Note: If engines are assigned to play both colors, the prompt will disappear and the game will play out until its conclusion
+
 Options:
-    menu            Display this menu
-    show            Display the board
-    list            Display the full move list
-    new [fen]       Start a new game and optionally set with fen string
-    level [level]   Set the engine's skill level (1 - 9)
-    switch          Switch sides and play as the other color
-    undo            Undo your last move
-    resign          Resign the game
-    quit            Exit the application
+    menu                                Display this menu
+    show [always|never]                 Display the board. "always" will display after each move.
+    pgn                                 Display the PGN
+    new [fen?]                          Start a new game and optionally set with fen string
+    player [color] [name]               Set user as color player and optionally assign [name]
+    engine [color] [type] [timeToMove]  Set an engine as color player and optionally assign [timeToMove] in milliseconds
+                                            [type] can be 'stockfish', 'ethereal', 'rustic'  
+    undo                                Undo your last move
+    resign                              Resign the game
+    quit                                Exit the application
 `)
     }
 
@@ -62,7 +86,18 @@ Options:
 
         this.printMenu()
 
+        this.newGame(null)
+
         while(true){
+
+            if(await this.engineMove()){
+                if(this.#handleGameTermination()){
+                    continue;
+                }
+                this.renderGame()
+
+                continue
+            }
 
             const input = prompt(`> `)
 
@@ -76,24 +111,31 @@ Options:
                 case 'show':
                     this.renderGame()
                     continue
-                case 'list':
-                    this.#displayMoveList()
+                case 'show always':
+                    this.renderGame()
+                    this.showAlways = true
+                    continue
+                case 'show never':
+                    this.renderGame()
+                    this.showAlways = false
+                    continue
+                case 'pgn':
+                    this.#displayPgn()
                     continue
                 case 'new':
-                    await this.newGame(null);
+                    await this.newGame(null)
                     continue
                 case 'undo':
                     this.game.undoMove() // undo engine's last move
                     this.game.undoMove() // undo player's last move
                     continue
-                case 'switch':
-                    this.#switchSides()
-                    await this.engineMove()
-                    continue
                 case 'resign':
+                    if(this.playerSide === null){
+                        throw new Error('Cannot resign if you are not playing.')
+                    }
+
                     this.game.setResigns(this.playerSide)
                     console.log(`Good game. Well played. Lets play another!`)
-                    this.game = new Game()
                     continue
             }
 
@@ -107,74 +149,139 @@ Options:
                 continue;
             }
 
-            const newLevelInput = input.match(/^level\s([0-9]+)/)
-            if(newLevelInput){
-                await this.engine.setSkillLevel(parseInt(newLevelInput[1]))
-                console.log(`Engine skill level changed to ~${newLevelInput[1]} ELO`)
+            const engineInput = input.match(/^engine\s(black|white)\s(stockfish|ethereal|rustic)(?:\s(\d+))?.*$/)
+            if(engineInput){
+                this.#setEngine(
+                    engineInput[1],
+                    engineInput[2],
+                    engineInput[3] == null ? 1000 : parseInt(engineInput[3]),
+                )
+                continue
+            }
+
+            const playerInput = input.match(/^player\s(black|white)\s(\S+).*$/)
+            if(playerInput){
+                this.#setPlayer(
+                    playerInput[1],
+                    playerInput[2] ?? 'user',
+                )
                 continue
             }
 
             // input is move notation
-
-            try {
-                const move = this.game.makeMove(input)
-                console.log(move.serialize(true))
-            }catch(err){
-                if(err instanceof GameOverError || err instanceof InvalidMoveError){
-                    console.log(`${err.name}: ${err.message}`)
-                }else{
-                    throw err
+            if(this.#isUserTurn()){
+                try {
+                    const move = this.game.makeMove(input)
+                    console.log(move.serialize(true))
+                }catch(err){
+                    if(err instanceof GameOverError || err instanceof InvalidMoveError){
+                        console.log(`${err.name}: ${err.message}`)
+                    }else{
+                        throw err
+                    }
+                    continue
                 }
-                continue
-            }
-
-            const status = this.game.getStatus()
-            if(status.terminationType !== 'unterminated'){
-                this.renderGame()
-                console.log('Game over')
-                console.log(`${status.winner} wins`)
-                continue
-            }
-
-            await this.engineMove()
-
-            if(status.terminationType !== 'unterminated'){
-                this.renderGame()
-                console.log('Game over')
-                console.log(`${status.winner} wins`)
+                this.#handleGameTermination()
+            }else{
+                console.log('Error: Unrecognized input. Enter "menu" for a list of commands')
             }
         }
     }
 
-    #switchSides(): void {
-        this.playerSide = this.playerSide == 'white' ? 'black' : 'white'
+    #isUserTurn(): boolean
+    {
+        return this.players[this.game.getSideToMove()].type === 'user'
     }
 
-    async engineMove(): Promise<void> {
-        await this.engine.setFen(this.game.getFenNotation().serialize())
-        const move = this.game.makeMove(await this.engine.getBestMove(), 'coordinate')
+    #updatePlayerTags()
+    {
+        this.game.setTag('White', this.players.white.name)
+        this.game.setTag('Black', this.players.black.name)
+    }
+
+    #setEngine(color:string, type: string, timeToMove: number)
+    {
+        if(color !== 'white' && color !== 'black'){
+            throw new Error(`Invalid color: ${color}`)
+        }
+
+        if(type !== 'stockfish' && type !== 'ethereal' && type !== 'rustic'){
+            throw new Error(`Invalid player type: ${type}`)
+        }
+
+        const player = color == 'white' ? this.players.white : this.players.black
+        player.type = 'engine'
+        player.name = type
+        player.engineTimeToMove = timeToMove
+
+        this.#updatePlayerTags()
+    }
+
+    #setPlayer(color: string, name: string)
+    {
+        if(color !== 'white' && color !== 'black'){
+            throw new Error(`Invalid color: ${color}`)
+        }
+
+        const player = color == 'white' ? this.players.white : this.players.black
+
+        player.type = 'user'
+        player.name = name
+        player.engineTimeToMove = null
+        this.playerSide = color
+
+        this.#updatePlayerTags()
+    }
+
+    async engineMove(): Promise<boolean> {
+
+        if(this.game.isGameOver()){
+            return false
+        }
+        const player = this.players[this.game.getSideToMove()]
+        if(player.type !== 'engine'){
+            return false
+        }
+
+        const engine = this.engineRegistry.get(player.name)
+        await engine.setFen(this.game.getFenNotation().serialize())
+        const move = this.game.makeMove(await engine.getBestMove(player.engineTimeToMove ?? 1000), 'coordinate')
 
         console.log(`${move.serialize(true)}`)
+
+        return true
     }
 
     async newGame(fen: string|null): Promise<void>
     {
         this.game = new Game(fen)
+        this.game.setTag('Site', 'PawnStorm ConsoleApp')
+        this.#updatePlayerTags()
+
         console.log(`New game with FEN: ${this.game.getFenNotation().serialize()}`)
         this.renderGame()
-        if(this.playerSide == 'black'){
-            await this.engineMove()
-        }
     }
 
-    #displayMoveList(): void
+    #handleGameTermination(): boolean
     {
-        const firstMove = this.game.getMoveNavigator().getFirstMove()
-        if(firstMove){
-            const serializer = new PgnSerializer(this.game)
-            serializer.withGameTags = false
-
-            console.log(serializer.serialize().trim())
+        if(!this.game.isGameOver()){
+            return false
         }
+
+        const status = this.game.getStatus()
+
+        if(!status.winner){
+            console.log('stalemate by ' + status.drawType)
+        }else{
+            console.log(`${ this.players[status.winner].name} wins`)
+        }
+        this.renderGame()
+
+        return true
+    }
+
+    #displayPgn(): void
+    {
+        console.log(new PgnSerializer(this.game).serialize().trim())
     }
 }

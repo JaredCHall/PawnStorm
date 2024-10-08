@@ -25,7 +25,7 @@ export class AlgebraicNotationParser implements ParserInterface{
         }
 
         // somehow this regex ensures that destination square is always in part 5, even with pawn moves
-        parts = notation.match(/^([KQBNR])?([a-h])?([1-8])?(x)?([a-h][1-8])(=)?([QBNR])?([+#])?$/)
+        parts = notation.match(/^([KQBNR])?([a-h])?([1-8])?(x)?([a-h][1-8])(=)?([QqBbNnRr])?([+#])?$/)
         if(parts === null){
             throw new InvalidMoveError(`"${notation}" is not valid algebraic notation.`)
         }
@@ -33,7 +33,7 @@ export class AlgebraicNotationParser implements ParserInterface{
         const startFile = SquareNameMap.fileIndexes[parts[2]] ?? null
         const startRank = parts[3] ? parseInt(parts[3]) - 1 : null
         const toSquare = SquareNameMap.indexByName[parts[5]]
-        const promotionType = parts[7] ? parts[7].replace(/=/,'') : null
+        const promotionType = parts[7] ? parts[7].replace(/=/,'').toUpperCase() : null
 
         const moves: BitMove[] = []
         for(let i=0;i<64;i++){

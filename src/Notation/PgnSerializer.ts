@@ -36,10 +36,10 @@ export class PgnSerializer {
 
         const firstMove = navigator.getFirstMove()
         if(firstMove){
-            serialized += this.serializeMoves(firstMove)
+            serialized += this.serializeMoves(firstMove) + ' '
         }
 
-        serialized += ' ' + this.game.getTag('Result') ?? PgnTagFormatter.formatResult(this.game.getStatus())
+        serialized += this.game.getTag('Result') ?? PgnTagFormatter.formatResult(this.game.getStatus())
         serialized += '\n'
 
         return serialized

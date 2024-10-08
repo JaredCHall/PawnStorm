@@ -2,6 +2,7 @@ import {assertEquals, assertThrows} from "@std/assert";
 import {describe, it} from "@std/testing/bdd"
 import {PgnParser} from "../../../src/Notation/PgnParser.ts";
 import {PgnSerializer} from "../../../src/Notation/PgnSerializer.ts";
+import {Game} from "../../../src/Game/Game.ts";
 
 
 describe("PgnSerializer", () => {
@@ -28,6 +29,20 @@ describe("PgnSerializer", () => {
         assertEquals(serializer.withVariations, true)
         assertEquals(serializer.withClock, true)
         assertEquals(serializer.withEval, true)
+    })
+
+    it.only('serializes game without moves', () => {
+        const game = new Game()
+        const serializer = new PgnSerializer(game)
+
+        assertEquals(serializer.serialize(), `[Event "Casual Game"]
+[Site "?"]
+[Round "1"]
+[White "?"]
+[Black "?"]
+
+*
+`)
     })
 
     it('serializes with all options enabled', () => {

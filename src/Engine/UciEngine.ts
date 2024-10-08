@@ -102,6 +102,6 @@ export class UciEngine
 
     async getBestMove(moveTime:number=500): Promise<string> {
         await this.writeCommand(`go movetime ${moveTime}`)
-        return await this.readResponse(/^bestmove\s+([a-h0-8=NBRQ]+)/, true, moveTime + 100)
+        return await this.readResponse(/^bestmove\s+([a-h0-8=nNbBrRqQ]+)/, true, moveTime + 100)
     }
 }

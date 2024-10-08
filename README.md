@@ -19,8 +19,14 @@ Features:
   - Rustic Chess
 - Console Application
   - Play against your favorite engine
-  - Watch engines battle other engines  ___*TODO\*___
+  - Watch engines battle other engines
   - Add engine evaluations to PGN ___*TODO\*___
+
+## Road to 1.0
+
+- Add evals to PGN
+- Polish Game API
+- Improved unit / integration test for engines
 
 ## Documentation
  - [Game Engine](docs/GameEngine) - For UI or Game Server
@@ -29,10 +35,7 @@ Features:
  - [Tests and Benchmarks](docs/TestsAndBenchmarks) - How the engine is tested and benchmarked
 
 ## Usage
-- `deno task battle` - Watch battle between two chess engines
-- `deno task play` - Play against an AI engine in the console
-- `deno task perft` - Calculate number of possible moves from given position at depth `n`
-
+- `deno task play` - Play against an AI engine or watch engines battle each other
 
 ## Installation - (Development and Testing)
 

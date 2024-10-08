@@ -15,7 +15,7 @@ export class CoordinateNotationParser implements ParserInterface{
     }
 
     parse(notation: string): BitMove {
-        const parts = notation.match(/^([a-h][1-8])(\s)?([a-h][1-8])(\s)?(=)?([QBNR])?$/)
+        const parts = notation.match(/^([a-h][1-8])(\s)?([a-h][1-8])(\s)?(=)?([QqBbNnRr])?$/)
         if(parts === null){
             throw new InvalidMoveError(`"${notation}" is not valid coordinate notation.`)
         }
@@ -26,7 +26,7 @@ export class CoordinateNotationParser implements ParserInterface{
         const toName = parts[3]
         const to = SquareNameMap.indexByName[toName]
 
-        const promoteType = parts[6] || null
+        const promoteType = parts[6] ? parts[6].toUpperCase() : null
         const moving = this.moveFactory.squareList[from]
         if(moving == 0){
             throw new InvalidMoveError(`"${notation}" is not possible. There is no piece on the ${fromName} square.`)
