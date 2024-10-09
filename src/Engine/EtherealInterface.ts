@@ -7,10 +7,6 @@ export class EtherealInterface extends UciEngine implements EngineInterface {
         super('Ethereal')
     }
 
-    async setSkillLevel(elo: number): Promise<void> {
-        return Promise.reject(new Error('Not supported'))
-    }
-
     async getEval(): Promise<number> {
         return Promise.reject(new Error('Not supported'))
     }

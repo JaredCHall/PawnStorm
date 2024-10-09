@@ -7,11 +7,6 @@ export class StockfishInterface extends UciEngine implements EngineInterface {
         super('stockfish')
     }
 
-    async setSkillLevel(elo: number): Promise<void> {
-        await this.writeCommand('setoption name UCI_LimitStrength value true')
-        await this.writeCommand(`setoption name UCI_Elo value ${elo}`)
-    }
-
     async getEval(): Promise<number> {
         await this.writeCommand('eval')
         return parseFloat(await this.readResponse(/^Final evaluation\s+([-+][0-9.]+)/, true))

@@ -135,7 +135,7 @@ const renderLine = (move: RecordedMove|null): string => {
             html += '<div class="full-move">'
             html += `<strong>${move.fullMoveCount}.</strong>`
         }
-        html += ${move.notation} + ' '
+        html += move.notation + ' '
         move.getChildren().forEach((child: RecordedMove) => {
             html += '<div class="variation">'
             renderLine(child, depth + 1)

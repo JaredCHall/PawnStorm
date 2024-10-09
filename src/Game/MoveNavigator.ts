@@ -58,11 +58,53 @@ export class MoveNavigator {
         }
     }
 
+    allMoves(): RecordedMove[] {
+        const moves: RecordedMove[] = [];
+        this.walkAll((move) => moves.push(move))
+        return moves
+    }
+
     getFirstMove(): RecordedMove|null
     {
         return this.idMap[0] ?? null
     }
 
+
+    walk(cb: (move: RecordedMove) => void, move: RecordedMove|null = null)
+    {
+        move ??= this.getFirstMove()
+        if(move === null){
+            return
+        }
+
+        while(move != null){
+            cb(move)
+            move = move.getNext()
+        }
+    }
+
+    walkAll(cb: (move: RecordedMove, isFirst: boolean, isLast: boolean, depth: number) => void, move: RecordedMove|null = null, depth: number = 0)
+    {
+        move ??= this.getFirstMove()
+        if(move === null){
+            return
+        }
+
+        let isFirst = true
+        let isLast = true
+        while(move != null){
+
+            const next: RecordedMove|null = move.getNext()
+            isLast = next === null
+
+            cb(move, isFirst, isLast, depth)
+            move.getChildren().forEach((move: RecordedMove) => {
+                this.walkAll(cb, move, depth + 1)
+            })
+            move = next
+            isFirst = false
+        }
+    }
 
     getLast(): RecordedMove|null {
         return this.idMap[this.cursor] ?? null

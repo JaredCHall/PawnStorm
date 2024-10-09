@@ -7,10 +7,6 @@ export class RusticInterface extends UciEngine implements EngineInterface {
         super('rustic')
     }
 
-    async setSkillLevel(elo: number): Promise<void> {
-        return Promise.reject(new Error('Not supported'))
-    }
-
     async getEval(): Promise<number> {
         await this.writeCommand('eval')
         return parseInt(await this.readResponse(/Evaluation:\s+[-]?(\d+)/, true)) / 100

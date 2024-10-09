@@ -20,13 +20,11 @@ Features:
 - Console Application
   - Play against your favorite engine
   - Watch engines battle other engines
-  - Add engine evaluations to PGN ___*TODO\*___
+  - Add engine evaluations to PGN
 
 ## Road to 1.0
 
-- Add evals to PGN
 - Polish Game API
-- Improved unit / integration test for engines
 
 ## Documentation
  - [Game Engine](docs/GameEngine) - For UI or Game Server

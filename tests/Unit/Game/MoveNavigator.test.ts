@@ -6,7 +6,6 @@ import {Square} from "../../../src/Board/Square.ts";
 import {Piece} from "../../../src/Board/Piece.ts";
 import {MoveNavigator} from "../../../src/Game/MoveNavigator.ts";
 import { FenNumber } from "../../../src/Notation/FenNumber.ts";
-import {PgnParser} from "../../../src/Notation/PgnParser.ts";
 import {PgnSerializer} from "../../../src/Notation/PgnSerializer.ts";
 import {Game} from "../../../src/Game/Game.ts";
 
